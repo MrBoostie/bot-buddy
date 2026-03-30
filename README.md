@@ -60,6 +60,10 @@ Then install service:
 ./scripts/install-service.sh buddy
 ```
 
+## CI
+
+GitHub Actions now runs `npm run check` + `npm test` on every push to `main` and on pull requests.
+
 ## Next features queued
 
 - memory file + simple persona card
