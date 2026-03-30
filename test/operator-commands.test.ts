@@ -15,6 +15,11 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
   };
 }
 
+test('returns ping payload', () => {
+  const result = evaluateOperatorCommand('/ping', makeDeps());
+  assert.equal(result, 'pong | uptime=12s | model=gpt-test');
+});
+
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
   assert.equal(

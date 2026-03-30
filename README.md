@@ -52,6 +52,7 @@ npm start
 In Discord, buddy responds when messaged as either `buddy <prompt>`, `<@BOT_ID> <prompt>`, or `<@!BOT_ID> <prompt>`.
 
 Built-in operator commands (directed to bot):
+- `/ping` — fast liveness check (`pong` + uptime + model)
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report
 - `/reload` — re-read `.env` safely (no process restart)

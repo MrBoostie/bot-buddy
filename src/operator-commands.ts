@@ -11,6 +11,10 @@ export type OperatorCommandDeps = {
 export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps): string | null {
   const cmd = input.trim().toLowerCase();
 
+  if (cmd === '/ping') {
+    return `pong | uptime=${deps.formatUptime()} | model=${deps.modelName()}`;
+  }
+
   if (cmd === '/status') {
     return `status: online | uptime=${deps.formatUptime()} | model=${deps.modelName()} | ${deps.runtimeSummary()}`;
   }
