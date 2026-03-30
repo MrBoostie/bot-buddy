@@ -10,32 +10,7 @@ import {
 import { think } from './brain.js';
 import { extractDirectedPrompt } from './directive.js';
 import { formatUptime } from './runtime.js';
-
-function commandReply(command: string): string | null {
-  const cmd = command.trim().toLowerCase();
-
-  if (cmd === '/status') {
-    return `status: online | uptime=${formatUptime()} | model=${config.openaiModel} | ${redactedRuntimeSummary()}`;
-  }
-
-  if (cmd === '/diag') {
-    const issues = validateRuntime();
-    return issues.length === 0
-      ? `diag: ok | hasDiscord=${String(hasDiscord())} | hasOpenAI=${String(hasOpenAI())}`
-      : `diag: issues detected -> ${issues.join(' ; ')}`;
-  }
-
-  if (cmd === '/reload') {
-    refreshConfigFromEnv();
-    const issues = validateRuntime();
-    if (issues.length > 0) {
-      return `reload: applied, but issues remain -> ${issues.join(' ; ')}`;
-    }
-    return `reload: applied | ${redactedRuntimeSummary()}`;
-  }
-
-  return null;
-}
+import { evaluateOperatorCommand } from './operator-commands.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -59,7 +34,15 @@ export async function startDiscord(): Promise<void> {
     const prompt = extractDirectedPrompt(msg.content, client.user!.id);
     if (!prompt) return;
 
-    const command = commandReply(prompt);
+    const command = evaluateOperatorCommand(prompt, {
+      formatUptime,
+      modelName: () => config.openaiModel,
+      runtimeSummary: redactedRuntimeSummary,
+      validateRuntime,
+      refreshConfigFromEnv,
+      hasDiscord,
+      hasOpenAI,
+    });
     if (command) {
       await msg.reply(command.slice(0, 1900));
       return;
