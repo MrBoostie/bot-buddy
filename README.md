@@ -19,6 +19,8 @@ Boostie's sidekick bot. Local-first today, Discord+OpenAI-ready tomorrow.
 ```bash
 npm install
 cp .env.example .env
+npm run check
+npm test
 npm run buddy
 ```
 
@@ -38,6 +40,8 @@ Then:
 npm run build
 npm start
 ```
+
+In Discord, buddy responds when messaged as either `buddy <prompt>`, `<@BOT_ID> <prompt>`, or `<@!BOT_ID> <prompt>`.
 
 ## VPS hardening note
 

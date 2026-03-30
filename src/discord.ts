@@ -1,6 +1,7 @@
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 import { config } from './config.js';
 import { think } from './brain.js';
+import { extractDirectedPrompt } from './directive.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -21,15 +22,7 @@ export async function startDiscord(): Promise<void> {
     if (msg.author.bot) return;
     if (config.discordChannelId && msg.channelId !== config.discordChannelId) return;
 
-    const content = msg.content.trim();
-    const mentioned = msg.mentions.has(client.user!.id);
-    const directed = mentioned || content.toLowerCase().startsWith('buddy ');
-    if (!directed) return;
-
-    const prompt = mentioned
-      ? content.replace(`<@${client.user!.id}>`, '').trim()
-      : content.replace(/^buddy\s+/i, '').trim();
-
+    const prompt = extractDirectedPrompt(msg.content, client.user!.id);
     if (!prompt) return;
 
     try {
