@@ -8,9 +8,9 @@ import {
   validateRuntime,
 } from './config.js';
 import { think } from './brain.js';
-import { extractDirectedPrompt } from './directive.js';
 import { formatUptime } from './runtime.js';
 import { evaluateOperatorCommand } from './operator-commands.js';
+import { routeDiscordInput } from './discord-routing.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -28,29 +28,38 @@ export async function startDiscord(): Promise<void> {
   });
 
   client.on(Events.MessageCreate, async (msg) => {
-    if (msg.author.bot) return;
-    if (config.discordChannelId && msg.channelId !== config.discordChannelId) return;
+    const result = routeDiscordInput(
+      {
+        authorIsBot: msg.author.bot,
+        channelId: msg.channelId,
+        content: msg.content,
+      },
+      {
+        botUserId: client.user!.id,
+        channelLockId: config.discordChannelId,
+        evaluateCommand: (prompt) =>
+          evaluateOperatorCommand(prompt, {
+            formatUptime,
+            modelName: () => config.openaiModel,
+            runtimeSummary: redactedRuntimeSummary,
+            validateRuntime,
+            refreshConfigFromEnv,
+            hasDiscord,
+            hasOpenAI,
+          }),
+      },
+    );
 
-    const prompt = extractDirectedPrompt(msg.content, client.user!.id);
-    if (!prompt) return;
+    if (result.kind === 'ignore') return;
 
-    const command = evaluateOperatorCommand(prompt, {
-      formatUptime,
-      modelName: () => config.openaiModel,
-      runtimeSummary: redactedRuntimeSummary,
-      validateRuntime,
-      refreshConfigFromEnv,
-      hasDiscord,
-      hasOpenAI,
-    });
-    if (command) {
-      await msg.reply(command.slice(0, 1900));
+    if (result.kind === 'command') {
+      await msg.reply(result.text);
       return;
     }
 
     try {
       await msg.channel.sendTyping();
-      const reply = await think(prompt);
+      const reply = await think(result.prompt);
       await msg.reply(reply.slice(0, 1900));
     } catch (err) {
       console.error('[discord] reply error', err);
