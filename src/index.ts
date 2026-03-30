@@ -1,23 +1,23 @@
 import { hasDiscord, redactedRuntimeSummary, validateRuntime } from './config.js';
 import { startDiscord } from './discord.js';
+import { logError, logInfo } from './log.js';
 
 async function main(): Promise<void> {
   const issues = validateRuntime();
   if (issues.length > 0) {
-    console.error('[boot] configuration guard failed:');
-    for (const issue of issues) console.error(`- ${issue}`);
-    console.error(`[boot] summary: ${redactedRuntimeSummary()}`);
+    logError('configuration guard failed', issues.join(' | '), { scope: 'boot' });
+    logInfo(`summary: ${redactedRuntimeSummary()}`, { scope: 'boot' });
     process.exitCode = 1;
     return;
   }
 
   if (!hasDiscord()) {
-    console.log('[boot] no DISCORD_TOKEN set. Run `npm run buddy` for local chat mode.');
-    console.log(`[boot] summary: ${redactedRuntimeSummary()}`);
+    logInfo('no DISCORD_TOKEN set. Run `npm run buddy` for local chat mode.', { scope: 'boot' });
+    logInfo(`summary: ${redactedRuntimeSummary()}`, { scope: 'boot' });
     return;
   }
 
-  console.log(`[boot] summary: ${redactedRuntimeSummary()}`);
+  logInfo(`summary: ${redactedRuntimeSummary()}`, { scope: 'boot' });
   await startDiscord();
 }
 

@@ -12,6 +12,7 @@ import { formatUptime } from './runtime.js';
 import { evaluateOperatorCommand } from './operator-commands.js';
 import { routeDiscordInput } from './discord-routing.js';
 import { executeDiscordRouting } from './discord-executor.js';
+import { createRequestId, logError, logInfo } from './log.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -25,7 +26,7 @@ export async function startDiscord(): Promise<void> {
   });
 
   client.once(Events.ClientReady, (c) => {
-    console.log(`[discord] logged in as ${c.user.tag}`);
+    logInfo(`logged in as ${c.user.tag}`, { scope: 'discord' });
   });
 
   client.on(Events.MessageCreate, async (msg) => {
@@ -51,11 +52,13 @@ export async function startDiscord(): Promise<void> {
       },
     );
 
+    const requestId = createRequestId();
+
     await executeDiscordRouting(result, {
       sendTyping: () => msg.channel.sendTyping(),
       think,
       reply: (text) => msg.reply(text),
-      logError: (message, error) => console.error(message, error),
+      logError: (message, error) => logError(message, error, { scope: 'discord', requestId }),
     });
   });
 

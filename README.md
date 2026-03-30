@@ -62,6 +62,10 @@ Runtime config guardrails:
 - Invalid `OPENCLAW_TIMEOUT_SEC` (<=0 / non-numeric) fails fast
 - Empty `OPENCLAW_AGENT_ID` fails fast
 
+Logging:
+- Structured console prefixes (`[scope] [level]`) for boot/discord paths
+- Discord execution errors include short request IDs (`rid=...`) for easier traceability
+
 Secrets hygiene:
 - Never commit `.env`
 - Commit `.env.example` only
