@@ -30,10 +30,17 @@ Talk in terminal. Type `exit` to quit.
 
 Populate `.env`:
 
-- `OPENAI_API_KEY`
+- `LLM_BACKEND=openclaw` (default, uses same OpenClaw auth path as Boostie)
+- `OPENCLAW_AGENT_ID=main`
+- `OPENCLAW_TIMEOUT_SEC=90`
 - `DISCORD_TOKEN`
 - optional `DISCORD_CHANNEL_ID` lock
-- `REQUIRE_OPENAI_FOR_DISCORD=true` (default): refuse Discord boot if key missing
+
+If you want direct key mode instead:
+- `LLM_BACKEND=openai`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- `REQUIRE_OPENAI_FOR_DISCORD=true` (default): refuse Discord boot if key missing in openai mode
 
 Then:
 
