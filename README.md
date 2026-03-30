@@ -33,6 +33,7 @@ Populate `.env`:
 - `OPENAI_API_KEY`
 - `DISCORD_TOKEN`
 - optional `DISCORD_CHANNEL_ID` lock
+- `REQUIRE_OPENAI_FOR_DISCORD=true` (default): refuse Discord boot if key missing
 
 Then:
 
@@ -42,6 +43,16 @@ npm start
 ```
 
 In Discord, buddy responds when messaged as either `buddy <prompt>`, `<@BOT_ID> <prompt>`, or `<@!BOT_ID> <prompt>`.
+
+Built-in operator commands (directed to bot):
+- `/status` — uptime + model + redacted runtime summary
+- `/diag` — quick configuration health report
+- `/reload` — re-read `.env` safely (no process restart)
+
+Secrets hygiene:
+- Never commit `.env`
+- Commit `.env.example` only
+- Keep API keys in local runtime env or systemd `EnvironmentFile`
 
 ## VPS hardening note
 
