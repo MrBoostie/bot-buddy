@@ -56,6 +56,11 @@ Built-in operator commands (directed to bot):
 - `/diag` — quick configuration health report
 - `/reload` — re-read `.env` safely (no process restart)
 
+Runtime config guardrails:
+- Invalid `LLM_BACKEND` values are flagged at boot (`openclaw`/`openai` only)
+- Invalid `OPENCLAW_TIMEOUT_SEC` (<=0 / non-numeric) fails fast
+- Empty `OPENCLAW_AGENT_ID` fails fast
+
 Secrets hygiene:
 - Never commit `.env`
 - Commit `.env.example` only
