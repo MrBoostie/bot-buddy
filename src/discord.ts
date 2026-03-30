@@ -11,6 +11,7 @@ import { think } from './brain.js';
 import { formatUptime } from './runtime.js';
 import { evaluateOperatorCommand } from './operator-commands.js';
 import { routeDiscordInput } from './discord-routing.js';
+import { executeDiscordRouting } from './discord-executor.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -50,21 +51,12 @@ export async function startDiscord(): Promise<void> {
       },
     );
 
-    if (result.kind === 'ignore') return;
-
-    if (result.kind === 'command') {
-      await msg.reply(result.text);
-      return;
-    }
-
-    try {
-      await msg.channel.sendTyping();
-      const reply = await think(result.prompt);
-      await msg.reply(reply.slice(0, 1900));
-    } catch (err) {
-      console.error('[discord] reply error', err);
-      await msg.reply('brain fart. try again in a sec.');
-    }
+    await executeDiscordRouting(result, {
+      sendTyping: () => msg.channel.sendTyping(),
+      think,
+      reply: (text) => msg.reply(text),
+      logError: (message, error) => console.error(message, error),
+    });
   });
 
   await client.login(config.discordToken);
