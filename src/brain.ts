@@ -5,8 +5,30 @@ import { config, hasOpenAI } from './config.js';
 
 const execFileAsync = promisify(execFile);
 
+type OpenClawAgentResponse = {
+  status?: string;
+  result?: { payloads?: Array<{ text?: string | null }> };
+};
+
 const fallbackReply = (input: string) =>
   `[local-mode] heard: ${input}\n\n(no OPENAI_API_KEY yet — wire creds tomorrow and I'll get smarter)`;
+
+export function parseOpenClawAgentOutput(stdout: string): string {
+  let parsed: OpenClawAgentResponse;
+
+  try {
+    parsed = JSON.parse(stdout) as OpenClawAgentResponse;
+  } catch {
+    throw new Error('openclaw agent returned invalid JSON output');
+  }
+
+  if (parsed.status !== 'ok') {
+    throw new Error(`openclaw agent failed with status=${parsed.status ?? 'unknown'}`);
+  }
+
+  const text = parsed.result?.payloads?.map((p) => p.text ?? '').join('\n').trim();
+  return text || '...thinking noises...';
+}
 
 async function thinkWithOpenAI(input: string): Promise<string> {
   if (!hasOpenAI()) return fallbackReply(input);
@@ -42,17 +64,7 @@ async function thinkWithOpenClaw(input: string): Promise<string> {
     { timeout: config.openclawTimeoutSec * 1000 + 5000, maxBuffer: 1024 * 1024 * 8 },
   );
 
-  const parsed = JSON.parse(stdout) as {
-    status?: string;
-    result?: { payloads?: Array<{ text?: string | null }> };
-  };
-
-  if (parsed.status !== 'ok') {
-    throw new Error(`openclaw agent failed with status=${parsed.status ?? 'unknown'}`);
-  }
-
-  const text = parsed.result?.payloads?.map((p) => p.text ?? '').join('\n').trim();
-  return text || '...thinking noises...';
+  return parseOpenClawAgentOutput(stdout);
 }
 
 export async function think(input: string): Promise<string> {
