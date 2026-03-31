@@ -7,6 +7,11 @@ test('parseAuditTailInput defaults to configured limit', () => {
   assert.deepEqual(result, { ok: true, limit: 5 });
 });
 
+test('parseAuditTailInput treats blank trailing argument spacing as default limit', () => {
+  const result = parseAuditTailInput('/audit-tail    ');
+  assert.deepEqual(result, { ok: true, limit: 5 });
+});
+
 test('parseAuditTailInput accepts explicit limit with extra whitespace', () => {
   const result = parseAuditTailInput('  /audit-tail   12  ');
   assert.deepEqual(result, { ok: true, limit: 12 });
