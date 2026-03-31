@@ -1,5 +1,27 @@
 # Changelog
 
+This project follows a simple keep-a-changelog style.
+
+When preparing a release, move `Unreleased` items into a new dated heading (e.g. `## 2026-04-01`) and start a fresh empty `Unreleased` section using the template below.
+
+### Unreleased template
+
+```md
+## Unreleased
+
+### Added
+- ...
+
+### Changed
+- ...
+
+### Fixed
+- ...
+
+### Internal
+- ...
+```
+
 ## Unreleased
 
 ### Added
