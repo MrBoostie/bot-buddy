@@ -1,5 +1,7 @@
 import { incrementCommandCount, recordCommandLatencyMs } from './metrics.js';
 
+const MAX_OPERATOR_REPLY_CHARS = 1900;
+
 export type OperatorCommandDeps = {
   formatUptime: () => string;
   modelName: () => string;
@@ -108,7 +110,14 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     if (!deps.allowAuditTail()) {
       return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
     }
-    return done(`audit-tail: ${deps.getAuditTail(parsedLimit)}`);
+
+    const payload = `audit-tail: ${deps.getAuditTail(parsedLimit)}`;
+    if (payload.length <= MAX_OPERATOR_REPLY_CHARS) {
+      return done(payload);
+    }
+
+    const suffix = ' ...[truncated]';
+    return done(`${payload.slice(0, MAX_OPERATOR_REPLY_CHARS - suffix.length)}${suffix}`);
   }
 
   return null;

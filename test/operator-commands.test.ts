@@ -192,6 +192,32 @@ test('rejects invalid audit-tail limit', () => {
   assert.equal(result, 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
 });
 
+test('truncates oversized audit-tail response safely', () => {
+  const result = evaluateOperatorCommand(
+    '/audit-tail',
+    makeDeps({
+      allowAuditTail: () => true,
+      getAuditTail: () => 'x'.repeat(5000),
+    }),
+  );
+
+  assert.ok(result?.startsWith('audit-tail: '));
+  assert.ok(result?.endsWith(' ...[truncated]'));
+  assert.ok((result?.length ?? 0) <= 1900);
+});
+
+test('does not truncate normal audit-tail response', () => {
+  const result = evaluateOperatorCommand(
+    '/audit-tail',
+    makeDeps({
+      allowAuditTail: () => true,
+      getAuditTail: () => 'short tail',
+    }),
+  );
+
+  assert.equal(result, 'audit-tail: short tail');
+});
+
 test('returns null for non-command input', () => {
   const result = evaluateOperatorCommand('hello bot', makeDeps());
   assert.equal(result, null);
