@@ -5,6 +5,7 @@ import {
   incrementCommandCount,
   incrementLlmErrorCount,
   incrementLlmSuccessCount,
+  recordCommandLatencyMs,
   recordLlmLatencyMs,
   resetMetricsForTests,
 } from '../src/metrics.ts';
@@ -17,10 +18,12 @@ test('metrics summary reflects counter increments', () => {
   incrementLlmErrorCount();
   recordLlmLatencyMs(200);
   recordLlmLatencyMs(300);
+  recordCommandLatencyMs(15);
+  recordCommandLatencyMs(30);
 
   assert.equal(
     getMetricsSummary(),
-    'commands=2,llmCalls=2,llmOk=1,llmErr=1,llmAvgMs=250,llmRecentMaxMs=300,llmLt250Ms=1,llm250To1000Ms=1,llmGt1000Ms=0',
+    'commands=2,llmCalls=2,llmOk=1,llmErr=1,llmAvgMs=250,llmRecentMaxMs=300,llmLt250Ms=1,llm250To1000Ms=1,llmGt1000Ms=0,cmdAvgMs=23,cmdRecentMaxMs=30',
   );
 });
 
