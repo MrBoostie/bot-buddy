@@ -44,5 +44,8 @@ jobs:
       - name: Type check
         run: npm run check
 
-      - name: Test
+      - name: Test (changelog policy fixtures)
+        run: npm run test:changelog-policy
+
+      - name: Test (full suite)
         run: npm test
