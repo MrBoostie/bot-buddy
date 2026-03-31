@@ -10,6 +10,7 @@ test('accepts valid openai backend config', () => {
     OPENCLAW_TIMEOUT_SEC: '45',
     OPENCLAW_AGENT_ID: 'main',
     OPERATOR_RELOAD_COOLDOWN_SEC: '30',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '0',
   });
 
   const issues = validateConfig(cfg);
@@ -40,21 +41,24 @@ test('boolean parser supports yes/no style values', () => {
   const cfg = buildConfigFromEnv({
     REQUIRE_OPENAI_FOR_DISCORD: 'no',
     ALLOW_METRICS_RESET: 'yes',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '60',
   });
 
   assert.equal(cfg.requireOpenAIForDiscord, false);
   assert.equal(cfg.allowMetricsReset, true);
+  assert.equal(cfg.metricsSnapshotIntervalSec, 60);
 });
-
-test('flags non-positive timeout, empty agent id, and invalid reload cooldown', () => {
+test('flags non-positive timeout, empty agent id, invalid reload cooldown, and invalid metrics snapshot interval', () => {
   const cfg = buildConfigFromEnv({
     OPENCLAW_TIMEOUT_SEC: '0',
     OPENCLAW_AGENT_ID: '   ',
     OPERATOR_RELOAD_COOLDOWN_SEC: '0',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '-1',
   });
 
   const issues = validateConfig(cfg);
   assert.equal(issues.some((issue) => issue.includes('OPENCLAW_TIMEOUT_SEC')), true);
   assert.equal(issues.some((issue) => issue.includes('OPENCLAW_AGENT_ID')), true);
   assert.equal(issues.some((issue) => issue.includes('OPERATOR_RELOAD_COOLDOWN_SEC')), true);
+  assert.equal(issues.some((issue) => issue.includes('METRICS_SNAPSHOT_INTERVAL_SEC')), true);
 });

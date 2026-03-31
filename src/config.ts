@@ -15,6 +15,7 @@ export type RuntimeConfig = {
   requireOpenAIForDiscord: boolean;
   operatorReloadCooldownSec: number;
   allowMetricsReset: boolean;
+  metricsSnapshotIntervalSec: number;
   discordToken?: string;
   discordClientId?: string;
   discordGuildId?: string;
@@ -57,6 +58,13 @@ function parsePositiveNumber(value: string | undefined, fallback: number): numbe
   return parsed;
 }
 
+function parseNonNegativeNumber(value: string | undefined, fallback: number): number {
+  if (!value) return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) return Number.NaN;
+  return parsed;
+}
+
 export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
   const backend = parseBackend(env.LLM_BACKEND);
 
@@ -75,6 +83,7 @@ export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
     requireOpenAIForDiscord: parseBoolean(env.REQUIRE_OPENAI_FOR_DISCORD, true),
     operatorReloadCooldownSec: parsePositiveNumber(env.OPERATOR_RELOAD_COOLDOWN_SEC, 30),
     allowMetricsReset: parseBoolean(env.ALLOW_METRICS_RESET, false),
+    metricsSnapshotIntervalSec: parseNonNegativeNumber(env.METRICS_SNAPSHOT_INTERVAL_SEC, 0),
     discordToken: env.DISCORD_TOKEN,
     discordClientId: env.DISCORD_CLIENT_ID,
     discordGuildId: env.DISCORD_GUILD_ID,
@@ -126,6 +135,10 @@ export function validateConfig(runtime: RuntimeConfig): string[] {
     issues.push('OPERATOR_RELOAD_COOLDOWN_SEC must be a positive number.');
   }
 
+  if (!Number.isFinite(runtime.metricsSnapshotIntervalSec) || runtime.metricsSnapshotIntervalSec < 0) {
+    issues.push('METRICS_SNAPSHOT_INTERVAL_SEC must be a non-negative number.');
+  }
+
   return issues;
 }
 
@@ -149,6 +162,7 @@ export function redactedRuntimeSummary(): string {
     `openclawTimeoutSec=${config.openclawTimeoutSec}`,
     `operatorReloadCooldownSec=${config.operatorReloadCooldownSec}`,
     `allowMetricsReset=${String(config.allowMetricsReset)}`,
+    `metricsSnapshotIntervalSec=${config.metricsSnapshotIntervalSec}`,
     `requireOpenAIForDiscord=${String(config.requireOpenAIForDiscord)}`,
   ].join(' | ');
 }

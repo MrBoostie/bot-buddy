@@ -59,6 +59,10 @@ Built-in operator commands (directed to bot):
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
 
+Operational logging toggles:
+- `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)
+- Set `METRICS_SNAPSHOT_INTERVAL_SEC` to a positive value to emit periodic `metrics snapshot` log lines
+
 Runtime config guardrails:
 - Invalid `LLM_BACKEND` values are flagged at boot (`openclaw`/`openai` only)
 - Invalid `OPENCLAW_TIMEOUT_SEC` (<=0 / non-numeric) fails fast

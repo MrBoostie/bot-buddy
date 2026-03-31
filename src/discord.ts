@@ -31,6 +31,16 @@ export async function startDiscord(): Promise<void> {
 
   client.once(Events.ClientReady, (c) => {
     logInfo(`logged in as ${c.user.tag}`, { scope: 'discord' });
+
+    if (config.metricsSnapshotIntervalSec > 0) {
+      const interval = setInterval(() => {
+        logInfo(`metrics snapshot | ${getMetricsSummary()}`, { scope: 'discord' });
+      }, config.metricsSnapshotIntervalSec * 1000);
+      interval.unref();
+      logInfo(`metrics snapshot enabled | everySec=${config.metricsSnapshotIntervalSec}`, {
+        scope: 'discord',
+      });
+    }
   });
 
   client.on(Events.MessageCreate, async (msg) => {
