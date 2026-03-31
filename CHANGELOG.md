@@ -34,3 +34,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ### Internal
 - Added shared numeric parsing helper `parseUnsignedIntInRange` for consistent strict numeric command argument validation.
 - Expanded parser test coverage for edge cases (whitespace variants, leading zeros, non-ASCII digits, large values, bounds).
+- Added CI changelog policy enforcement for behavior-visible PR changes, with documented local runner script and maintainers-only `skip-changelog` label bypass.
