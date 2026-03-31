@@ -1,5 +1,9 @@
 import type { DiscordRoutingResult } from './discord-routing.js';
-import { incrementLlmErrorCount, incrementLlmSuccessCount } from './metrics.js';
+import {
+  incrementLlmErrorCount,
+  incrementLlmSuccessCount,
+  recordLlmLatencyMs,
+} from './metrics.js';
 
 export type DiscordExecutorDeps = {
   sendTyping: () => Promise<unknown>;
@@ -19,6 +23,8 @@ export async function executeDiscordRouting(
     return;
   }
 
+  const startedAt = Date.now();
+
   try {
     await deps.sendTyping();
     const reply = await deps.think(result.prompt);
@@ -28,5 +34,7 @@ export async function executeDiscordRouting(
     incrementLlmErrorCount();
     deps.logError('[discord] reply error', err);
     await deps.reply('brain fart. try again in a sec.');
+  } finally {
+    recordLlmLatencyMs(Date.now() - startedAt);
   }
 }

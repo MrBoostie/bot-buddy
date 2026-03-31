@@ -55,7 +55,7 @@ Built-in operator commands (directed to bot):
 - `/ping` — fast liveness check (`pong` + uptime + model)
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + last backend error snapshot
-- `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics)
+- `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including avg LLM latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 
 Runtime config guardrails:
