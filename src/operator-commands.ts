@@ -1,6 +1,8 @@
 import { incrementCommandCount, recordCommandLatencyMs } from './metrics.js';
 
 const MAX_OPERATOR_REPLY_CHARS = 1900;
+const AUDIT_TAIL_DEFAULT_LIMIT = 5;
+const AUDIT_TAIL_MAX_LIMIT = 20;
 
 export type OperatorCommandDeps = {
   formatUptime: () => string;
@@ -45,12 +47,13 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const issues = deps.validateRuntime();
     const backend = deps.backendHealthSummary();
     const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
+    const auditTail = `auditTailDefault=${AUDIT_TAIL_DEFAULT_LIMIT} | auditTailMax=${AUDIT_TAIL_MAX_LIMIT}`;
     return issues.length === 0
       ? done(
-          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${guards} | lastBackendError=${backend}`,
+          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${guards} | ${auditTail} | lastBackendError=${backend}`,
         )
       : done(
-          `diag: issues detected -> ${issues.join(' ; ')} | ${guards} | lastBackendError=${backend}`,
+          `diag: issues detected -> ${issues.join(' ; ')} | ${guards} | ${auditTail} | lastBackendError=${backend}`,
         );
   }
 
@@ -105,9 +108,15 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     }
 
     const parsedLimit =
-      parts.length === 2 && parts[1] !== undefined ? Number.parseInt(parts[1], 10) : 5;
+      parts.length === 2 && parts[1] !== undefined
+        ? Number.parseInt(parts[1], 10)
+        : AUDIT_TAIL_DEFAULT_LIMIT;
 
-    if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 20) {
+    if (
+      !Number.isInteger(parsedLimit) ||
+      parsedLimit < 1 ||
+      parsedLimit > AUDIT_TAIL_MAX_LIMIT
+    ) {
       return done('audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
     }
 
