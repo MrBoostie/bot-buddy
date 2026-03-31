@@ -28,6 +28,19 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
       : `diag: issues detected -> ${issues.join(' ; ')} | lastBackendError=${backend}`;
   }
 
+  if (cmd === '/health') {
+    const issues = deps.validateRuntime();
+    const runtime = issues.length === 0 ? 'ok' : 'degraded';
+    return [
+      'health',
+      `runtime=${runtime}`,
+      `issues=${issues.length}`,
+      `discord=${String(deps.hasDiscord())}`,
+      `openai=${String(deps.hasOpenAI())}`,
+      `backend=${deps.backendHealthSummary()}`,
+    ].join(' | ');
+  }
+
   if (cmd === '/reload') {
     deps.refreshConfigFromEnv();
     const issues = deps.validateRuntime();

@@ -48,6 +48,28 @@ test('returns diag issues payload', () => {
   );
 });
 
+test('returns health payload in ok state', () => {
+  const result = evaluateOperatorCommand('/health', makeDeps());
+  assert.equal(
+    result,
+    'health | runtime=ok | issues=0 | discord=true | openai=false | backend=none',
+  );
+});
+
+test('returns health payload in degraded state', () => {
+  const result = evaluateOperatorCommand(
+    '/health',
+    makeDeps({
+      validateRuntime: () => ['bad env'],
+      backendHealthSummary: () => 'timeout @ 2026-03-31T00:40:00.000Z',
+    }),
+  );
+  assert.equal(
+    result,
+    'health | runtime=degraded | issues=1 | discord=true | openai=false | backend=timeout @ 2026-03-31T00:40:00.000Z',
+  );
+});
+
 test('runs reload and returns success payload', () => {
   let reloadCalls = 0;
   const result = evaluateOperatorCommand(
