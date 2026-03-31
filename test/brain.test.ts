@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseOpenClawAgentOutput } from '../src/brain.ts';
+import { classifyOpenClawExecError, parseOpenClawAgentOutput } from '../src/brain.ts';
 
 test('parses successful openclaw output with concatenated payload text', () => {
   const text = parseOpenClawAgentOutput(
@@ -36,4 +36,19 @@ test('throws clear error on malformed JSON', () => {
     () => parseOpenClawAgentOutput('{not-json'),
     /openclaw agent returned invalid JSON output/,
   );
+});
+
+test('classifies ENOENT exec failure', () => {
+  const message = classifyOpenClawExecError({ code: 'ENOENT' });
+  assert.equal(message, 'openclaw CLI is not installed or not available in PATH');
+});
+
+test('classifies timeout exec failure', () => {
+  const message = classifyOpenClawExecError({ code: 'ETIMEDOUT', message: 'process timed out' });
+  assert.equal(message.includes('openclaw agent timed out after '), true);
+});
+
+test('classifies unknown exec failure with code when present', () => {
+  const message = classifyOpenClawExecError({ code: 'EACCES' });
+  assert.equal(message, 'openclaw agent execution failed (code=EACCES)');
 });
