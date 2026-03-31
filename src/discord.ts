@@ -16,7 +16,7 @@ import { createRequestId, logError, logInfo } from './log.js';
 import { getBackendHealthSummary } from './brain-health.js';
 import { tryAcquireReload } from './operator-rate-limit.js';
 import { getMetricsSummary, resetMetrics } from './metrics.js';
-import { getOperatorAuditEvent } from './operator-audit.js';
+import { getAuditTail, getOperatorAuditEvent, recordAuditEvent } from './operator-audit.js';
 import { evaluateMetricsSnapshot } from './metrics-snapshot.js';
 
 export async function startDiscord(): Promise<void> {
@@ -75,6 +75,8 @@ export async function startDiscord(): Promise<void> {
             metricsSummary: getMetricsSummary,
             allowMetricsReset: () => config.allowMetricsReset,
             resetMetrics,
+            allowAuditTail: () => config.allowAuditTail,
+            getAuditTail,
           }),
       },
     );
@@ -83,7 +85,9 @@ export async function startDiscord(): Promise<void> {
 
     const auditEvent = getOperatorAuditEvent(result);
     if (auditEvent) {
-      logInfo(`${auditEvent} | actor=${msg.author.id} | channel=${msg.channelId}`, {
+      const line = `${auditEvent} | actor=${msg.author.id} | channel=${msg.channelId}`;
+      recordAuditEvent(line);
+      logInfo(line, {
         scope: 'discord',
         requestId,
       });

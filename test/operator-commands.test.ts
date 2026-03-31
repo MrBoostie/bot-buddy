@@ -16,6 +16,8 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
     allowMetricsReset: () => false,
     resetMetrics: () => {},
+    allowAuditTail: () => false,
+    getAuditTail: () => 'none',
     ...overrides,
   };
 }
@@ -145,6 +147,22 @@ test('resets metrics when metrics-reset guard is on', () => {
     result,
     'metrics-reset: ok | commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
   );
+});
+
+test('returns audit-tail disabled payload when guard is off', () => {
+  const result = evaluateOperatorCommand('/audit-tail', makeDeps());
+  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+});
+
+test('returns audit tail when guard is on', () => {
+  const result = evaluateOperatorCommand(
+    '/audit-tail',
+    makeDeps({
+      allowAuditTail: () => true,
+      getAuditTail: () => '2026-03-31T03:30:00.000Z operator metrics reset executed',
+    }),
+  );
+  assert.equal(result, 'audit-tail: 2026-03-31T03:30:00.000Z operator metrics reset executed');
 });
 
 test('returns null for non-command input', () => {

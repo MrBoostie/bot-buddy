@@ -13,6 +13,8 @@ export type OperatorCommandDeps = {
   metricsSummary: () => string;
   allowMetricsReset: () => boolean;
   resetMetrics: () => void;
+  allowAuditTail: () => boolean;
+  getAuditTail: (limit?: number) => string;
 };
 
 export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps): string | null {
@@ -86,6 +88,14 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     }
     deps.resetMetrics();
     return done(`metrics-reset: ok | ${deps.metricsSummary()}`);
+  }
+
+  if (cmd === '/audit-tail') {
+    incrementCommandCount();
+    if (!deps.allowAuditTail()) {
+      return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+    }
+    return done(`audit-tail: ${deps.getAuditTail(5)}`);
   }
 
   return null;

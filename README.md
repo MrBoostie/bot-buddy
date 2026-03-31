@@ -58,6 +58,7 @@ Built-in operator commands (directed to bot):
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
+- `/audit-tail` — show recent in-memory operator audit events (disabled by default; enable with `ALLOW_AUDIT_TAIL=true`)
 
 Operational logging toggles:
 - `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)

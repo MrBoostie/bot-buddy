@@ -15,6 +15,7 @@ export type RuntimeConfig = {
   requireOpenAIForDiscord: boolean;
   operatorReloadCooldownSec: number;
   allowMetricsReset: boolean;
+  allowAuditTail: boolean;
   metricsSnapshotIntervalSec: number;
   discordToken?: string;
   discordClientId?: string;
@@ -83,6 +84,7 @@ export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
     requireOpenAIForDiscord: parseBoolean(env.REQUIRE_OPENAI_FOR_DISCORD, true),
     operatorReloadCooldownSec: parsePositiveNumber(env.OPERATOR_RELOAD_COOLDOWN_SEC, 30),
     allowMetricsReset: parseBoolean(env.ALLOW_METRICS_RESET, false),
+    allowAuditTail: parseBoolean(env.ALLOW_AUDIT_TAIL, false),
     metricsSnapshotIntervalSec: parseNonNegativeNumber(env.METRICS_SNAPSHOT_INTERVAL_SEC, 0),
     discordToken: env.DISCORD_TOKEN,
     discordClientId: env.DISCORD_CLIENT_ID,
@@ -162,6 +164,7 @@ export function redactedRuntimeSummary(): string {
     `openclawTimeoutSec=${config.openclawTimeoutSec}`,
     `operatorReloadCooldownSec=${config.operatorReloadCooldownSec}`,
     `allowMetricsReset=${String(config.allowMetricsReset)}`,
+    `allowAuditTail=${String(config.allowAuditTail)}`,
     `metricsSnapshotIntervalSec=${config.metricsSnapshotIntervalSec}`,
     `requireOpenAIForDiscord=${String(config.requireOpenAIForDiscord)}`,
   ].join(' | ');

@@ -41,11 +41,13 @@ test('boolean parser supports yes/no style values', () => {
   const cfg = buildConfigFromEnv({
     REQUIRE_OPENAI_FOR_DISCORD: 'no',
     ALLOW_METRICS_RESET: 'yes',
+    ALLOW_AUDIT_TAIL: 'true',
     METRICS_SNAPSHOT_INTERVAL_SEC: '60',
   });
 
   assert.equal(cfg.requireOpenAIForDiscord, false);
   assert.equal(cfg.allowMetricsReset, true);
+  assert.equal(cfg.allowAuditTail, true);
   assert.equal(cfg.metricsSnapshotIntervalSec, 60);
 });
 test('flags non-positive timeout, empty agent id, invalid reload cooldown, and invalid metrics snapshot interval', () => {
