@@ -87,6 +87,12 @@ Secrets hygiene:
 - Commit `.env.example` only
 - Keep API keys in local runtime env or systemd `EnvironmentFile`
 
+## Developer notes
+
+- `parseUnsignedIntInRange(raw, min, max)` in `src/operator-commands.ts` is the shared strict numeric parser for operator command args.
+- It enforces ASCII digits only (`0-9`) and explicit range bounds (no sign prefixes, decimals, or localized numerals).
+- Reuse this helper for future numeric operator command arguments to keep validation behavior consistent.
+
 ## VPS hardening note
 
 You said: *"Boostie has sudo, buddy will not."* ✅
