@@ -94,3 +94,15 @@ test('fails when scripts change without changelog update', () => {
   assert.equal(result.code, 1);
   assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
 });
+
+test('fails when package.json changes without changelog update', () => {
+  const { dir, baseSha } = setupRepo();
+  writeFileSync(join(dir, 'package.json'), '{"name":"fixture","version":"1.0.1"}\n');
+  sh(dir, 'git add package.json');
+  sh(dir, 'git commit -m "package behavior change"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+});
