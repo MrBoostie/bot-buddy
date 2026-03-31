@@ -42,6 +42,11 @@ test('parseAuditTailInput accepts leading-zero values', () => {
   assert.deepEqual(result, { ok: true, limit: 3 });
 });
 
+test('parseAuditTailInput rejects zero-padded out-of-range values', () => {
+  const result = parseAuditTailInput('/audit-tail 021');
+  assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
+});
+
 test('parseAuditTailInput rejects non-command input', () => {
   const result = parseAuditTailInput('/ping');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
