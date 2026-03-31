@@ -106,3 +106,15 @@ test('fails when package.json changes without changelog update', () => {
   assert.equal(result.code, 1);
   assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
 });
+
+test('passes when README behavior-visible docs change with changelog update', () => {
+  const { dir, baseSha } = setupRepo();
+  writeFileSync(join(dir, 'README.md'), '# test\n\nupdated operator behavior docs\n');
+  writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- readme update\n');
+  sh(dir, 'git add README.md CHANGELOG.md');
+  sh(dir, 'git commit -m "readme + changelog"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 0);
+});
