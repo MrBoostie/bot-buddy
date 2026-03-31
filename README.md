@@ -65,6 +65,7 @@ Runtime config guardrails:
 
 Logging:
 - Structured console prefixes (`[scope] [level]`) for boot/discord paths
+- Startup emits an ops-focused line: backend mode + reload cooldown + channel lock state
 - Discord execution errors include short request IDs (`rid=...`) for easier traceability
 
 Secrets hygiene:

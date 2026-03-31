@@ -1,9 +1,18 @@
-import { hasDiscord, redactedRuntimeSummary, validateRuntime } from './config.js';
+import { config, hasDiscord, redactedRuntimeSummary, validateRuntime } from './config.js';
 import { startDiscord } from './discord.js';
 import { logError, logInfo } from './log.js';
-import { decideBoot } from './boot.js';
+import { decideBoot, formatBootOpsLine } from './boot.js';
 
 async function main(): Promise<void> {
+  logInfo(
+    formatBootOpsLine({
+      llmBackend: config.llmBackend,
+      reloadCooldownSec: config.operatorReloadCooldownSec,
+      channelLockId: config.discordChannelId,
+    }),
+    { scope: 'boot' },
+  );
+
   const issues = validateRuntime();
   const decision = decideBoot(issues, hasDiscord());
 

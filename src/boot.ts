@@ -14,3 +14,12 @@ export function decideBoot(issues: string[], hasDiscordToken: boolean): BootDeci
 
   return { kind: 'start-discord' };
 }
+
+export function formatBootOpsLine(input: {
+  llmBackend: string;
+  reloadCooldownSec: number;
+  channelLockId?: string;
+}): string {
+  const channelLock = input.channelLockId ? `on(${input.channelLockId})` : 'off';
+  return `ops: backend=${input.llmBackend} | reloadCooldownSec=${input.reloadCooldownSec} | channelLock=${channelLock}`;
+}
