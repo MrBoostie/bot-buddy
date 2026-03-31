@@ -72,6 +72,11 @@ test('parseAuditTailInput rejects very large numeric values', () => {
   assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
 });
 
+test('parseAuditTailInput rejects non-ascii digit input', () => {
+  const result = parseAuditTailInput('/audit-tail １２');
+  assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
+});
+
 test('parseAuditTailInput rejects non-command input', () => {
   const result = parseAuditTailInput('/ping');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
