@@ -32,10 +32,14 @@ jobs:
           shellcheck scripts/check-changelog-policy.sh
 
       - name: Enforce changelog updates for behavior-visible PR changes
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'skip-changelog')
         run: |
           chmod +x scripts/check-changelog-policy.sh
           scripts/check-changelog-policy.sh "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}"
+
+      - name: Changelog policy bypass active
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'skip-changelog')
+        run: echo "skip-changelog label present; changelog policy check bypassed for this PR"
 
       - name: Type check
         run: npm run check

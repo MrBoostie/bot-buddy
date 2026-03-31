@@ -136,6 +136,11 @@ For changelog/PR policy, treat these as behavior-visible:
 - `package.json` changes that alter runtime dependencies or scripts
 - `README.md` updates that change documented operator/runtime behavior
 
+### Changelog policy bypass label
+
+- Maintainers can add PR label `skip-changelog` to bypass the changelog policy check in exceptional cases.
+- Use sparingly (e.g., clearly non-user-visible internal CI/docs-only cleanup).
+
 ### Run changelog policy check locally
 
 You can run the same changelog policy used in CI against two commits:
