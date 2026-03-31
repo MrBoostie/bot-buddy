@@ -131,3 +131,15 @@ test('passes when scripts change with changelog update', () => {
   const result = runPolicy(dir, baseSha, headSha);
   assert.equal(result.code, 0);
 });
+
+test('passes when package.json changes with changelog update', () => {
+  const { dir, baseSha } = setupRepo();
+  writeFileSync(join(dir, 'package.json'), '{"name":"fixture","version":"1.0.1"}\n');
+  writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- package update\n');
+  sh(dir, 'git add package.json CHANGELOG.md');
+  sh(dir, 'git commit -m "package + changelog"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 0);
+});
