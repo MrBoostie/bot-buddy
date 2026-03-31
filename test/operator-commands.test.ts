@@ -37,7 +37,10 @@ test('returns status payload', () => {
 
 test('returns diag ok payload', () => {
   const result = evaluateOperatorCommand('/diag', makeDeps());
-  assert.equal(result, 'diag: ok | hasDiscord=true | hasOpenAI=false | lastBackendError=none');
+  assert.equal(
+    result,
+    'diag: ok | hasDiscord=true | hasOpenAI=false | allowMetricsReset=false | allowAuditTail=false | lastBackendError=none',
+  );
 });
 
 test('returns diag issues payload', () => {
@@ -46,11 +49,13 @@ test('returns diag issues payload', () => {
     makeDeps({
       validateRuntime: () => ['bad env', 'missing key'],
       backendHealthSummary: () => 'openclaw timeout @ 2026-03-31T00:20:00.000Z',
+      allowMetricsReset: () => true,
+      allowAuditTail: () => true,
     }),
   );
   assert.equal(
     result,
-    'diag: issues detected -> bad env ; missing key | lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z',
+    'diag: issues detected -> bad env ; missing key | allowMetricsReset=true | allowAuditTail=true | lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z',
   );
 });
 

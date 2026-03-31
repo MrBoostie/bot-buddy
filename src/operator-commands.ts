@@ -42,11 +42,14 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     incrementCommandCount();
     const issues = deps.validateRuntime();
     const backend = deps.backendHealthSummary();
+    const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
     return issues.length === 0
       ? done(
-          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | lastBackendError=${backend}`,
+          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${guards} | lastBackendError=${backend}`,
         )
-      : done(`diag: issues detected -> ${issues.join(' ; ')} | lastBackendError=${backend}`);
+      : done(
+          `diag: issues detected -> ${issues.join(' ; ')} | ${guards} | lastBackendError=${backend}`,
+        );
   }
 
   if (cmd === '/health') {
