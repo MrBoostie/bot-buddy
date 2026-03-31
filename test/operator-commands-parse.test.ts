@@ -17,6 +17,11 @@ test('parseAuditTailInput accepts explicit limit with extra whitespace', () => {
   assert.deepEqual(result, { ok: true, limit: 12 });
 });
 
+test('parseAuditTailInput accepts tab/newline whitespace around arguments', () => {
+  const result = parseAuditTailInput('\n\t/audit-tail\t7\n');
+  assert.deepEqual(result, { ok: true, limit: 7 });
+});
+
 test('parseAuditTailInput rejects extra args', () => {
   const result = parseAuditTailInput('/audit-tail 3 extra');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
