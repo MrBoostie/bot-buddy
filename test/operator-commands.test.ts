@@ -11,6 +11,7 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     refreshConfigFromEnv: () => {},
     hasDiscord: () => true,
     hasOpenAI: () => false,
+    backendHealthSummary: () => 'none',
     ...overrides,
   };
 }
@@ -30,15 +31,21 @@ test('returns status payload', () => {
 
 test('returns diag ok payload', () => {
   const result = evaluateOperatorCommand('/diag', makeDeps());
-  assert.equal(result, 'diag: ok | hasDiscord=true | hasOpenAI=false');
+  assert.equal(result, 'diag: ok | hasDiscord=true | hasOpenAI=false | lastBackendError=none');
 });
 
 test('returns diag issues payload', () => {
   const result = evaluateOperatorCommand(
     '/diag',
-    makeDeps({ validateRuntime: () => ['bad env', 'missing key'] }),
+    makeDeps({
+      validateRuntime: () => ['bad env', 'missing key'],
+      backendHealthSummary: () => 'openclaw timeout @ 2026-03-31T00:20:00.000Z',
+    }),
   );
-  assert.equal(result, 'diag: issues detected -> bad env ; missing key');
+  assert.equal(
+    result,
+    'diag: issues detected -> bad env ; missing key | lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z',
+  );
 });
 
 test('runs reload and returns success payload', () => {

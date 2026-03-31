@@ -6,6 +6,7 @@ export type OperatorCommandDeps = {
   refreshConfigFromEnv: () => void;
   hasDiscord: () => boolean;
   hasOpenAI: () => boolean;
+  backendHealthSummary: () => string;
 };
 
 export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps): string | null {
@@ -21,9 +22,10 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd === '/diag') {
     const issues = deps.validateRuntime();
+    const backend = deps.backendHealthSummary();
     return issues.length === 0
-      ? `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())}`
-      : `diag: issues detected -> ${issues.join(' ; ')}`;
+      ? `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | lastBackendError=${backend}`
+      : `diag: issues detected -> ${issues.join(' ; ')} | lastBackendError=${backend}`;
   }
 
   if (cmd === '/reload') {

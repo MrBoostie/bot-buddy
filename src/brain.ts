@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import OpenAI from 'openai';
 import { config, hasOpenAI } from './config.js';
+import { clearBackendError, recordBackendError } from './brain-health.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -96,8 +97,14 @@ async function thinkWithOpenClaw(input: string): Promise<string> {
 }
 
 export async function think(input: string): Promise<string> {
-  if (config.llmBackend === 'openai') {
-    return thinkWithOpenAI(input);
+  try {
+    const reply =
+      config.llmBackend === 'openai' ? await thinkWithOpenAI(input) : await thinkWithOpenClaw(input);
+    clearBackendError();
+    return reply;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    recordBackendError(message);
+    throw error;
   }
-  return thinkWithOpenClaw(input);
 }

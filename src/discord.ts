@@ -13,6 +13,7 @@ import { evaluateOperatorCommand } from './operator-commands.js';
 import { routeDiscordInput } from './discord-routing.js';
 import { executeDiscordRouting } from './discord-executor.js';
 import { createRequestId, logError, logInfo } from './log.js';
+import { getBackendHealthSummary } from './brain-health.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -48,6 +49,7 @@ export async function startDiscord(): Promise<void> {
             refreshConfigFromEnv,
             hasDiscord,
             hasOpenAI,
+            backendHealthSummary: getBackendHealthSummary,
           }),
       },
     );
