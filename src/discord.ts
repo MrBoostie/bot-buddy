@@ -14,6 +14,7 @@ import { routeDiscordInput } from './discord-routing.js';
 import { executeDiscordRouting } from './discord-executor.js';
 import { createRequestId, logError, logInfo } from './log.js';
 import { getBackendHealthSummary } from './brain-health.js';
+import { tryAcquireReload } from './operator-rate-limit.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -50,6 +51,7 @@ export async function startDiscord(): Promise<void> {
             hasDiscord,
             hasOpenAI,
             backendHealthSummary: getBackendHealthSummary,
+            tryAcquireReload,
           }),
       },
     );

@@ -7,6 +7,7 @@ export type OperatorCommandDeps = {
   hasDiscord: () => boolean;
   hasOpenAI: () => boolean;
   backendHealthSummary: () => string;
+  tryAcquireReload: () => { ok: true } | { ok: false; retryAfterSec: number };
 };
 
 export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps): string | null {
@@ -42,6 +43,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   }
 
   if (cmd === '/reload') {
+    const gate = deps.tryAcquireReload();
+    if (!gate.ok) {
+      return `reload: rate-limited | retryAfterSec=${gate.retryAfterSec}`;
+    }
+
     deps.refreshConfigFromEnv();
     const issues = deps.validateRuntime();
     if (issues.length > 0) {

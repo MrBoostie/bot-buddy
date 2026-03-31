@@ -12,6 +12,7 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     hasDiscord: () => true,
     hasOpenAI: () => false,
     backendHealthSummary: () => 'none',
+    tryAcquireReload: () => ({ ok: true }),
     ...overrides,
   };
 }
@@ -83,6 +84,22 @@ test('runs reload and returns success payload', () => {
 
   assert.equal(reloadCalls, 1);
   assert.equal(result, 'reload: applied | bot=buddy | llmBackend=openclaw');
+});
+
+test('returns reload rate-limit payload and skips refresh', () => {
+  let reloadCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/reload',
+    makeDeps({
+      tryAcquireReload: () => ({ ok: false, retryAfterSec: 12 }),
+      refreshConfigFromEnv: () => {
+        reloadCalls += 1;
+      },
+    }),
+  );
+
+  assert.equal(reloadCalls, 0);
+  assert.equal(result, 'reload: rate-limited | retryAfterSec=12');
 });
 
 test('runs reload and returns issues payload when validation fails', () => {
