@@ -161,6 +161,14 @@ For fast fixture-only policy checks:
 npm run test:changelog-policy
 ```
 
+### Changelog policy fixture coverage
+
+- `src/` changes: fail without changelog, pass with changelog
+- `README.md` changes: fail without changelog, pass with changelog
+- `scripts/` changes: fail without changelog, pass with changelog
+- `package.json` changes: fail without changelog, pass with changelog
+- Non-behavior-visible-only changes: pass without changelog
+
 ## Next features queued
 
 - memory file + simple persona card
