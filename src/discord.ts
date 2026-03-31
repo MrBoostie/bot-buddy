@@ -85,7 +85,7 @@ export async function startDiscord(): Promise<void> {
 
     const auditEvent = getOperatorAuditEvent(result);
     if (auditEvent) {
-      const line = `${auditEvent} | actor=${msg.author.id} | channel=${msg.channelId}`;
+      const line = `${auditEvent} | actor=${msg.author.id} | channel=${msg.channelId} | rid=${requestId}`;
       recordAuditEvent(line);
       logInfo(line, {
         scope: 'discord',
