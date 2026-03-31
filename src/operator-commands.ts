@@ -4,9 +4,30 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 
+type ParseUnsignedIntInRangeResult =
+  | { ok: true; value: number }
+  | { ok: false; reason: 'invalid-number' | 'out-of-range' };
+
 type AuditTailParseResult =
   | { ok: true; limit: number }
   | { ok: false; reason: 'invalid-usage' | 'invalid-limit' };
+
+export function parseUnsignedIntInRange(
+  raw: string,
+  min: number,
+  max: number,
+): ParseUnsignedIntInRangeResult {
+  if (!/^\d+$/.test(raw)) {
+    return { ok: false, reason: 'invalid-number' };
+  }
+
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < min || value > max) {
+    return { ok: false, reason: 'out-of-range' };
+  }
+
+  return { ok: true, value };
+}
 
 export function parseAuditTailInput(input: string): AuditTailParseResult {
   const cmd = input.trim().toLowerCase();
@@ -24,16 +45,12 @@ export function parseAuditTailInput(input: string): AuditTailParseResult {
     return { ok: true, limit: AUDIT_TAIL_DEFAULT_LIMIT };
   }
 
-  if (!/^\d+$/.test(rawLimit)) {
+  const parsedLimit = parseUnsignedIntInRange(rawLimit, 1, AUDIT_TAIL_MAX_LIMIT);
+  if (!parsedLimit.ok) {
     return { ok: false, reason: 'invalid-limit' };
   }
 
-  const parsedLimit = Number(rawLimit);
-  if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > AUDIT_TAIL_MAX_LIMIT) {
-    return { ok: false, reason: 'invalid-limit' };
-  }
-
-  return { ok: true, limit: parsedLimit };
+  return { ok: true, limit: parsedLimit.value };
 }
 
 export type OperatorCommandDeps = {

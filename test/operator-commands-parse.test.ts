@@ -1,6 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseAuditTailInput } from '../src/operator-commands.ts';
+import { parseAuditTailInput, parseUnsignedIntInRange } from '../src/operator-commands.ts';
+
+test('parseUnsignedIntInRange accepts in-range digits', () => {
+  const result = parseUnsignedIntInRange('12', 1, 20);
+  assert.deepEqual(result, { ok: true, value: 12 });
+});
+
+test('parseUnsignedIntInRange rejects non-digit tokens', () => {
+  const result = parseUnsignedIntInRange('2.5', 1, 20);
+  assert.deepEqual(result, { ok: false, reason: 'invalid-number' });
+});
+
+test('parseUnsignedIntInRange rejects out-of-range digits', () => {
+  const result = parseUnsignedIntInRange('21', 1, 20);
+  assert.deepEqual(result, { ok: false, reason: 'out-of-range' });
+});
 
 test('parseAuditTailInput defaults to configured limit', () => {
   const result = parseAuditTailInput('/audit-tail');
