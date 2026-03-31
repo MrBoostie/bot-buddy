@@ -54,11 +54,17 @@ In Discord, buddy responds when messaged as either `buddy <prompt>`, `<@BOT_ID> 
 Built-in operator commands (directed to bot):
 - `/ping` — fast liveness check (`pong` + uptime + model)
 - `/status` — uptime + model + redacted runtime summary
-- `/diag` — quick configuration health report + last backend error snapshot
+- `/diag` — quick configuration health report + guard/policy snapshot + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
 - `/audit-tail` or `/audit-tail <1-20>` — show recent in-memory operator audit events (disabled by default; enable with `ALLOW_AUDIT_TAIL=true`; limit must be an unsigned integer; invalid extra args are rejected)
+
+Sample `/diag` output:
+
+```text
+diag: ok | hasDiscord=true | hasOpenAI=false | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
+```
 
 Operational logging toggles:
 - `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)
