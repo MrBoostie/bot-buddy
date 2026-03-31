@@ -20,6 +20,22 @@ test('returns denied audit event for metrics reset when disabled', () => {
   assert.equal(event, 'operator metrics reset denied (disabled)');
 });
 
+test('returns audit event for audit-tail disabled', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)',
+  });
+  assert.equal(event, 'operator audit tail denied (disabled)');
+});
+
+test('returns audit event for audit-tail access', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'audit-tail: 2026-03-31T03:30:00.000Z operator metrics reset executed',
+  });
+  assert.equal(event, 'operator audit tail viewed');
+});
+
 test('returns null for non-audited command', () => {
   const event = getOperatorAuditEvent({ kind: 'command', text: 'pong | uptime=5s | model=gpt' });
   assert.equal(event, null);
