@@ -3,6 +3,8 @@ let llmSuccessCount = 0;
 let llmErrorCount = 0;
 let llmLatencyTotalMs = 0;
 let llmLatencyCount = 0;
+const llmRecentLatencyMs: number[] = [];
+const LLM_RECENT_WINDOW_SIZE = 20;
 
 export function incrementCommandCount(): void {
   commandCount += 1;
@@ -20,11 +22,16 @@ export function recordLlmLatencyMs(durationMs: number): void {
   if (!Number.isFinite(durationMs) || durationMs < 0) return;
   llmLatencyTotalMs += durationMs;
   llmLatencyCount += 1;
+  llmRecentLatencyMs.push(durationMs);
+  if (llmRecentLatencyMs.length > LLM_RECENT_WINDOW_SIZE) {
+    llmRecentLatencyMs.shift();
+  }
 }
 
 export function getMetricsSummary(): string {
   const llmAvgMs = llmLatencyCount > 0 ? Math.round(llmLatencyTotalMs / llmLatencyCount) : 0;
-  return `commands=${commandCount},llmOk=${llmSuccessCount},llmErr=${llmErrorCount},llmAvgMs=${llmAvgMs}`;
+  const llmRecentMaxMs = llmRecentLatencyMs.length > 0 ? Math.round(Math.max(...llmRecentLatencyMs)) : 0;
+  return `commands=${commandCount},llmOk=${llmSuccessCount},llmErr=${llmErrorCount},llmAvgMs=${llmAvgMs},llmRecentMaxMs=${llmRecentMaxMs}`;
 }
 
 export function resetMetricsForTests(): void {
@@ -33,4 +40,5 @@ export function resetMetricsForTests(): void {
   llmErrorCount = 0;
   llmLatencyTotalMs = 0;
   llmLatencyCount = 0;
+  llmRecentLatencyMs.length = 0;
 }
