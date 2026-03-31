@@ -48,12 +48,13 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const backend = deps.backendHealthSummary();
     const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
     const auditTail = `auditTailDefault=${AUDIT_TAIL_DEFAULT_LIMIT} | auditTailMax=${AUDIT_TAIL_MAX_LIMIT}`;
+    const replyPolicy = `operatorReplyMaxChars=${MAX_OPERATOR_REPLY_CHARS}`;
     return issues.length === 0
       ? done(
-          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${guards} | ${auditTail} | lastBackendError=${backend}`,
+          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
         )
       : done(
-          `diag: issues detected -> ${issues.join(' ; ')} | ${guards} | ${auditTail} | lastBackendError=${backend}`,
+          `diag: issues detected -> ${issues.join(' ; ')} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
         );
   }
 
