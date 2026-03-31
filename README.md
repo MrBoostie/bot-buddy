@@ -118,6 +118,15 @@ GitHub Actions now runs `npm run check` + `npm test` on every push to `main` and
 
 - Ongoing changes are tracked in [CHANGELOG.md](./CHANGELOG.md).
 
+## Release checklist
+
+Before merging/releasing user-visible changes:
+
+1. `npm run check`
+2. `npm test`
+3. Update `CHANGELOG.md` (`Unreleased` section) for behavior-visible updates
+4. Ensure README operator docs reflect any command/diagnostic changes
+
 ## Next features queued
 
 - memory file + simple persona card
