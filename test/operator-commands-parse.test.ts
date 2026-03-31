@@ -32,6 +32,16 @@ test('parseAuditTailInput rejects decimal values', () => {
   assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
 });
 
+test('parseAuditTailInput rejects plus-signed values', () => {
+  const result = parseAuditTailInput('/audit-tail +3');
+  assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
+});
+
+test('parseAuditTailInput accepts leading-zero values', () => {
+  const result = parseAuditTailInput('/audit-tail 03');
+  assert.deepEqual(result, { ok: true, limit: 3 });
+});
+
 test('parseAuditTailInput rejects non-command input', () => {
   const result = parseAuditTailInput('/ping');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });

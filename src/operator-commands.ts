@@ -24,7 +24,7 @@ export function parseAuditTailInput(input: string): AuditTailParseResult {
     return { ok: true, limit: AUDIT_TAIL_DEFAULT_LIMIT };
   }
 
-  if (!/^[-+]?\d+$/.test(rawLimit)) {
+  if (!/^\d+$/.test(rawLimit)) {
     return { ok: false, reason: 'invalid-limit' };
   }
 
