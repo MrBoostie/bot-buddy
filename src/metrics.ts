@@ -43,7 +43,8 @@ export function recordLlmLatencyMs(durationMs: number): void {
 export function getMetricsSummary(): string {
   const llmAvgMs = llmLatencyCount > 0 ? Math.round(llmLatencyTotalMs / llmLatencyCount) : 0;
   const llmRecentMaxMs = llmRecentLatencyMs.length > 0 ? Math.round(Math.max(...llmRecentLatencyMs)) : 0;
-  return `commands=${commandCount},llmOk=${llmSuccessCount},llmErr=${llmErrorCount},llmAvgMs=${llmAvgMs},llmRecentMaxMs=${llmRecentMaxMs},llmLt250Ms=${llmLt250MsCount},llm250To1000Ms=${llm250To1000MsCount},llmGt1000Ms=${llmGt1000MsCount}`;
+  const llmCalls = llmSuccessCount + llmErrorCount;
+  return `commands=${commandCount},llmCalls=${llmCalls},llmOk=${llmSuccessCount},llmErr=${llmErrorCount},llmAvgMs=${llmAvgMs},llmRecentMaxMs=${llmRecentMaxMs},llmLt250Ms=${llmLt250MsCount},llm250To1000Ms=${llm250To1000MsCount},llmGt1000Ms=${llmGt1000MsCount}`;
 }
 
 export function resetMetricsForTests(): void {

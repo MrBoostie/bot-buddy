@@ -86,7 +86,7 @@ test('llm route types, thinks, and replies', async () => {
 
   assert.deepEqual(callOrder, ['typing', 'think:hello', 'reply']);
   assert.deepEqual(replies, ['world']);
-  assert.equal(getMetricsSummary().startsWith('commands=0,llmOk=1,llmErr=0,llmAvgMs='), true);
+  assert.equal(getMetricsSummary().startsWith('commands=0,llmCalls=1,llmOk=1,llmErr=0,llmAvgMs='), true);
 });
 
 test('llm route truncates long replies to 1900 chars', async () => {
@@ -132,5 +132,5 @@ test('llm failure returns safe fallback and logs error', async () => {
   assert.deepEqual(replies, ['brain fart. try again in a sec.']);
   assert.equal(logs.length, 1);
   assert.equal(logs[0].message, '[discord] reply error');
-  assert.equal(getMetricsSummary().startsWith('commands=0,llmOk=0,llmErr=1,llmAvgMs='), true);
+  assert.equal(getMetricsSummary().startsWith('commands=0,llmCalls=1,llmOk=0,llmErr=1,llmAvgMs='), true);
 });

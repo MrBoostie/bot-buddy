@@ -20,7 +20,7 @@ test('metrics summary reflects counter increments', () => {
 
   assert.equal(
     getMetricsSummary(),
-    'commands=2,llmOk=1,llmErr=1,llmAvgMs=250,llmRecentMaxMs=300,llmLt250Ms=1,llm250To1000Ms=1,llmGt1000Ms=0',
+    'commands=2,llmCalls=2,llmOk=1,llmErr=1,llmAvgMs=250,llmRecentMaxMs=300,llmLt250Ms=1,llm250To1000Ms=1,llmGt1000Ms=0',
   );
 });
 
