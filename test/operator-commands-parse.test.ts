@@ -17,6 +17,29 @@ test('parseUnsignedIntInRange rejects out-of-range digits', () => {
   assert.deepEqual(result, { ok: false, reason: 'out-of-range' });
 });
 
+test('parseUnsignedIntInRange table-driven edge coverage', () => {
+  const cases: Array<{
+    raw: string;
+    min: number;
+    max: number;
+    expected:
+      | { ok: true; value: number }
+      | { ok: false; reason: 'invalid-number' | 'out-of-range' };
+  }> = [
+    { raw: '1', min: 1, max: 20, expected: { ok: true, value: 1 } },
+    { raw: '20', min: 1, max: 20, expected: { ok: true, value: 20 } },
+    { raw: '0007', min: 1, max: 20, expected: { ok: true, value: 7 } },
+    { raw: '0', min: 1, max: 20, expected: { ok: false, reason: 'out-of-range' } },
+    { raw: '21', min: 1, max: 20, expected: { ok: false, reason: 'out-of-range' } },
+    { raw: ' 7', min: 1, max: 20, expected: { ok: false, reason: 'invalid-number' } },
+    { raw: '７', min: 1, max: 20, expected: { ok: false, reason: 'invalid-number' } },
+  ];
+
+  for (const tc of cases) {
+    assert.deepEqual(parseUnsignedIntInRange(tc.raw, tc.min, tc.max), tc.expected);
+  }
+});
+
 test('parseAuditTailInput defaults to configured limit', () => {
   const result = parseAuditTailInput('/audit-tail');
   assert.deepEqual(result, { ok: true, limit: 5 });
