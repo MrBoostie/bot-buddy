@@ -13,7 +13,7 @@ function sh(cwd: string, command: string): string {
 
 function setupRepo(): { dir: string; baseSha: string } {
   const dir = mkdtempSync(join(tmpdir(), 'bot-buddy-changelog-policy-'));
-  sh(dir, 'git init');
+  sh(dir, 'git init -b main');
   sh(dir, 'git config user.name "Test Bot"');
   sh(dir, 'git config user.email "test@example.com"');
 
