@@ -155,6 +155,12 @@ Example (last commit vs current HEAD):
 scripts/check-changelog-policy.sh HEAD~1 HEAD
 ```
 
+For fast fixture-only policy checks:
+
+```bash
+npm run test:changelog-policy
+```
+
 ## Next features queued
 
 - memory file + simple persona card
