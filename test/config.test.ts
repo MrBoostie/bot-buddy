@@ -39,9 +39,11 @@ test('flags missing OpenAI key only when required for openai discord mode', () =
 test('boolean parser supports yes/no style values', () => {
   const cfg = buildConfigFromEnv({
     REQUIRE_OPENAI_FOR_DISCORD: 'no',
+    ALLOW_METRICS_RESET: 'yes',
   });
 
   assert.equal(cfg.requireOpenAIForDiscord, false);
+  assert.equal(cfg.allowMetricsReset, true);
 });
 
 test('flags non-positive timeout, empty agent id, and invalid reload cooldown', () => {

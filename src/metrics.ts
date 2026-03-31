@@ -47,7 +47,7 @@ export function getMetricsSummary(): string {
   return `commands=${commandCount},llmCalls=${llmCalls},llmOk=${llmSuccessCount},llmErr=${llmErrorCount},llmAvgMs=${llmAvgMs},llmRecentMaxMs=${llmRecentMaxMs},llmLt250Ms=${llmLt250MsCount},llm250To1000Ms=${llm250To1000MsCount},llmGt1000Ms=${llmGt1000MsCount}`;
 }
 
-export function resetMetricsForTests(): void {
+export function resetMetrics(): void {
   commandCount = 0;
   llmSuccessCount = 0;
   llmErrorCount = 0;
@@ -57,4 +57,8 @@ export function resetMetricsForTests(): void {
   llm250To1000MsCount = 0;
   llmGt1000MsCount = 0;
   llmRecentLatencyMs.length = 0;
+}
+
+export function resetMetricsForTests(): void {
+  resetMetrics();
 }

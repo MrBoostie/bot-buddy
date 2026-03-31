@@ -57,6 +57,7 @@ Built-in operator commands (directed to bot):
 - `/diag` — quick configuration health report + last backend error snapshot
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, avg/recent-max latency, and latency buckets)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
+- `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
 
 Runtime config guardrails:
 - Invalid `LLM_BACKEND` values are flagged at boot (`openclaw`/`openai` only)

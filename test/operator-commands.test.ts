@@ -14,6 +14,8 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     backendHealthSummary: () => 'none',
     tryAcquireReload: () => ({ ok: true }),
     metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0',
+    allowMetricsReset: () => false,
+    resetMetrics: () => {},
     ...overrides,
   };
 }
@@ -118,6 +120,31 @@ test('runs reload and returns issues payload when validation fails', () => {
 
   assert.equal(reloadCalls, 1);
   assert.equal(result, 'reload: applied, but issues remain -> still broken');
+});
+
+test('returns metrics-reset disabled payload when guard is off', () => {
+  const result = evaluateOperatorCommand('/metrics-reset', makeDeps());
+  assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+});
+
+test('resets metrics when metrics-reset guard is on', () => {
+  let resetCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/metrics-reset',
+    makeDeps({
+      allowMetricsReset: () => true,
+      resetMetrics: () => {
+        resetCalls += 1;
+      },
+      metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0',
+    }),
+  );
+
+  assert.equal(resetCalls, 1);
+  assert.equal(
+    result,
+    'metrics-reset: ok | commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0',
+  );
 });
 
 test('returns null for non-command input', () => {

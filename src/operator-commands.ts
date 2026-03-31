@@ -11,6 +11,8 @@ export type OperatorCommandDeps = {
   backendHealthSummary: () => string;
   tryAcquireReload: () => { ok: true } | { ok: false; retryAfterSec: number };
   metricsSummary: () => string;
+  allowMetricsReset: () => boolean;
+  resetMetrics: () => void;
 };
 
 export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps): string | null {
@@ -63,6 +65,15 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
       return `reload: applied, but issues remain -> ${issues.join(' ; ')}`;
     }
     return `reload: applied | ${deps.runtimeSummary()}`;
+  }
+
+  if (cmd === '/metrics-reset') {
+    incrementCommandCount();
+    if (!deps.allowMetricsReset()) {
+      return 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
+    }
+    deps.resetMetrics();
+    return `metrics-reset: ok | ${deps.metricsSummary()}`;
   }
 
   return null;

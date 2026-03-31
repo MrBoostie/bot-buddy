@@ -14,6 +14,7 @@ export type RuntimeConfig = {
   openaiModel: string;
   requireOpenAIForDiscord: boolean;
   operatorReloadCooldownSec: number;
+  allowMetricsReset: boolean;
   discordToken?: string;
   discordClientId?: string;
   discordGuildId?: string;
@@ -73,6 +74,7 @@ export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
     openaiModel: env.OPENAI_MODEL ?? 'gpt-4.1-mini',
     requireOpenAIForDiscord: parseBoolean(env.REQUIRE_OPENAI_FOR_DISCORD, true),
     operatorReloadCooldownSec: parsePositiveNumber(env.OPERATOR_RELOAD_COOLDOWN_SEC, 30),
+    allowMetricsReset: parseBoolean(env.ALLOW_METRICS_RESET, false),
     discordToken: env.DISCORD_TOKEN,
     discordClientId: env.DISCORD_CLIENT_ID,
     discordGuildId: env.DISCORD_GUILD_ID,
@@ -146,6 +148,7 @@ export function redactedRuntimeSummary(): string {
     `openclawAgent=${config.openclawAgentId}`,
     `openclawTimeoutSec=${config.openclawTimeoutSec}`,
     `operatorReloadCooldownSec=${config.operatorReloadCooldownSec}`,
+    `allowMetricsReset=${String(config.allowMetricsReset)}`,
     `requireOpenAIForDiscord=${String(config.requireOpenAIForDiscord)}`,
   ].join(' | ');
 }

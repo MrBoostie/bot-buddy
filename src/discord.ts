@@ -15,7 +15,7 @@ import { executeDiscordRouting } from './discord-executor.js';
 import { createRequestId, logError, logInfo } from './log.js';
 import { getBackendHealthSummary } from './brain-health.js';
 import { tryAcquireReload } from './operator-rate-limit.js';
-import { getMetricsSummary } from './metrics.js';
+import { getMetricsSummary, resetMetrics } from './metrics.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -54,6 +54,8 @@ export async function startDiscord(): Promise<void> {
             backendHealthSummary: getBackendHealthSummary,
             tryAcquireReload,
             metricsSummary: getMetricsSummary,
+            allowMetricsReset: () => config.allowMetricsReset,
+            resetMetrics,
           }),
       },
     );
