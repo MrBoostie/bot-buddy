@@ -127,6 +127,15 @@ Before merging/releasing user-visible changes:
 3. Update `CHANGELOG.md` (`Unreleased` section) for behavior-visible updates
 4. Ensure README operator docs reflect any command/diagnostic changes
 
+### What counts as behavior-visible?
+
+For changelog/PR policy, treat these as behavior-visible:
+
+- Changes under `src/` that alter bot runtime behavior or operator command responses
+- Changes under `scripts/` that affect setup/deploy/runtime operations
+- `package.json` changes that alter runtime dependencies or scripts
+- `README.md` updates that change documented operator/runtime behavior
+
 ## Next features queued
 
 - memory file + simple persona card
