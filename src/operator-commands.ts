@@ -100,8 +100,12 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const parts = cmd.split(/\s+/).filter(Boolean);
     if (parts[0] !== '/audit-tail') return null;
 
+    if (parts.length > 2) {
+      return done('audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
+    }
+
     const parsedLimit =
-      parts.length >= 2 && parts[1] !== undefined ? Number.parseInt(parts[1], 10) : 5;
+      parts.length === 2 && parts[1] !== undefined ? Number.parseInt(parts[1], 10) : 5;
 
     if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 20) {
       return done('audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');

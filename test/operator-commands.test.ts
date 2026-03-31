@@ -187,6 +187,28 @@ test('supports custom audit-tail limit in valid range', () => {
   assert.equal(result, 'audit-tail: tail');
 });
 
+test('supports extra whitespace around audit-tail limit', () => {
+  let calledWith: number | undefined;
+  const result = evaluateOperatorCommand(
+    '/audit-tail    3   ',
+    makeDeps({
+      allowAuditTail: () => true,
+      getAuditTail: (limit) => {
+        calledWith = limit;
+        return 'tail';
+      },
+    }),
+  );
+
+  assert.equal(calledWith, 3);
+  assert.equal(result, 'audit-tail: tail');
+});
+
+test('rejects extra audit-tail args', () => {
+  const result = evaluateOperatorCommand('/audit-tail 3 extra', makeDeps());
+  assert.equal(result, 'audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
+});
+
 test('rejects invalid audit-tail limit', () => {
   const result = evaluateOperatorCommand('/audit-tail 21', makeDeps());
   assert.equal(result, 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
