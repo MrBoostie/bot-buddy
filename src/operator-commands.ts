@@ -4,6 +4,33 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 
+type AuditTailParseResult =
+  | { ok: true; limit: number }
+  | { ok: false; reason: 'invalid-usage' | 'invalid-limit' };
+
+export function parseAuditTailInput(input: string): AuditTailParseResult {
+  const cmd = input.trim().toLowerCase();
+  const parts = cmd.split(/\s+/).filter(Boolean);
+  if (parts[0] !== '/audit-tail') {
+    return { ok: false, reason: 'invalid-usage' };
+  }
+
+  if (parts.length > 2) {
+    return { ok: false, reason: 'invalid-usage' };
+  }
+
+  const parsedLimit =
+    parts.length === 2 && parts[1] !== undefined
+      ? Number.parseInt(parts[1], 10)
+      : AUDIT_TAIL_DEFAULT_LIMIT;
+
+  if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > AUDIT_TAIL_MAX_LIMIT) {
+    return { ok: false, reason: 'invalid-limit' };
+  }
+
+  return { ok: true, limit: parsedLimit };
+}
+
 export type OperatorCommandDeps = {
   formatUptime: () => string;
   modelName: () => string;
@@ -101,23 +128,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd.startsWith('/audit-tail')) {
     incrementCommandCount();
-    const parts = cmd.split(/\s+/).filter(Boolean);
-    if (parts[0] !== '/audit-tail') return null;
-
-    if (parts.length > 2) {
-      return done('audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
-    }
-
-    const parsedLimit =
-      parts.length === 2 && parts[1] !== undefined
-        ? Number.parseInt(parts[1], 10)
-        : AUDIT_TAIL_DEFAULT_LIMIT;
-
-    if (
-      !Number.isInteger(parsedLimit) ||
-      parsedLimit < 1 ||
-      parsedLimit > AUDIT_TAIL_MAX_LIMIT
-    ) {
+    const parsed = parseAuditTailInput(cmd);
+    if (!parsed.ok) {
+      if (parsed.reason === 'invalid-usage') {
+        return done('audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
+      }
       return done('audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
     }
 
@@ -125,7 +140,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
       return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
     }
 
-    const payload = `audit-tail: ${deps.getAuditTail(parsedLimit)}`;
+    const payload = `audit-tail: ${deps.getAuditTail(parsed.limit)}`;
     if (payload.length <= MAX_OPERATOR_REPLY_CHARS) {
       return done(payload);
     }
