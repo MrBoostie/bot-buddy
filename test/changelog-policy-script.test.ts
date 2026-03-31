@@ -69,3 +69,28 @@ test('passes when non-behavior-visible files change without changelog update', (
   const result = runPolicy(dir, baseSha, headSha);
   assert.equal(result.code, 0);
 });
+
+test('fails when README behavior-visible docs change without changelog update', () => {
+  const { dir, baseSha } = setupRepo();
+  writeFileSync(join(dir, 'README.md'), '# test\n\nupdated operator behavior docs\n');
+  sh(dir, 'git add README.md');
+  sh(dir, 'git commit -m "readme behavior change"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+});
+
+test('fails when scripts change without changelog update', () => {
+  const { dir, baseSha } = setupRepo();
+  mkdirSync(join(dir, 'scripts'), { recursive: true });
+  writeFileSync(join(dir, 'scripts', 'helper.sh'), '#!/usr/bin/env bash\necho hi\n');
+  sh(dir, 'git add scripts/helper.sh');
+  sh(dir, 'git commit -m "script behavior change"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+});
