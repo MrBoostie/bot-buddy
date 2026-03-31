@@ -118,3 +118,16 @@ test('passes when README behavior-visible docs change with changelog update', ()
   const result = runPolicy(dir, baseSha, headSha);
   assert.equal(result.code, 0);
 });
+
+test('passes when scripts change with changelog update', () => {
+  const { dir, baseSha } = setupRepo();
+  mkdirSync(join(dir, 'scripts'), { recursive: true });
+  writeFileSync(join(dir, 'scripts', 'helper.sh'), '#!/usr/bin/env bash\necho hi\n');
+  writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- script update\n');
+  sh(dir, 'git add scripts/helper.sh CHANGELOG.md');
+  sh(dir, 'git commit -m "script + changelog"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 0);
+});
