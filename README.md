@@ -136,6 +136,20 @@ For changelog/PR policy, treat these as behavior-visible:
 - `package.json` changes that alter runtime dependencies or scripts
 - `README.md` updates that change documented operator/runtime behavior
 
+### Run changelog policy check locally
+
+You can run the same changelog policy used in CI against two commits:
+
+```bash
+scripts/check-changelog-policy.sh <base-sha> <head-sha>
+```
+
+Example (last commit vs current HEAD):
+
+```bash
+scripts/check-changelog-policy.sh HEAD~1 HEAD
+```
+
 ## Next features queued
 
 - memory file + simple persona card
