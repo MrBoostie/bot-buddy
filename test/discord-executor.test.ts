@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { executeDiscordRouting } from '../src/discord-executor.ts';
+import { getMetricsSummary, resetMetricsForTests } from '../src/metrics.ts';
 
 test('ignore route performs no actions', async () => {
   let typingCalls = 0;
@@ -61,6 +62,7 @@ test('command route replies without typing/think', async () => {
 });
 
 test('llm route types, thinks, and replies', async () => {
+  resetMetricsForTests();
   const callOrder: string[] = [];
   const replies: string[] = [];
 
@@ -84,6 +86,7 @@ test('llm route types, thinks, and replies', async () => {
 
   assert.deepEqual(callOrder, ['typing', 'think:hello', 'reply']);
   assert.deepEqual(replies, ['world']);
+  assert.equal(getMetricsSummary(), 'commands=0,llmOk=1,llmErr=0');
 });
 
 test('llm route truncates long replies to 1900 chars', async () => {
@@ -106,6 +109,7 @@ test('llm route truncates long replies to 1900 chars', async () => {
 });
 
 test('llm failure returns safe fallback and logs error', async () => {
+  resetMetricsForTests();
   const replies: string[] = [];
   const logs: Array<{ message: string; error: unknown }> = [];
 
@@ -128,4 +132,5 @@ test('llm failure returns safe fallback and logs error', async () => {
   assert.deepEqual(replies, ['brain fart. try again in a sec.']);
   assert.equal(logs.length, 1);
   assert.equal(logs[0].message, '[discord] reply error');
+  assert.equal(getMetricsSummary(), 'commands=0,llmOk=0,llmErr=1');
 });

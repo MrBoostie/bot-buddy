@@ -1,3 +1,5 @@
+import { incrementCommandCount } from './metrics.js';
+
 export type OperatorCommandDeps = {
   formatUptime: () => string;
   modelName: () => string;
@@ -8,20 +10,24 @@ export type OperatorCommandDeps = {
   hasOpenAI: () => boolean;
   backendHealthSummary: () => string;
   tryAcquireReload: () => { ok: true } | { ok: false; retryAfterSec: number };
+  metricsSummary: () => string;
 };
 
 export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps): string | null {
   const cmd = input.trim().toLowerCase();
 
   if (cmd === '/ping') {
+    incrementCommandCount();
     return `pong | uptime=${deps.formatUptime()} | model=${deps.modelName()}`;
   }
 
   if (cmd === '/status') {
+    incrementCommandCount();
     return `status: online | uptime=${deps.formatUptime()} | model=${deps.modelName()} | ${deps.runtimeSummary()}`;
   }
 
   if (cmd === '/diag') {
+    incrementCommandCount();
     const issues = deps.validateRuntime();
     const backend = deps.backendHealthSummary();
     return issues.length === 0
@@ -30,6 +36,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   }
 
   if (cmd === '/health') {
+    incrementCommandCount();
     const issues = deps.validateRuntime();
     const runtime = issues.length === 0 ? 'ok' : 'degraded';
     return [
@@ -39,10 +46,12 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
       `discord=${String(deps.hasDiscord())}`,
       `openai=${String(deps.hasOpenAI())}`,
       `backend=${deps.backendHealthSummary()}`,
+      `metrics=${deps.metricsSummary()}`,
     ].join(' | ');
   }
 
   if (cmd === '/reload') {
+    incrementCommandCount();
     const gate = deps.tryAcquireReload();
     if (!gate.ok) {
       return `reload: rate-limited | retryAfterSec=${gate.retryAfterSec}`;
