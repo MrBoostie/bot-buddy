@@ -170,6 +170,28 @@ test('returns audit tail when guard is on', () => {
   assert.equal(result, 'audit-tail: 2026-03-31T03:30:00.000Z operator metrics reset executed');
 });
 
+test('supports custom audit-tail limit in valid range', () => {
+  let calledWith: number | undefined;
+  const result = evaluateOperatorCommand(
+    '/audit-tail 12',
+    makeDeps({
+      allowAuditTail: () => true,
+      getAuditTail: (limit) => {
+        calledWith = limit;
+        return 'tail';
+      },
+    }),
+  );
+
+  assert.equal(calledWith, 12);
+  assert.equal(result, 'audit-tail: tail');
+});
+
+test('rejects invalid audit-tail limit', () => {
+  const result = evaluateOperatorCommand('/audit-tail 21', makeDeps());
+  assert.equal(result, 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
+});
+
 test('returns null for non-command input', () => {
   const result = evaluateOperatorCommand('hello bot', makeDeps());
   assert.equal(result, null);

@@ -93,12 +93,22 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`metrics-reset: ok | ${deps.metricsSummary()}`);
   }
 
-  if (cmd === '/audit-tail') {
+  if (cmd.startsWith('/audit-tail')) {
     incrementCommandCount();
+    const parts = cmd.split(/\s+/).filter(Boolean);
+    if (parts[0] !== '/audit-tail') return null;
+
+    const parsedLimit =
+      parts.length >= 2 && parts[1] !== undefined ? Number.parseInt(parts[1], 10) : 5;
+
+    if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 20) {
+      return done('audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
+    }
+
     if (!deps.allowAuditTail()) {
       return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
     }
-    return done(`audit-tail: ${deps.getAuditTail(5)}`);
+    return done(`audit-tail: ${deps.getAuditTail(parsedLimit)}`);
   }
 
   return null;
