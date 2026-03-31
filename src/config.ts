@@ -13,6 +13,7 @@ export type RuntimeConfig = {
   openaiApiKey?: string;
   openaiModel: string;
   requireOpenAIForDiscord: boolean;
+  operatorReloadCooldownSec: number;
   discordToken?: string;
   discordClientId?: string;
   discordGuildId?: string;
@@ -71,6 +72,7 @@ export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
     openaiApiKey: env.OPENAI_API_KEY,
     openaiModel: env.OPENAI_MODEL ?? 'gpt-4.1-mini',
     requireOpenAIForDiscord: parseBoolean(env.REQUIRE_OPENAI_FOR_DISCORD, true),
+    operatorReloadCooldownSec: parsePositiveNumber(env.OPERATOR_RELOAD_COOLDOWN_SEC, 30),
     discordToken: env.DISCORD_TOKEN,
     discordClientId: env.DISCORD_CLIENT_ID,
     discordGuildId: env.DISCORD_GUILD_ID,
@@ -118,6 +120,10 @@ export function validateConfig(runtime: RuntimeConfig): string[] {
     issues.push('OPENCLAW_TIMEOUT_SEC must be a positive number.');
   }
 
+  if (!Number.isFinite(runtime.operatorReloadCooldownSec) || runtime.operatorReloadCooldownSec <= 0) {
+    issues.push('OPERATOR_RELOAD_COOLDOWN_SEC must be a positive number.');
+  }
+
   return issues;
 }
 
@@ -139,6 +145,7 @@ export function redactedRuntimeSummary(): string {
     `channelLock=${channelLock}`,
     `openclawAgent=${config.openclawAgentId}`,
     `openclawTimeoutSec=${config.openclawTimeoutSec}`,
+    `operatorReloadCooldownSec=${config.operatorReloadCooldownSec}`,
     `requireOpenAIForDiscord=${String(config.requireOpenAIForDiscord)}`,
   ].join(' | ');
 }

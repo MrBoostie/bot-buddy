@@ -56,7 +56,7 @@ Built-in operator commands (directed to bot):
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + last backend error snapshot
 - `/health` — machine-grep-friendly one-line health summary
-- `/reload` — re-read `.env` safely (no process restart, 30s cooldown)
+- `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 
 Runtime config guardrails:
 - Invalid `LLM_BACKEND` values are flagged at boot (`openclaw`/`openai` only)

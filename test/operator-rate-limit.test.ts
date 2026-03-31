@@ -24,3 +24,13 @@ test('reload allowed again after cooldown', () => {
   const result = tryAcquireReload(40_000);
   assert.deepEqual(result, { ok: true });
 });
+
+test('supports custom cooldown override for deterministic checks', () => {
+  resetReloadGateForTests();
+  tryAcquireReload(1_000, 5_000);
+  const blocked = tryAcquireReload(5_500, 5_000);
+  assert.equal(blocked.ok, false);
+
+  const allowed = tryAcquireReload(6_100, 5_000);
+  assert.deepEqual(allowed, { ok: true });
+});
