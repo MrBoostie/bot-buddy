@@ -19,11 +19,16 @@ export function parseAuditTailInput(input: string): AuditTailParseResult {
     return { ok: false, reason: 'invalid-usage' };
   }
 
-  const parsedLimit =
-    parts.length === 2 && parts[1] !== undefined
-      ? Number.parseInt(parts[1], 10)
-      : AUDIT_TAIL_DEFAULT_LIMIT;
+  const rawLimit = parts.length === 2 ? parts[1] : undefined;
+  if (rawLimit === undefined) {
+    return { ok: true, limit: AUDIT_TAIL_DEFAULT_LIMIT };
+  }
 
+  if (!/^[-+]?\d+$/.test(rawLimit)) {
+    return { ok: false, reason: 'invalid-limit' };
+  }
+
+  const parsedLimit = Number(rawLimit);
   if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > AUDIT_TAIL_MAX_LIMIT) {
     return { ok: false, reason: 'invalid-limit' };
   }

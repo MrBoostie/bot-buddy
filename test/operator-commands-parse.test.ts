@@ -22,6 +22,16 @@ test('parseAuditTailInput rejects invalid range', () => {
   assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
 });
 
+test('parseAuditTailInput rejects negative values', () => {
+  const result = parseAuditTailInput('/audit-tail -1');
+  assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
+});
+
+test('parseAuditTailInput rejects decimal values', () => {
+  const result = parseAuditTailInput('/audit-tail 2.5');
+  assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
+});
+
 test('parseAuditTailInput rejects non-command input', () => {
   const result = parseAuditTailInput('/ping');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
