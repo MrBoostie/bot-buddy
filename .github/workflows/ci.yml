@@ -28,20 +28,8 @@ jobs:
       - name: Enforce changelog updates for behavior-visible PR changes
         if: github.event_name == 'pull_request'
         run: |
-          set -euo pipefail
-          BASE_SHA="${{ github.event.pull_request.base.sha }}"
-          HEAD_SHA="${{ github.sha }}"
-          CHANGED="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
-
-          echo "Changed files:" 
-          echo "$CHANGED"
-
-          if echo "$CHANGED" | grep -Eq '^(src/|scripts/|package\.json|README\.md)'; then
-            if ! echo "$CHANGED" | grep -q '^CHANGELOG\.md$'; then
-              echo "::error::CHANGELOG.md must be updated when behavior-visible files change in a PR."
-              exit 1
-            fi
-          fi
+          chmod +x scripts/check-changelog-policy.sh
+          scripts/check-changelog-policy.sh "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}"
 
       - name: Type check
         run: npm run check
