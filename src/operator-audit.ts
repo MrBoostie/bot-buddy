@@ -18,6 +18,14 @@ export function getOperatorAuditEvent(result: DiscordRoutingResult): string | nu
     return 'operator audit tail denied (disabled)';
   }
 
+  if (result.text.startsWith('audit-tail: invalid usage')) {
+    return 'operator audit tail denied (invalid usage)';
+  }
+
+  if (result.text.startsWith('audit-tail: invalid limit')) {
+    return 'operator audit tail denied (invalid limit)';
+  }
+
   if (result.text.startsWith('audit-tail: ')) {
     return 'operator audit tail viewed';
   }

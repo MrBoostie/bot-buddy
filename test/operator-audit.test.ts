@@ -36,6 +36,22 @@ test('returns audit event for audit-tail access', () => {
   assert.equal(event, 'operator audit tail viewed');
 });
 
+test('returns denied audit event for invalid audit-tail usage', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)',
+  });
+  assert.equal(event, 'operator audit tail denied (invalid usage)');
+});
+
+test('returns denied audit event for invalid audit-tail limit', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)',
+  });
+  assert.equal(event, 'operator audit tail denied (invalid limit)');
+});
+
 test('returns null for non-audited command', () => {
   const event = getOperatorAuditEvent({ kind: 'command', text: 'pong | uptime=5s | model=gpt' });
   assert.equal(event, null);
