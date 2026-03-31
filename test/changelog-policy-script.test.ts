@@ -143,3 +143,29 @@ test('passes when package.json changes with changelog update', () => {
   const result = runPolicy(dir, baseSha, headSha);
   assert.equal(result.code, 0);
 });
+
+test('fails on mixed behavior-visible and non-visible changes without changelog', () => {
+  const { dir, baseSha } = setupRepo();
+  writeFileSync(join(dir, 'README.md'), '# test\n\nbehavior change\n');
+  writeFileSync(join(dir, 'notes.txt'), 'non-visible change\n');
+  sh(dir, 'git add README.md notes.txt');
+  sh(dir, 'git commit -m "mixed visible + non-visible without changelog"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+});
+
+test('passes on mixed behavior-visible and non-visible changes with changelog', () => {
+  const { dir, baseSha } = setupRepo();
+  writeFileSync(join(dir, 'README.md'), '# test\n\nbehavior change\n');
+  writeFileSync(join(dir, 'notes.txt'), 'non-visible change\n');
+  writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- mixed update\n');
+  sh(dir, 'git add README.md notes.txt CHANGELOG.md');
+  sh(dir, 'git commit -m "mixed visible + non-visible with changelog"');
+  const headSha = sh(dir, 'git rev-parse HEAD');
+
+  const result = runPolicy(dir, baseSha, headSha);
+  assert.equal(result.code, 0);
+});
