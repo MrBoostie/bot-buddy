@@ -16,6 +16,7 @@ import { createRequestId, logError, logInfo } from './log.js';
 import { getBackendHealthSummary } from './brain-health.js';
 import { tryAcquireReload } from './operator-rate-limit.js';
 import { getMetricsSummary, resetMetrics } from './metrics.js';
+import { getOperatorAuditEvent } from './operator-audit.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -61,6 +62,14 @@ export async function startDiscord(): Promise<void> {
     );
 
     const requestId = createRequestId();
+
+    const auditEvent = getOperatorAuditEvent(result);
+    if (auditEvent) {
+      logInfo(`${auditEvent} | actor=${msg.author.id} | channel=${msg.channelId}`, {
+        scope: 'discord',
+        requestId,
+      });
+    }
 
     await executeDiscordRouting(result, {
       sendTyping: () => msg.channel.sendTyping(),
