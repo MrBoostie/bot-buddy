@@ -62,6 +62,7 @@ Built-in operator commands (directed to bot):
 Operational logging toggles:
 - `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)
 - Set `METRICS_SNAPSHOT_INTERVAL_SEC` to a positive value to emit periodic `metrics snapshot` log lines
+- Unchanged periodic snapshots are deduped; next changed snapshot reports how many unchanged intervals were suppressed
 
 Runtime config guardrails:
 - Invalid `LLM_BACKEND` values are flagged at boot (`openclaw`/`openai` only)

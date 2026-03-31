@@ -17,6 +17,7 @@ import { getBackendHealthSummary } from './brain-health.js';
 import { tryAcquireReload } from './operator-rate-limit.js';
 import { getMetricsSummary, resetMetrics } from './metrics.js';
 import { getOperatorAuditEvent } from './operator-audit.js';
+import { evaluateMetricsSnapshot } from './metrics-snapshot.js';
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -34,7 +35,14 @@ export async function startDiscord(): Promise<void> {
 
     if (config.metricsSnapshotIntervalSec > 0) {
       const interval = setInterval(() => {
-        logInfo(`metrics snapshot | ${getMetricsSummary()}`, { scope: 'discord' });
+        const snapshot = evaluateMetricsSnapshot(getMetricsSummary());
+        if (!snapshot.emit) return;
+
+        const suffix =
+          snapshot.suppressedBeforeEmit > 0
+            ? ` | suppressedUnchanged=${snapshot.suppressedBeforeEmit}`
+            : '';
+        logInfo(`metrics snapshot | ${snapshot.summary}${suffix}`, { scope: 'discord' });
       }, config.metricsSnapshotIntervalSec * 1000);
       interval.unref();
       logInfo(`metrics snapshot enabled | everySec=${config.metricsSnapshotIntervalSec}`, {
