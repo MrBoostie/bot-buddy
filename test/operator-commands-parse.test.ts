@@ -17,7 +17,12 @@ test('parseAuditTailInput rejects extra args', () => {
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
 });
 
-test('parseAuditTailInput rejects invalid range', () => {
+test('parseAuditTailInput accepts max in-range value', () => {
+  const result = parseAuditTailInput('/audit-tail 20');
+  assert.deepEqual(result, { ok: true, limit: 20 });
+});
+
+test('parseAuditTailInput rejects value above max range', () => {
   const result = parseAuditTailInput('/audit-tail 21');
   assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
 });
