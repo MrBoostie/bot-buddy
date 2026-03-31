@@ -52,6 +52,11 @@ test('parseAuditTailInput rejects zero value even when zero-padded', () => {
   assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
 });
 
+test('parseAuditTailInput rejects very large numeric values', () => {
+  const result = parseAuditTailInput('/audit-tail 999999999999');
+  assert.deepEqual(result, { ok: false, reason: 'invalid-limit' });
+});
+
 test('parseAuditTailInput rejects non-command input', () => {
   const result = parseAuditTailInput('/ping');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
