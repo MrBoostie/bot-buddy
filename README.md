@@ -114,6 +114,10 @@ Then install service:
 
 GitHub Actions now runs `npm run check` + `npm test` on every push to `main` and on pull requests.
 
+## Release notes
+
+- Ongoing changes are tracked in [CHANGELOG.md](./CHANGELOG.md).
+
 ## Next features queued
 
 - memory file + simple persona card
