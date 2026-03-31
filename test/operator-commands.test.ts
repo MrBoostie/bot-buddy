@@ -13,7 +13,7 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     hasOpenAI: () => false,
     backendHealthSummary: () => 'none',
     tryAcquireReload: () => ({ ok: true }),
-    metricsSummary: () => 'commands=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0',
+    metricsSummary: () => 'commands=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0',
     ...overrides,
   };
 }
@@ -54,7 +54,7 @@ test('returns health payload in ok state', () => {
   const result = evaluateOperatorCommand('/health', makeDeps());
   assert.equal(
     result,
-    'health | runtime=ok | issues=0 | discord=true | openai=false | backend=none | metrics=commands=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0',
+    'health | runtime=ok | issues=0 | discord=true | openai=false | backend=none | metrics=commands=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0',
   );
 });
 
@@ -64,12 +64,12 @@ test('returns health payload in degraded state', () => {
     makeDeps({
       validateRuntime: () => ['bad env'],
       backendHealthSummary: () => 'timeout @ 2026-03-31T00:40:00.000Z',
-      metricsSummary: () => 'commands=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100',
+      metricsSummary: () => 'commands=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1',
     }),
   );
   assert.equal(
     result,
-    'health | runtime=degraded | issues=1 | discord=true | openai=false | backend=timeout @ 2026-03-31T00:40:00.000Z | metrics=commands=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100',
+    'health | runtime=degraded | issues=1 | discord=true | openai=false | backend=timeout @ 2026-03-31T00:40:00.000Z | metrics=commands=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1',
   );
 });
 
