@@ -288,6 +288,17 @@ test('diag issues assertion handles regex metacharacters safely', () => {
   assertDiagIssues(result, 'missing key (OPENAI_API_KEY?)');
 });
 
+test('diag issues assertion handles bracket and pipe literals safely', () => {
+  const result = evaluateOperatorCommand(
+    '/diag',
+    makeDeps({
+      validateRuntime: () => ['token [OPENAI|ALT] missing'],
+    }),
+  );
+
+  assertDiagIssues(result, 'token [OPENAI|ALT] missing');
+});
+
 test('returns diag payload with openai backend mode when configured', () => {
   const result = evaluateOperatorCommand(
     '/diag',
