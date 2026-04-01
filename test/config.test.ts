@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildConfigFromEnv, validateConfig } from '../src/config.ts';
+import { buildConfigFromEnv, runtimeModelLabel, validateConfig } from '../src/config.ts';
 
 test('accepts valid openai backend config', () => {
   const cfg = buildConfigFromEnv({
@@ -50,6 +50,7 @@ test('boolean parser supports yes/no style values', () => {
   assert.equal(cfg.allowAuditTail, true);
   assert.equal(cfg.metricsSnapshotIntervalSec, 60);
 });
+
 test('flags non-positive timeout, empty agent id, invalid reload cooldown, and invalid metrics snapshot interval', () => {
   const cfg = buildConfigFromEnv({
     OPENCLAW_TIMEOUT_SEC: '0',
@@ -63,4 +64,33 @@ test('flags non-positive timeout, empty agent id, invalid reload cooldown, and i
   assert.equal(issues.some((issue) => issue.includes('OPENCLAW_AGENT_ID')), true);
   assert.equal(issues.some((issue) => issue.includes('OPERATOR_RELOAD_COOLDOWN_SEC')), true);
   assert.equal(issues.some((issue) => issue.includes('METRICS_SNAPSHOT_INTERVAL_SEC')), true);
+});
+
+test('runtimeModelLabel uses openclaw agent label in openclaw mode', () => {
+  const cfg = buildConfigFromEnv({
+    LLM_BACKEND: 'openclaw',
+    OPENCLAW_AGENT_ID: 'gremlin',
+    OPENAI_MODEL: 'gpt-4.1-mini',
+  });
+
+  assert.equal(runtimeModelLabel(cfg), 'openclaw:gremlin');
+});
+
+test('runtimeModelLabel trims openclaw agent label and falls back to unknown when empty', () => {
+  const cfg = buildConfigFromEnv({
+    LLM_BACKEND: 'openclaw',
+    OPENCLAW_AGENT_ID: '   ',
+  });
+
+  assert.equal(runtimeModelLabel(cfg), 'openclaw:unknown');
+});
+
+test('runtimeModelLabel uses openai model in openai mode', () => {
+  const cfg = buildConfigFromEnv({
+    LLM_BACKEND: 'openai',
+    OPENAI_MODEL: 'gpt-4o-mini',
+    OPENCLAW_AGENT_ID: 'main',
+  });
+
+  assert.equal(runtimeModelLabel(cfg), 'gpt-4o-mini');
 });

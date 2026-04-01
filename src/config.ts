@@ -148,6 +148,15 @@ export function validateRuntime(): string[] {
   return validateConfig(config);
 }
 
+export function runtimeModelLabel(runtime: RuntimeConfig = config): string {
+  if (runtime.llmBackend === 'openclaw') {
+    const agent = runtime.openclawAgentId.trim() || 'unknown';
+    return `openclaw:${agent}`;
+  }
+
+  return runtime.openaiModel;
+}
+
 export function redactedRuntimeSummary(): string {
   const hasToken = Boolean(config.discordToken);
   const hasKey = Boolean(config.openaiApiKey);

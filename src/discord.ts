@@ -6,6 +6,7 @@ import {
   redactedRuntimeSummary,
   refreshConfigFromEnv,
   validateRuntime,
+  runtimeModelLabel,
 } from './config.js';
 import { think } from './brain.js';
 import { formatUptime } from './runtime.js';
@@ -64,7 +65,7 @@ export async function startDiscord(): Promise<void> {
         evaluateCommand: (prompt) =>
           evaluateOperatorCommand(prompt, {
             formatUptime,
-            modelName: () => config.openaiModel,
+            modelName: () => runtimeModelLabel(),
             runtimeSummary: redactedRuntimeSummary,
             validateRuntime,
             refreshConfigFromEnv,

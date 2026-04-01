@@ -31,6 +31,9 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - `/diag` now includes operator guard/policy fields (`allowMetricsReset`, `allowAuditTail`, `auditTailDefault`, `auditTailMax`, `operatorReplyMaxChars`).
   - In-memory operator audit events now include request correlation (`rid`) and classify invalid `/audit-tail` attempts.
 
+### Fixed
+- `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
+
 ### Internal
 - Added shared numeric parsing helper `parseUnsignedIntInRange` for consistent strict numeric command argument validation.
 - Expanded parser test coverage for edge cases (whitespace variants, leading zeros, non-ASCII digits, large values, bounds).
