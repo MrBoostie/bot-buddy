@@ -74,6 +74,10 @@ function assertStatusPayload(
   );
 }
 
+function assertPingPayload(text: string | null, model: string): void {
+  assert.equal(text, `pong | uptime=12s | model=${model}`);
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -135,7 +139,7 @@ test('makeModeSwitchDeps honors initial/switched mode permutations', () => {
 
 test('returns ping payload', () => {
   const result = evaluateOperatorCommand('/ping', makeDeps());
-  assert.equal(result, 'pong | uptime=12s | model=gpt-test');
+  assertPingPayload(result, 'gpt-test');
 });
 
 test('returns status payload', () => {
@@ -149,7 +153,7 @@ test('returns ping/status payloads with openclaw agent model label', () => {
   const ping = evaluateOperatorCommand('/ping', deps);
   const status = evaluateOperatorCommand('/status', deps);
 
-  assert.equal(ping, 'pong | uptime=12s | model=openclaw:gremlin');
+  assertPingPayload(ping, 'openclaw:gremlin');
   assertStatusPayload(status, { model: 'openclaw:gremlin', llmBackend: 'openclaw' });
 });
 
@@ -163,7 +167,7 @@ test('returns ping/status payloads with openai model label', () => {
   const ping = evaluateOperatorCommand('/ping', deps);
   const status = evaluateOperatorCommand('/status', deps);
 
-  assert.equal(ping, 'pong | uptime=12s | model=gpt-4o-mini');
+  assertPingPayload(ping, 'gpt-4o-mini');
   assertStatusPayload(status, { model: 'gpt-4o-mini', llmBackend: 'openai' });
 });
 
