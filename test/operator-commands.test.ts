@@ -61,6 +61,19 @@ function assertReloadIssuesRemain(text: string | null, issues: string): void {
   assert.equal(text, `reload: applied, but issues remain -> ${issues}`);
 }
 
+function assertStatusPayload(
+  text: string | null,
+  options: {
+    model: string;
+    llmBackend: 'openclaw' | 'openai';
+  },
+): void {
+  assert.equal(
+    text,
+    `status: online | uptime=12s | model=${options.model} | bot=buddy | llmBackend=${options.llmBackend}`,
+  );
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -127,10 +140,7 @@ test('returns ping payload', () => {
 
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
-  assert.equal(
-    result,
-    'status: online | uptime=12s | model=gpt-test | bot=buddy | llmBackend=openclaw',
-  );
+  assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });
 });
 
 test('returns ping/status payloads with openclaw agent model label', () => {
@@ -140,10 +150,7 @@ test('returns ping/status payloads with openclaw agent model label', () => {
   const status = evaluateOperatorCommand('/status', deps);
 
   assert.equal(ping, 'pong | uptime=12s | model=openclaw:gremlin');
-  assert.equal(
-    status,
-    'status: online | uptime=12s | model=openclaw:gremlin | bot=buddy | llmBackend=openclaw',
-  );
+  assertStatusPayload(status, { model: 'openclaw:gremlin', llmBackend: 'openclaw' });
 });
 
 test('returns ping/status payloads with openai model label', () => {
@@ -157,10 +164,7 @@ test('returns ping/status payloads with openai model label', () => {
   const status = evaluateOperatorCommand('/status', deps);
 
   assert.equal(ping, 'pong | uptime=12s | model=gpt-4o-mini');
-  assert.equal(
-    status,
-    'status: online | uptime=12s | model=gpt-4o-mini | bot=buddy | llmBackend=openai',
-  );
+  assertStatusPayload(status, { model: 'gpt-4o-mini', llmBackend: 'openai' });
 });
 
 test('returns diag ok payload', () => {
@@ -386,10 +390,7 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
   assertReloadIssuesRemain(reloaded, 'OPENAI_API_KEY missing');
   assertHasBackendMode(afterDiag, 'openai');
   assertDiagIssues(afterDiag, 'OPENAI_API_KEY missing');
-  assert.equal(
-    afterStatus,
-    'status: online | uptime=12s | model=gpt-4o-mini | bot=buddy | llmBackend=openai',
-  );
+  assertStatusPayload(afterStatus, { model: 'gpt-4o-mini', llmBackend: 'openai' });
 });
 
 test('returns metrics-reset disabled payload when guard is off', () => {
