@@ -209,6 +209,24 @@ test('returns health payload in degraded state', () => {
   );
 });
 
+test('diag and health surface inconsistent openai capability signals', () => {
+  const deps = makeDeps({
+    llmBackend: () => 'openai',
+    hasOpenAI: () => false,
+    runtimeSummary: () => 'bot=buddy | llmBackend=openai',
+    validateRuntime: () => ['OPENAI_API_KEY is missing while LLM_BACKEND=openai'],
+  });
+
+  const diag = evaluateOperatorCommand('/diag', deps);
+  const health = evaluateOperatorCommand('/health', deps);
+
+  assert.match(diag ?? '', /issues detected -> OPENAI_API_KEY is missing while LLM_BACKEND=openai/);
+  assert.match(diag ?? '', /llmBackend=openai/);
+
+  assert.match(health ?? '', /^health \| runtime=degraded \| issues=1 \|/);
+  assert.match(health ?? '', /\| openai=false \|/);
+});
+
 test('health stays coherent across reload switch to openai', () => {
   const deps = makeModeSwitchDeps({
     validateRuntime: (mode) => (mode === 'openai' ? ['OPENAI_API_KEY missing'] : []),
