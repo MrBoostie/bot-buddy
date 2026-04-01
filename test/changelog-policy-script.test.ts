@@ -27,12 +27,11 @@ function setupRepo(): { dir: string; baseSha: string } {
   return { dir, baseSha: sh(dir, 'git rev-parse HEAD') };
 }
 
-function runPolicy(
+function runPolicyWithArgs(
   cwd: string,
-  baseSha: string,
-  headSha: string,
+  args: string[],
 ): { code: number; stderr: string; stdout: string } {
-  const result = spawnSync('bash', [SCRIPT_PATH, baseSha, headSha], {
+  const result = spawnSync('bash', [SCRIPT_PATH, ...args], {
     cwd,
     encoding: 'utf8',
   });
@@ -41,6 +40,14 @@ function runPolicy(
     stderr: result.stderr ?? '',
     stdout: result.stdout ?? '',
   };
+}
+
+function runPolicy(
+  cwd: string,
+  baseSha: string,
+  headSha: string,
+): { code: number; stderr: string; stdout: string } {
+  return runPolicyWithArgs(cwd, [baseSha, headSha]);
 }
 
 function commitAndRunPolicy(
@@ -60,6 +67,13 @@ function expectPolicyFailure(result: { code: number; stderr: string; stdout: str
   assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
   assert.match(result.stdout, /::error::CHANGELOG\.md must be updated/i);
 }
+
+test('returns usage error when invoked without required args', () => {
+  const { dir } = setupRepo();
+  const result = runPolicyWithArgs(dir, []);
+  assert.equal(result.code, 2);
+  assert.match(result.stderr, /Usage: .* <base-sha> <head-sha>/i);
+});
 
 test('fails when behavior-visible files change without changelog update', () => {
   const { dir, baseSha } = setupRepo();
