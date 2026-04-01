@@ -36,6 +36,36 @@ test('returns status payload', () => {
   );
 });
 
+test('returns ping/status payloads with openclaw agent model label', () => {
+  const deps = makeDeps({ modelName: () => 'openclaw:gremlin' });
+
+  const ping = evaluateOperatorCommand('/ping', deps);
+  const status = evaluateOperatorCommand('/status', deps);
+
+  assert.equal(ping, 'pong | uptime=12s | model=openclaw:gremlin');
+  assert.equal(
+    status,
+    'status: online | uptime=12s | model=openclaw:gremlin | bot=buddy | llmBackend=openclaw',
+  );
+});
+
+test('returns ping/status payloads with openai model label', () => {
+  const deps = makeDeps({
+    modelName: () => 'gpt-4o-mini',
+    llmBackend: () => 'openai',
+    runtimeSummary: () => 'bot=buddy | llmBackend=openai',
+  });
+
+  const ping = evaluateOperatorCommand('/ping', deps);
+  const status = evaluateOperatorCommand('/status', deps);
+
+  assert.equal(ping, 'pong | uptime=12s | model=gpt-4o-mini');
+  assert.equal(
+    status,
+    'status: online | uptime=12s | model=gpt-4o-mini | bot=buddy | llmBackend=openai',
+  );
+});
+
 test('returns diag ok payload', () => {
   const result = evaluateOperatorCommand('/diag', makeDeps());
   assert.equal(
