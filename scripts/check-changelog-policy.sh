@@ -17,6 +17,7 @@ echo "$CHANGED"
 if echo "$CHANGED" | grep -Eq '^(src/|scripts/|package\.json|README\.md)'; then
   if ! echo "$CHANGED" | grep -q '^CHANGELOG\.md$'; then
     echo "ERROR: CHANGELOG.md must be updated when behavior-visible files change in a PR." >&2
+    echo "Hint: run npm run test:changelog-policy and see CONTRIBUTING.md (Changelog policy + PR checklist)." >&2
     exit 1
   fi
 fi
