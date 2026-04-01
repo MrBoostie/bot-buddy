@@ -64,6 +64,20 @@ function assertDiagPolicyTail(text: string | null): void {
   assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
 }
 
+function assertDiagBackendAndGuards(
+  text: string | null,
+  options: {
+    llmBackend: 'openclaw' | 'openai';
+    allowMetricsReset: boolean;
+    allowAuditTail: boolean;
+  },
+): void {
+  const target = text ?? '';
+  assertHasBackendMode(target, options.llmBackend);
+  assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
+  assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
+}
+
 function assertDiagOk(
   text: string | null,
   options: {
@@ -230,9 +244,11 @@ test('returns diag issues payload', () => {
     }),
   );
   assertDiagIssues(result, 'bad env ; missing key');
-  assertHasBackendMode(result, 'openclaw');
-  assert.match(result ?? '', /allowMetricsReset=true/);
-  assert.match(result ?? '', /allowAuditTail=true/);
+  assertDiagBackendAndGuards(result, {
+    llmBackend: 'openclaw',
+    allowMetricsReset: true,
+    allowAuditTail: true,
+  });
   assertDiagPolicyTail(result);
   assert.match(result ?? '', /lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z/);
 });
@@ -308,7 +324,11 @@ test('diag and health surface inconsistent openai capability signals', () => {
   const health = evaluateOperatorCommand('/health', deps);
 
   assertDiagIssues(diag, 'OPENAI_API_KEY is missing while LLM_BACKEND=openai');
-  assert.match(diag ?? '', /llmBackend=openai/);
+  assertDiagBackendAndGuards(diag, {
+    llmBackend: 'openai',
+    allowMetricsReset: false,
+    allowAuditTail: false,
+  });
   assertDiagPolicyTail(diag);
 
   assertHealthSignals(health, { runtime: 'degraded', issues: 1, openai: false });
@@ -441,7 +461,11 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
 
   assertHasBackendMode(beforeDiag, 'openclaw');
   assertReloadIssuesRemain(reloaded, 'OPENAI_API_KEY missing');
-  assertHasBackendMode(afterDiag, 'openai');
+  assertDiagBackendAndGuards(afterDiag, {
+    llmBackend: 'openai',
+    allowMetricsReset: false,
+    allowAuditTail: false,
+  });
   assertDiagIssues(afterDiag, 'OPENAI_API_KEY missing');
   assertDiagPolicyTail(afterDiag);
   assertStatusPayload(afterStatus, { model: 'gpt-4o-mini', llmBackend: 'openai' });
