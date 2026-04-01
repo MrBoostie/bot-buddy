@@ -18,6 +18,7 @@ const OPERATOR_COMMANDS = {
 
 const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
 const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
+const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
   const commands: string[] = [
     OPERATOR_COMMANDS.question,
@@ -199,7 +200,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     cmd.startsWith(`${OPERATOR_COMMANDS.commands} `)
   ) {
     incrementCommandCount();
-    return done('help: invalid usage (use /?, /help, or /commands)');
+    return done(HELP_INVALID_USAGE);
   }
 
   if (cmd === OPERATOR_COMMANDS.status) {
