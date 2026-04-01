@@ -6,6 +6,11 @@ cd "$ROOT_DIR"
 
 MISSING=0
 
+DOC_FILES=(README.md CONTRIBUTING.md CHANGELOG.md)
+if [[ "$#" -gt 0 ]]; then
+  DOC_FILES=("$@")
+fi
+
 check_link_target() {
   local source_file="$1"
   local target="$2"
@@ -23,7 +28,7 @@ check_link_target() {
   fi
 }
 
-for file in README.md CONTRIBUTING.md CHANGELOG.md; do
+for file in "${DOC_FILES[@]}"; do
   if [[ ! -f "$file" ]]; then
     echo "ERROR: expected doc missing: $file" >&2
     MISSING=1
@@ -44,4 +49,4 @@ if [[ "$MISSING" -ne 0 ]]; then
   exit 1
 fi
 
-echo "Doc link check passed for README.md, CONTRIBUTING.md, CHANGELOG.md"
+echo "Doc link check passed for: ${DOC_FILES[*]}"

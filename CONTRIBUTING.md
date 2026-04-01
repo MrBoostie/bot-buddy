@@ -30,6 +30,8 @@ npm run test:changelog-policy
 npm test
 ```
 
+Tip for faster local loops: run scoped docs checks with file args, e.g. `bash scripts/check-doc-links.sh CONTRIBUTING.md`.
+
 ## PR checklist
 
 - [ ] `npm run check` passes

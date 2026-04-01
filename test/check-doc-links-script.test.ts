@@ -26,8 +26,11 @@ function setupDocsFixture(files: Record<string, string>): string {
   return dir;
 }
 
-function runDocCheck(cwd: string): { code: number; stdout: string; stderr: string } {
-  const result = spawnSync('bash', ['scripts/check-doc-links.sh'], { cwd, encoding: 'utf8' });
+function runDocCheck(
+  cwd: string,
+  files: string[] = [],
+): { code: number; stdout: string; stderr: string } {
+  const result = spawnSync('bash', ['scripts/check-doc-links.sh', ...files], { cwd, encoding: 'utf8' });
   return {
     code: result.status ?? 1,
     stdout: result.stdout ?? '',
@@ -74,4 +77,15 @@ test('fails when anchored relative target file is missing', () => {
   const result = runDocCheck(dir);
   assert.equal(result.code, 1);
   assert.match(result.stderr, /references missing link target: \.\/docs\/missing\.md#intro/i);
+});
+
+test('supports scoped file checks via positional file args', () => {
+  const dir = setupDocsFixture({
+    'README.md': '[Bad](./docs/missing.md)\n',
+    'CONTRIBUTING.md': '[Good](./CHANGELOG.md)\n',
+  });
+
+  const result = runDocCheck(dir, ['CONTRIBUTING.md']);
+  assert.equal(result.code, 0);
+  assert.match(result.stdout, /Doc link check passed for: CONTRIBUTING\.md/i);
 });
