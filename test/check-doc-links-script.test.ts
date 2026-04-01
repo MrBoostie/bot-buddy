@@ -89,3 +89,14 @@ test('supports scoped file checks via positional file args', () => {
   assert.equal(result.code, 0);
   assert.match(result.stdout, /Doc link check passed for: CONTRIBUTING\.md/i);
 });
+
+test('fails clearly when scoped file argument does not exist', () => {
+  const dir = setupDocsFixture({
+    'README.md': '[Good](./CONTRIBUTING.md)\n',
+  });
+
+  const result = runDocCheck(dir, ['MISSING.md']);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /expected doc missing: MISSING\.md/i);
+  assert.match(result.stdout, /::error::Documentation link check failed/i);
+});
