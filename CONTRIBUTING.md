@@ -22,6 +22,14 @@ npm test
 npm run test:changelog-policy
 ```
 
+## PR checklist
+
+- [ ] `npm run check` passes
+- [ ] `npm test` passes
+- [ ] `CHANGELOG.md` updated for behavior-visible changes (or maintainer applied `skip-changelog` label intentionally)
+- [ ] `README.md` / operator docs updated if command/runtime behavior changed
+- [ ] New/changed policy logic covered by `test/changelog-policy-script.test.ts` where applicable
+
 ## Changelog policy
 
 Behavior-visible changes require a `CHANGELOG.md` update (unless maintainers apply the exceptional `skip-changelog` PR label).
