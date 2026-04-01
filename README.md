@@ -122,12 +122,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for contributor workflow and changelog 
 
 ## Release checklist
 
-Before merging/releasing user-visible changes:
-
-1. `npm run check`
-2. `npm test`
-3. Update `CHANGELOG.md` (`Unreleased` section) for behavior-visible updates
-4. Ensure README operator docs reflect any command/diagnostic changes
+Canonical contributor/release checklist is maintained in [CONTRIBUTING.md](./CONTRIBUTING.md) to avoid drift.
 
 ### What counts as behavior-visible?
 
