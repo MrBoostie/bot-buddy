@@ -49,6 +49,18 @@ function assertDiagIssues(text: string | null, issuePrefix: string): void {
   assert.match(target, new RegExp(`^diag: issues detected -> ${issuePrefix}`));
 }
 
+function assertReloadApplied(text: string | null, summaryPrefix = 'bot=buddy'): void {
+  assert.equal(text, `reload: applied | ${summaryPrefix}`);
+}
+
+function assertReloadRateLimited(text: string | null, retryAfterSec: number): void {
+  assert.equal(text, `reload: rate-limited | retryAfterSec=${retryAfterSec}`);
+}
+
+function assertReloadIssuesRemain(text: string | null, issues: string): void {
+  assert.equal(text, `reload: applied, but issues remain -> ${issues}`);
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -270,7 +282,7 @@ test('runs reload and returns success payload', () => {
   );
 
   assert.equal(reloadCalls, 1);
-  assert.equal(result, 'reload: applied | bot=buddy | llmBackend=openclaw');
+  assertReloadApplied(result, 'bot=buddy | llmBackend=openclaw');
 });
 
 test('runs reload and returns success payload for openai mode summary', () => {
@@ -288,7 +300,7 @@ test('runs reload and returns success payload for openai mode summary', () => {
   );
 
   assert.equal(reloadCalls, 1);
-  assert.equal(result, 'reload: applied | bot=buddy | llmBackend=openai | openAIKey=set');
+  assertReloadApplied(result, 'bot=buddy | llmBackend=openai | openAIKey=set');
 });
 
 test('diag and reload stay semantically aligned on backend mode after mode switch', () => {
@@ -299,7 +311,7 @@ test('diag and reload stay semantically aligned on backend mode after mode switc
   const after = evaluateOperatorCommand('/diag', deps);
 
   assertHasBackendMode(before, 'openclaw');
-  assert.equal(reloaded, 'reload: applied | bot=buddy | llmBackend=openai');
+  assertReloadApplied(reloaded, 'bot=buddy | llmBackend=openai');
   assertHasBackendMode(after, 'openai');
 });
 
@@ -316,7 +328,7 @@ test('returns reload rate-limit payload and skips refresh', () => {
   );
 
   assert.equal(reloadCalls, 0);
-  assert.equal(result, 'reload: rate-limited | retryAfterSec=12');
+  assertReloadRateLimited(result, 12);
 });
 
 test('reload rate-limit does not mutate backend mode observed by diag', () => {
@@ -339,7 +351,7 @@ test('reload rate-limit does not mutate backend mode observed by diag', () => {
   const after = evaluateOperatorCommand('/diag', deps);
 
   assertHasBackendMode(before, 'openclaw');
-  assert.equal(reloaded, 'reload: rate-limited | retryAfterSec=9');
+  assertReloadRateLimited(reloaded, 9);
   assert.equal(refreshCalls, 0);
   assertHasBackendMode(after, 'openclaw');
 });
@@ -357,7 +369,7 @@ test('runs reload and returns issues payload when validation fails', () => {
   );
 
   assert.equal(reloadCalls, 1);
-  assert.equal(result, 'reload: applied, but issues remain -> still broken');
+  assertReloadIssuesRemain(result, 'still broken');
 });
 
 test('reload issues branch keeps diag/status mode-consistent after switch to openai', () => {
@@ -371,7 +383,7 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
   const afterStatus = evaluateOperatorCommand('/status', deps);
 
   assertHasBackendMode(beforeDiag, 'openclaw');
-  assert.equal(reloaded, 'reload: applied, but issues remain -> OPENAI_API_KEY missing');
+  assertReloadIssuesRemain(reloaded, 'OPENAI_API_KEY missing');
   assertHasBackendMode(afterDiag, 'openai');
   assertDiagIssues(afterDiag, 'OPENAI_API_KEY missing');
   assert.equal(
