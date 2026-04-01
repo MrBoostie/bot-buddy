@@ -35,6 +35,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Added `/commands` as an alias for `/help` to improve command discoverability.
   - `/help`/`/commands` now include targeted `enable:` env-toggle hints when guard-gated commands are disabled.
   - `/help` and `/commands` now reject extra args with an explicit usage hint instead of silently falling through.
+  - Unrecognized slash commands now return `unknown command: /<name> (use /help)` instead of falling through to LLM handling.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).

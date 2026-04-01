@@ -783,3 +783,13 @@ test('returns null for non-command input', () => {
   const result = evaluateOperatorCommand('hello bot', makeDeps());
   assert.equal(result, null);
 });
+
+test('returns unknown command hint for unrecognized slash command', () => {
+  const result = evaluateOperatorCommand('/hepl', makeDeps());
+  assert.equal(result, 'unknown command: /hepl (use /help)');
+});
+
+test('returns unknown command hint for unrecognized slash command with args', () => {
+  const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
+  assert.equal(result, 'unknown command: /mystery (use /help)');
+});

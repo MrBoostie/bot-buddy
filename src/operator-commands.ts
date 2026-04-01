@@ -211,5 +211,10 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`${payload.slice(0, MAX_OPERATOR_REPLY_CHARS - suffix.length)}${suffix}`);
   }
 
+  if (cmd.startsWith('/')) {
+    const unknown = cmd.split(/\s+/, 1)[0] || cmd;
+    return done(`unknown command: ${unknown} (use /help)`);
+  }
+
   return null;
 }
