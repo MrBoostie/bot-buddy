@@ -62,7 +62,7 @@ Built-in operator commands (directed to bot):
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
 - `/audit-tail` or `/audit-tail <1-20>` — show recent in-memory operator audit events (disabled by default; enable with `ALLOW_AUDIT_TAIL=true`; limit must be an unsigned integer; invalid extra args are rejected)
 
-Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /help)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`).
+Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /?, /help, or /commands)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`).
 
 Sample `/diag` output:
 

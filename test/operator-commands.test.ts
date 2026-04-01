@@ -796,20 +796,20 @@ test('returns null for non-command input', () => {
 
 test('returns unknown command hint for unrecognized slash command', () => {
   const result = evaluateOperatorCommand('/hepl', makeDeps());
-  assert.equal(result, 'unknown command: /hepl (use /help) | did you mean /help?');
+  assert.equal(result, 'unknown command: /hepl (use /?, /help, or /commands) | did you mean /help?');
 });
 
 test('returns unknown command hint for common transposition typo', () => {
   const result = evaluateOperatorCommand('/stauts', makeDeps());
-  assert.equal(result, 'unknown command: /stauts (use /help) | did you mean /status?');
+  assert.equal(result, 'unknown command: /stauts (use /?, /help, or /commands) | did you mean /status?');
 });
 
 test('returns unknown command hint for unrecognized slash command with args', () => {
   const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
-  assert.equal(result, 'unknown command: /mystery (use /help)');
+  assert.equal(result, 'unknown command: /mystery (use /?, /help, or /commands)');
 });
 
 test('does not suggest /? for short unknown slash commands', () => {
   const result = evaluateOperatorCommand('/x', makeDeps());
-  assert.equal(result, 'unknown command: /x (use /help)');
+  assert.equal(result, 'unknown command: /x (use /?, /help, or /commands)');
 });

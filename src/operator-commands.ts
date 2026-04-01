@@ -17,6 +17,7 @@ const OPERATOR_COMMANDS = {
 } as const;
 
 const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
+const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
   const commands: string[] = [
     OPERATOR_COMMANDS.ping,
@@ -288,7 +289,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd.startsWith('/')) {
     const unknown = cmd.split(/\s+/, 1)[0] || cmd;
-    return done(`unknown command: ${unknown} (use /help)${unknownCommandSuggestion(unknown)}`);
+    return done(`unknown command: ${unknown} ${HELP_USAGE_HINT}${unknownCommandSuggestion(unknown)}`);
   }
 
   return null;
