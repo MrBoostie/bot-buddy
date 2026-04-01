@@ -287,6 +287,14 @@ test('returns command list payload for /commands alias', () => {
   );
 });
 
+test('rejects invalid help usage with extra args', () => {
+  const viaHelp = evaluateOperatorCommand('/help now', makeDeps());
+  const viaAlias = evaluateOperatorCommand('/commands now', makeDeps());
+
+  assert.equal(viaHelp, 'help: invalid usage (use /help or /commands)');
+  assert.equal(viaAlias, 'help: invalid usage (use /help or /commands)');
+});
+
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
   assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });

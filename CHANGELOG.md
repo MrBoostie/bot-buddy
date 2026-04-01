@@ -34,6 +34,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - `/help` now reflects guard state by marking `/metrics-reset` and `/audit-tail` as disabled when their guards are off.
   - Added `/commands` as an alias for `/help` to improve command discoverability.
   - `/help`/`/commands` now include targeted `enable:` env-toggle hints when guard-gated commands are disabled.
+  - `/help` and `/commands` now reject extra args with an explicit usage hint instead of silently falling through.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).

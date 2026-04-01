@@ -118,6 +118,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`commands: ${helpCommandSummary(deps)}${helpEnableHint(deps)}`);
   }
 
+  if (cmd.startsWith('/help ') || cmd.startsWith('/commands ')) {
+    incrementCommandCount();
+    return done('help: invalid usage (use /help or /commands)');
+  }
+
   if (cmd === '/status') {
     incrementCommandCount();
     return done(
