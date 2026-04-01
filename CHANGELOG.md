@@ -70,3 +70,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added a table-driven `formatAppVersionLog()` test that covers all supported source variants (`BOT_BUDDY_VERSION`, `npm_package_version`, `unknown`).
 - Removed redundant single-case `formatAppVersionLog()` tests in favor of the table-driven source-variant coverage to reduce maintenance noise.
 - Consolidated README version/startup-log docs assertions into one table-driven test to reduce duplicate test scaffolding while preserving coverage.
+- Consolidated unknown-command typo suggestion assertions into a single table-driven operator-command test to reduce repetitive test blocks while keeping behavior coverage unchanged.

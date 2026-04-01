@@ -815,29 +815,34 @@ test('returns null for non-command input', () => {
   assert.equal(result, null);
 });
 
-test('returns unknown command hint for unrecognized slash command', () => {
-  const result = evaluateOperatorCommand('/hepl', makeDeps());
-  assert.equal(result, 'unknown command: /hepl (use /?, /help, or /commands) | did you mean /help?');
-});
+test('returns unknown command hint for near-miss slash-command typos (table-driven)', () => {
+  const cases: Array<{ input: string; expected: string }> = [
+    {
+      input: '/hepl',
+      expected: 'unknown command: /hepl (use /?, /help, or /commands) | did you mean /help?',
+    },
+    {
+      input: '/stauts',
+      expected: 'unknown command: /stauts (use /?, /help, or /commands) | did you mean /status?',
+    },
+    {
+      input: '/uptim',
+      expected: 'unknown command: /uptim (use /?, /help, or /commands) | did you mean /uptime?',
+    },
+    {
+      input: '/upp',
+      expected: 'unknown command: /upp (use /?, /help, or /commands) | did you mean /up?',
+    },
+    {
+      input: '/verison',
+      expected: 'unknown command: /verison (use /?, /help, or /commands) | did you mean /version?',
+    },
+  ];
 
-test('returns unknown command hint for common transposition typo', () => {
-  const result = evaluateOperatorCommand('/stauts', makeDeps());
-  assert.equal(result, 'unknown command: /stauts (use /?, /help, or /commands) | did you mean /status?');
-});
-
-test('returns unknown command hint for uptime typo', () => {
-  const result = evaluateOperatorCommand('/uptim', makeDeps());
-  assert.equal(result, 'unknown command: /uptim (use /?, /help, or /commands) | did you mean /uptime?');
-});
-
-test('returns unknown command hint for short uptime alias typo', () => {
-  const result = evaluateOperatorCommand('/upp', makeDeps());
-  assert.equal(result, 'unknown command: /upp (use /?, /help, or /commands) | did you mean /up?');
-});
-
-test('returns unknown command hint for version typo', () => {
-  const result = evaluateOperatorCommand('/verison', makeDeps());
-  assert.equal(result, 'unknown command: /verison (use /?, /help, or /commands) | did you mean /version?');
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(c.input, makeDeps());
+    assert.equal(result, c.expected);
+  }
 });
 
 test('returns unknown command hint for unrecognized slash command with args', () => {
