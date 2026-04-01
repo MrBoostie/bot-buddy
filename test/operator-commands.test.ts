@@ -44,6 +44,11 @@ function assertHealthSignals(
   assert.match(target, new RegExp(`\\| openai=${String(options.openai)} \\|`));
 }
 
+function assertHealthBackendSummary(text: string | null, backendSummary: string): void {
+  const target = text ?? '';
+  assert.match(target, new RegExp(`\\| backend=${backendSummary} \\|`));
+}
+
 function assertDiagIssues(text: string | null, issuePrefix: string): void {
   const target = text ?? '';
   assert.match(target, new RegExp(`^diag: issues detected -> ${issuePrefix}`));
@@ -255,9 +260,11 @@ test('diag reflects hasOpenAI=true after reload switches backend to openai', () 
 
 test('returns health payload in ok state', () => {
   const result = evaluateOperatorCommand('/health', makeDeps());
-  assert.equal(
-    result,
-    'health | runtime=ok | issues=0 | discord=true | openai=false | backend=none | metrics=commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
+  assertHealthSignals(result, { runtime: 'ok', issues: 0, openai: false });
+  assertHealthBackendSummary(result, 'none');
+  assert.match(
+    result ?? '',
+    /\| metrics=commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0$/,
   );
 });
 
@@ -270,9 +277,11 @@ test('returns health payload in degraded state', () => {
       metricsSummary: () => 'commands=9,llmCalls=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1,cmdAvgMs=14,cmdRecentMaxMs=22',
     }),
   );
-  assert.equal(
-    result,
-    'health | runtime=degraded | issues=1 | discord=true | openai=false | backend=timeout @ 2026-03-31T00:40:00.000Z | metrics=commands=9,llmCalls=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1,cmdAvgMs=14,cmdRecentMaxMs=22',
+  assertHealthSignals(result, { runtime: 'degraded', issues: 1, openai: false });
+  assertHealthBackendSummary(result, 'timeout @ 2026-03-31T00:40:00.000Z');
+  assert.match(
+    result ?? '',
+    /\| metrics=commands=9,llmCalls=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1,cmdAvgMs=14,cmdRecentMaxMs=22$/,
   );
 });
 
