@@ -54,9 +54,14 @@ function assertHealthMetricsSuffix(text: string | null, metrics: string): void {
   assert.match(target, new RegExp(`\\| metrics=${metrics}$`));
 }
 
+function escapeForRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function assertDiagIssues(text: string | null, issuePrefix: string): void {
   const target = text ?? '';
-  assert.match(target, new RegExp(`^diag: issues detected -> ${issuePrefix}`));
+  const escaped = escapeForRegExp(issuePrefix);
+  assert.match(target, new RegExp(`^diag: issues detected -> ${escaped}`));
 }
 
 function assertDiagPolicyTail(text: string | null): void {
