@@ -814,6 +814,11 @@ test('returns unknown command hint for common transposition typo', () => {
   assert.equal(result, 'unknown command: /stauts (use /?, /help, or /commands) | did you mean /status?');
 });
 
+test('returns unknown command hint for uptime typo', () => {
+  const result = evaluateOperatorCommand('/uptim', makeDeps());
+  assert.equal(result, 'unknown command: /uptim (use /?, /help, or /commands) | did you mean /uptime?');
+});
+
 test('returns unknown command hint for unrecognized slash command with args', () => {
   const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
   assert.equal(result, 'unknown command: /mystery (use /?, /help, or /commands)');
