@@ -37,6 +37,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Added `/?` as a compact alias for help/command discovery output.
   - Help output now lists all help aliases (`/?`, `/help`, `/commands`) explicitly to improve discoverability.
   - Added `/uptime` operator command for a compact uptime+model check.
+  - Added `/up` alias for `/uptime` for faster operator ergonomics.
   - `/help` and `/commands` now reject extra args with an explicit usage hint instead of silently falling through.
   - Unrecognized slash commands now return `unknown command: /<name> (use /help)` instead of falling through to LLM handling.
   - Unknown command hints now include typo suggestions for near-miss operator commands (e.g. `/hepl` suggests `/help`).

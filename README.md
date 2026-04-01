@@ -56,7 +56,7 @@ Built-in operator commands (directed to bot):
   - Extra args are rejected (`/help now` -> `help: invalid usage (use /?, /help, or /commands)`) to keep operator command parsing predictable.
   - Help output now includes all three help aliases explicitly for easier discoverability.
 - `/ping` — fast liveness check (`pong` + uptime + model)
-- `/uptime` — compact uptime + model check without ping wording
+- `/up` or `/uptime` — compact uptime + model check without ping wording
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + guard/policy snapshot + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
