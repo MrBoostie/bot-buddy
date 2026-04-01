@@ -49,6 +49,28 @@ function assertDiagIssues(text: string | null, issuePrefix: string): void {
   assert.match(target, new RegExp(`^diag: issues detected -> ${issuePrefix}`));
 }
 
+function assertDiagOk(
+  text: string | null,
+  options: {
+    hasDiscord: boolean;
+    hasOpenAI: boolean;
+    llmBackend: 'openclaw' | 'openai';
+    allowMetricsReset: boolean;
+    allowAuditTail: boolean;
+    lastBackendError?: string;
+  },
+): void {
+  const target = text ?? '';
+  assert.match(target, /^diag: ok \|/);
+  assert.match(target, new RegExp(`\| hasDiscord=${String(options.hasDiscord)} \|`));
+  assert.match(target, new RegExp(`\| hasOpenAI=${String(options.hasOpenAI)} \|`));
+  assert.match(target, new RegExp(`\| llmBackend=${options.llmBackend} \|`));
+  assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
+  assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
+  assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
+  assert.match(target, new RegExp(`\| lastBackendError=${options.lastBackendError ?? 'none'}$`));
+}
+
 function assertReloadApplied(text: string | null, summaryPrefix = 'bot=buddy'): void {
   assert.equal(text, `reload: applied | ${summaryPrefix}`);
 }
@@ -173,10 +195,13 @@ test('returns ping/status payloads with openai model label', () => {
 
 test('returns diag ok payload', () => {
   const result = evaluateOperatorCommand('/diag', makeDeps());
-  assert.equal(
-    result,
-    'diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none',
-  );
+  assertDiagOk(result, {
+    hasDiscord: true,
+    hasOpenAI: false,
+    llmBackend: 'openclaw',
+    allowMetricsReset: false,
+    allowAuditTail: false,
+  });
 });
 
 test('returns diag issues payload', () => {
@@ -205,10 +230,13 @@ test('returns diag payload with openai backend mode when configured', () => {
     }),
   );
 
-  assert.equal(
-    result,
-    'diag: ok | hasDiscord=true | hasOpenAI=true | llmBackend=openai | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none',
-  );
+  assertDiagOk(result, {
+    hasDiscord: true,
+    hasOpenAI: true,
+    llmBackend: 'openai',
+    allowMetricsReset: false,
+    allowAuditTail: false,
+  });
 });
 
 test('diag reflects hasOpenAI=true after reload switches backend to openai', () => {
