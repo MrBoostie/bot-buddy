@@ -172,6 +172,20 @@ test('returns diag payload with openai backend mode when configured', () => {
   );
 });
 
+test('diag reflects hasOpenAI=true after reload switches backend to openai', () => {
+  const deps = makeModeSwitchDeps();
+
+  const before = evaluateOperatorCommand('/diag', deps);
+  evaluateOperatorCommand('/reload', deps);
+  const after = evaluateOperatorCommand('/diag', deps);
+
+  assertHasBackendMode(before, 'openclaw');
+  assert.match(before ?? '', /hasOpenAI=false/);
+
+  assertHasBackendMode(after, 'openai');
+  assert.match(after ?? '', /hasOpenAI=true/);
+});
+
 test('returns health payload in ok state', () => {
   const result = evaluateOperatorCommand('/health', makeDeps());
   assert.equal(
