@@ -193,3 +193,27 @@ test('formatAppVersionLog renders unknown-source payload consistently', () => {
     'app version | value=unknown | source=unknown',
   );
 });
+
+test('formatAppVersionLog covers all supported version sources (table-driven)', () => {
+  const cases: Array<{
+    info: Parameters<typeof formatAppVersionLog>[0];
+    expected: string;
+  }> = [
+    {
+      info: { value: '2.4.1', source: 'BOT_BUDDY_VERSION' },
+      expected: 'app version | value=2.4.1 | source=BOT_BUDDY_VERSION',
+    },
+    {
+      info: { value: '1.9.0', source: 'npm_package_version' },
+      expected: 'app version | value=1.9.0 | source=npm_package_version',
+    },
+    {
+      info: { value: 'unknown', source: 'unknown' },
+      expected: 'app version | value=unknown | source=unknown',
+    },
+  ];
+
+  for (const { info, expected } of cases) {
+    assert.equal(formatAppVersionLog(info), expected);
+  }
+});
