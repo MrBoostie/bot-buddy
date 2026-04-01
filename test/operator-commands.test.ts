@@ -45,6 +45,43 @@ function makeModeSwitchDeps(options: {
   });
 }
 
+test('makeModeSwitchDeps honors initial/switched mode permutations', () => {
+  const cases: Array<{
+    initialMode: 'openclaw' | 'openai';
+    switchedMode: 'openclaw' | 'openai';
+    expectedInitialModel: string;
+    expectedSwitchedModel: string;
+  }> = [
+    {
+      initialMode: 'openclaw',
+      switchedMode: 'openai',
+      expectedInitialModel: 'openclaw:main',
+      expectedSwitchedModel: 'gpt-4o-mini',
+    },
+    {
+      initialMode: 'openai',
+      switchedMode: 'openclaw',
+      expectedInitialModel: 'gpt-4o-mini',
+      expectedSwitchedModel: 'openclaw:main',
+    },
+  ];
+
+  for (const c of cases) {
+    const deps = makeModeSwitchDeps({
+      initialMode: c.initialMode,
+      switchedMode: c.switchedMode,
+    });
+
+    assert.equal(deps.llmBackend(), c.initialMode);
+    assert.equal(deps.modelName(), c.expectedInitialModel);
+
+    deps.refreshConfigFromEnv();
+
+    assert.equal(deps.llmBackend(), c.switchedMode);
+    assert.equal(deps.modelName(), c.expectedSwitchedModel);
+  }
+});
+
 test('returns ping payload', () => {
   const result = evaluateOperatorCommand('/ping', makeDeps());
   assert.equal(result, 'pong | uptime=12s | model=gpt-test');
