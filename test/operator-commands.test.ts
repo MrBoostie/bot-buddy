@@ -277,6 +277,17 @@ test('returns diag issues payload', () => {
   assertDiagLastBackendError(result, 'openclaw timeout @ 2026-03-31T00:20:00.000Z');
 });
 
+test('diag issues assertion handles regex metacharacters safely', () => {
+  const result = evaluateOperatorCommand(
+    '/diag',
+    makeDeps({
+      validateRuntime: () => ['missing key (OPENAI_API_KEY?)'],
+    }),
+  );
+
+  assertDiagIssues(result, 'missing key (OPENAI_API_KEY?)');
+});
+
 test('returns diag payload with openai backend mode when configured', () => {
   const result = evaluateOperatorCommand(
     '/diag',
