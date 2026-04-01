@@ -23,6 +23,14 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
   };
 }
 
+function backendModeToken(mode: 'openclaw' | 'openai'): string {
+  return `llmBackend=${mode}`;
+}
+
+function assertHasBackendMode(text: string | null, mode: 'openclaw' | 'openai'): void {
+  assert.match(text ?? '', new RegExp(backendModeToken(mode)));
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -227,9 +235,9 @@ test('diag and reload stay semantically aligned on backend mode after mode switc
   const reloaded = evaluateOperatorCommand('/reload', deps);
   const after = evaluateOperatorCommand('/diag', deps);
 
-  assert.match(before ?? '', /llmBackend=openclaw/);
+  assertHasBackendMode(before, 'openclaw');
   assert.equal(reloaded, 'reload: applied | bot=buddy | llmBackend=openai');
-  assert.match(after ?? '', /llmBackend=openai/);
+  assertHasBackendMode(after, 'openai');
 });
 
 test('returns reload rate-limit payload and skips refresh', () => {
@@ -267,10 +275,10 @@ test('reload rate-limit does not mutate backend mode observed by diag', () => {
   );
   const after = evaluateOperatorCommand('/diag', deps);
 
-  assert.match(before ?? '', /llmBackend=openclaw/);
+  assertHasBackendMode(before, 'openclaw');
   assert.equal(reloaded, 'reload: rate-limited | retryAfterSec=9');
   assert.equal(refreshCalls, 0);
-  assert.match(after ?? '', /llmBackend=openclaw/);
+  assertHasBackendMode(after, 'openclaw');
 });
 
 test('runs reload and returns issues payload when validation fails', () => {
@@ -299,9 +307,9 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
   const afterDiag = evaluateOperatorCommand('/diag', deps);
   const afterStatus = evaluateOperatorCommand('/status', deps);
 
-  assert.match(beforeDiag ?? '', /llmBackend=openclaw/);
+  assertHasBackendMode(beforeDiag, 'openclaw');
   assert.equal(reloaded, 'reload: applied, but issues remain -> OPENAI_API_KEY missing');
-  assert.match(afterDiag ?? '', /llmBackend=openai/);
+  assertHasBackendMode(afterDiag, 'openai');
   assert.match(afterDiag ?? '', /issues detected -> OPENAI_API_KEY missing/);
   assert.equal(
     afterStatus,
