@@ -23,6 +23,28 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
   };
 }
 
+function makeModeSwitchDeps(options: {
+  initialMode?: 'openclaw' | 'openai';
+  switchedMode?: 'openclaw' | 'openai';
+  onRefresh?: () => void;
+  validateRuntime?: (mode: 'openclaw' | 'openai') => string[];
+} = {}): OperatorCommandDeps {
+  let mode = options.initialMode ?? 'openclaw';
+  const switchedMode = options.switchedMode ?? 'openai';
+
+  return makeDeps({
+    modelName: () => (mode === 'openai' ? 'gpt-4o-mini' : 'openclaw:main'),
+    llmBackend: () => mode,
+    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
+    refreshConfigFromEnv: () => {
+      mode = switchedMode;
+      options.onRefresh?.();
+    },
+    validateRuntime: () => options.validateRuntime?.(mode) ?? [],
+    hasOpenAI: () => mode === 'openai',
+  });
+}
+
 test('returns ping payload', () => {
   const result = evaluateOperatorCommand('/ping', makeDeps());
   assert.equal(result, 'pong | uptime=12s | model=gpt-test');
@@ -162,16 +184,7 @@ test('runs reload and returns success payload for openai mode summary', () => {
 });
 
 test('diag and reload stay semantically aligned on backend mode after mode switch', () => {
-  let mode: 'openclaw' | 'openai' = 'openclaw';
-
-  const deps = makeDeps({
-    llmBackend: () => mode,
-    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
-    refreshConfigFromEnv: () => {
-      mode = 'openai';
-    },
-    hasOpenAI: () => mode === 'openai',
-  });
+  const deps = makeModeSwitchDeps();
 
   const before = evaluateOperatorCommand('/diag', deps);
   const reloaded = evaluateOperatorCommand('/reload', deps);
@@ -199,22 +212,22 @@ test('returns reload rate-limit payload and skips refresh', () => {
 });
 
 test('reload rate-limit does not mutate backend mode observed by diag', () => {
-  let mode: 'openclaw' | 'openai' = 'openclaw';
   let refreshCalls = 0;
 
-  const deps = makeDeps({
-    llmBackend: () => mode,
-    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
-    tryAcquireReload: () => ({ ok: false, retryAfterSec: 9 }),
-    refreshConfigFromEnv: () => {
+  const deps = makeModeSwitchDeps({
+    onRefresh: () => {
       refreshCalls += 1;
-      mode = 'openai';
     },
-    hasOpenAI: () => mode === 'openai',
   });
 
   const before = evaluateOperatorCommand('/diag', deps);
-  const reloaded = evaluateOperatorCommand('/reload', deps);
+  const reloaded = evaluateOperatorCommand(
+    '/reload',
+    makeDeps({
+      ...deps,
+      tryAcquireReload: () => ({ ok: false, retryAfterSec: 9 }),
+    }),
+  );
   const after = evaluateOperatorCommand('/diag', deps);
 
   assert.match(before ?? '', /llmBackend=openclaw/);
@@ -240,17 +253,8 @@ test('runs reload and returns issues payload when validation fails', () => {
 });
 
 test('reload issues branch keeps diag/status mode-consistent after switch to openai', () => {
-  let mode: 'openclaw' | 'openai' = 'openclaw';
-
-  const deps = makeDeps({
-    modelName: () => (mode === 'openai' ? 'gpt-4o-mini' : 'openclaw:main'),
-    llmBackend: () => mode,
-    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
-    refreshConfigFromEnv: () => {
-      mode = 'openai';
-    },
-    validateRuntime: () => (mode === 'openai' ? ['OPENAI_API_KEY missing'] : []),
-    hasOpenAI: () => mode === 'openai',
+  const deps = makeModeSwitchDeps({
+    validateRuntime: (mode) => (mode === 'openai' ? ['OPENAI_API_KEY missing'] : []),
   });
 
   const beforeDiag = evaluateOperatorCommand('/diag', deps);
