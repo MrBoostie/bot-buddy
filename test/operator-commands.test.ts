@@ -799,6 +799,11 @@ test('returns unknown command hint for unrecognized slash command', () => {
   assert.equal(result, 'unknown command: /hepl (use /help) | did you mean /help?');
 });
 
+test('returns unknown command hint for common transposition typo', () => {
+  const result = evaluateOperatorCommand('/stauts', makeDeps());
+  assert.equal(result, 'unknown command: /stauts (use /help) | did you mean /status?');
+});
+
 test('returns unknown command hint for unrecognized slash command with args', () => {
   const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
   assert.equal(result, 'unknown command: /mystery (use /help)');
