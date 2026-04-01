@@ -69,6 +69,21 @@ scripts/check-changelog-policy.sh HEAD~1 HEAD
 - `test/changelog-policy-script.test.ts` — fixture-based policy behavior tests (fail/pass matrix).
 - `.github/workflows/ci.yml` — CI checks/order (`check`, policy fixtures, full test suite).
 
+## Policy troubleshooting
+
+If changelog policy CI fails, check these first:
+
+- You changed a behavior-visible path (`src/`, `scripts/`, `package.json`, or behavior-impacting `README.md`) but did not update `CHANGELOG.md`.
+- You updated `CHANGELOG.md`, but the file wasn’t included in the commit/PR diff.
+- You expected non-visible-only changes, but a touched file still matches policy scope.
+
+Quick local verification:
+
+```bash
+npm run test:changelog-policy
+scripts/check-changelog-policy.sh <base-sha> <head-sha>
+```
+
 ## Release hygiene
 
 - Keep `README.md` operator/runtime docs in sync with behavior changes.
