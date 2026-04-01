@@ -14,6 +14,24 @@ function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' 
   return commands.join(', ');
 }
 
+function helpEnableHint(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
+  const envToggles: string[] = [];
+
+  if (!deps.allowMetricsReset()) {
+    envToggles.push('ALLOW_METRICS_RESET=true');
+  }
+
+  if (!deps.allowAuditTail()) {
+    envToggles.push('ALLOW_AUDIT_TAIL=true');
+  }
+
+  if (envToggles.length === 0) {
+    return '';
+  }
+
+  return ` | enable: ${envToggles.join(', ')}`;
+}
+
 type ParseUnsignedIntInRangeResult =
   | { ok: true; value: number }
   | { ok: false; reason: 'invalid-number' | 'out-of-range' };
@@ -97,7 +115,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd === '/help' || cmd === '/commands') {
     incrementCommandCount();
-    return done(`commands: ${helpCommandSummary(deps)}`);
+    return done(`commands: ${helpCommandSummary(deps)}${helpEnableHint(deps)}`);
   }
 
   if (cmd === '/status') {
