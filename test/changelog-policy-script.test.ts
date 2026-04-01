@@ -27,12 +27,20 @@ function setupRepo(): { dir: string; baseSha: string } {
   return { dir, baseSha: sh(dir, 'git rev-parse HEAD') };
 }
 
-function runPolicy(cwd: string, baseSha: string, headSha: string): { code: number; stderr: string } {
+function runPolicy(
+  cwd: string,
+  baseSha: string,
+  headSha: string,
+): { code: number; stderr: string; stdout: string } {
   const result = spawnSync('bash', [SCRIPT_PATH, baseSha, headSha], {
     cwd,
     encoding: 'utf8',
   });
-  return { code: result.status ?? 1, stderr: result.stderr ?? '' };
+  return {
+    code: result.status ?? 1,
+    stderr: result.stderr ?? '',
+    stdout: result.stdout ?? '',
+  };
 }
 
 function commitAndRunPolicy(
@@ -47,9 +55,10 @@ function commitAndRunPolicy(
   return runPolicy(dir, baseSha, headSha);
 }
 
-function expectPolicyFailure(result: { code: number; stderr: string }): void {
+function expectPolicyFailure(result: { code: number; stderr: string; stdout: string }): void {
   assert.equal(result.code, 1);
   assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+  assert.match(result.stdout, /::error::CHANGELOG\.md must be updated/i);
 }
 
 test('fails when behavior-visible files change without changelog update', () => {
@@ -65,6 +74,7 @@ test('passes when behavior-visible files change with changelog update', () => {
   writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- updated\n');
   const result = commitAndRunPolicy(dir, baseSha, 'src/main.ts CHANGELOG.md', 'change src + changelog');
   assert.equal(result.code, 0);
+  assert.match(result.stdout, /::notice::Changelog policy satisfied for behavior-visible changes/i);
 });
 
 test('passes when non-behavior-visible files change without changelog update', () => {
@@ -72,6 +82,7 @@ test('passes when non-behavior-visible files change without changelog update', (
   writeFileSync(join(dir, 'notes.txt'), 'internal notes\n');
   const result = commitAndRunPolicy(dir, baseSha, 'notes.txt', 'notes only');
   assert.equal(result.code, 0);
+  assert.match(result.stdout, /::notice::No behavior-visible file changes detected/i);
 });
 
 test('fails when README behavior-visible docs change without changelog update', () => {
