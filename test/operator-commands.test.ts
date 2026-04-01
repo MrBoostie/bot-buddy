@@ -304,13 +304,13 @@ test('returns help payload with targeted enable hint when only one guard is off'
 });
 
 test('rejects invalid help usage with extra args', () => {
-  const viaHelp = evaluateOperatorCommand('/help now', makeDeps());
-  const viaAlias = evaluateOperatorCommand('/commands now', makeDeps());
-  const viaQuestionAlias = evaluateOperatorCommand('/? now', makeDeps());
+  const inputs = ['/help now', '/commands now', '/? now'];
+  const expected = 'help: invalid usage (use /?, /help, or /commands)';
 
-  assert.equal(viaHelp, 'help: invalid usage (use /?, /help, or /commands)');
-  assert.equal(viaAlias, 'help: invalid usage (use /?, /help, or /commands)');
-  assert.equal(viaQuestionAlias, 'help: invalid usage (use /?, /help, or /commands)');
+  for (const input of inputs) {
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.equal(result, expected);
+  }
 });
 
 test('returns status payload', () => {
