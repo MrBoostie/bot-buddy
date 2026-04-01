@@ -64,6 +64,12 @@ function assertDiagIssues(text: string | null, issuePrefix: string): void {
   assert.match(target, new RegExp(`^diag: issues detected -> ${escaped}`));
 }
 
+function assertAssertionFailure(fn: () => unknown): void {
+  assert.throws(fn, (err: unknown) => {
+    return err instanceof assert.AssertionError;
+  });
+}
+
 function assertDiagPolicyTail(text: string | null): void {
   const target = text ?? '';
   assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
@@ -320,7 +326,7 @@ test('diag issues assertion rejects near-match issue text (single-character diff
       }),
     );
 
-    assert.throws(() => assertDiagIssues(result, c.expected));
+    assertAssertionFailure(() => assertDiagIssues(result, c.expected));
   }
 });
 
