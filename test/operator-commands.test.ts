@@ -247,7 +247,7 @@ test('returns help payload with disabled guard markers when guards are off', () 
   const result = evaluateOperatorCommand('/help', makeDeps());
   assert.equal(
     result,
-    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+    'commands: /?, /help, /commands, /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
   );
 });
 
@@ -261,7 +261,7 @@ test('returns help payload without disabled markers when guards are on', () => {
   );
   assert.equal(
     result,
-    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+    'commands: /?, /help, /commands, /ping, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
   );
 });
 
@@ -275,7 +275,7 @@ test('returns help payload with targeted enable hint when only one guard is off'
   );
   assert.equal(
     result,
-    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
+    'commands: /?, /help, /commands, /ping, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
   );
 });
 
@@ -283,7 +283,7 @@ test('returns command list payload for /commands alias', () => {
   const result = evaluateOperatorCommand('/commands', makeDeps());
   assert.equal(
     result,
-    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+    'commands: /?, /help, /commands, /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
   );
 });
 
@@ -291,7 +291,7 @@ test('returns command list payload for /? alias', () => {
   const result = evaluateOperatorCommand('/?', makeDeps());
   assert.equal(
     result,
-    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+    'commands: /?, /help, /commands, /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
   );
 });
 

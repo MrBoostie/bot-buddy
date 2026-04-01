@@ -20,6 +20,9 @@ const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
 const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
   const commands: string[] = [
+    OPERATOR_COMMANDS.question,
+    OPERATOR_COMMANDS.help,
+    OPERATOR_COMMANDS.commands,
     OPERATOR_COMMANDS.ping,
     OPERATOR_COMMANDS.status,
     OPERATOR_COMMANDS.diag,

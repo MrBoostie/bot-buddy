@@ -54,6 +54,7 @@ In Discord, buddy responds when messaged as either `buddy <prompt>`, `<@BOT_ID> 
 Built-in operator commands (directed to bot):
 - `/?`, `/help`, or `/commands` — list available operator commands (marks guard-gated commands as disabled when not enabled and includes exact env toggles to enable them)
   - Extra args are rejected (`/help now` -> `help: invalid usage (use /?, /help, or /commands)`) to keep operator command parsing predictable.
+  - Help output now includes all three help aliases explicitly for easier discoverability.
 - `/ping` — fast liveness check (`pong` + uptime + model)
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + guard/policy snapshot + last backend error
