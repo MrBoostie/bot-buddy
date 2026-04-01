@@ -65,3 +65,13 @@ test('ignores external and anchor links', () => {
   const result = runDocCheck(dir);
   assert.equal(result.code, 0);
 });
+
+test('fails when anchored relative target file is missing', () => {
+  const dir = setupDocsFixture({
+    'README.md': '[Missing anchored](./docs/missing.md#intro)\n',
+  });
+
+  const result = runDocCheck(dir);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /references missing link target: \.\/docs\/missing\.md#intro/i);
+});
