@@ -277,37 +277,23 @@ test('returns diag issues payload', () => {
   assertDiagLastBackendError(result, 'openclaw timeout @ 2026-03-31T00:20:00.000Z');
 });
 
-test('diag issues assertion handles regex metacharacters safely', () => {
-  const result = evaluateOperatorCommand(
-    '/diag',
-    makeDeps({
-      validateRuntime: () => ['missing key (OPENAI_API_KEY?)'],
-    }),
-  );
+test('diag issues assertion treats regex-like issue text as literals (table-driven)', () => {
+  const cases = [
+    'missing key (OPENAI_API_KEY?)',
+    'token [OPENAI|ALT] missing',
+    'path C:\\bot\\key ^missing$',
+  ];
 
-  assertDiagIssues(result, 'missing key (OPENAI_API_KEY?)');
-});
+  for (const issue of cases) {
+    const result = evaluateOperatorCommand(
+      '/diag',
+      makeDeps({
+        validateRuntime: () => [issue],
+      }),
+    );
 
-test('diag issues assertion handles bracket and pipe literals safely', () => {
-  const result = evaluateOperatorCommand(
-    '/diag',
-    makeDeps({
-      validateRuntime: () => ['token [OPENAI|ALT] missing'],
-    }),
-  );
-
-  assertDiagIssues(result, 'token [OPENAI|ALT] missing');
-});
-
-test('diag issues assertion handles backslashes and anchors safely', () => {
-  const result = evaluateOperatorCommand(
-    '/diag',
-    makeDeps({
-      validateRuntime: () => ['path C:\\bot\\key ^missing$'],
-    }),
-  );
-
-  assertDiagIssues(result, 'path C:\\bot\\key ^missing$');
+    assertDiagIssues(result, issue);
+  }
 });
 
 test('returns diag payload with openai backend mode when configured', () => {
