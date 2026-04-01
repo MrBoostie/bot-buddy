@@ -198,6 +198,31 @@ test('returns reload rate-limit payload and skips refresh', () => {
   assert.equal(result, 'reload: rate-limited | retryAfterSec=12');
 });
 
+test('reload rate-limit does not mutate backend mode observed by diag', () => {
+  let mode: 'openclaw' | 'openai' = 'openclaw';
+  let refreshCalls = 0;
+
+  const deps = makeDeps({
+    llmBackend: () => mode,
+    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
+    tryAcquireReload: () => ({ ok: false, retryAfterSec: 9 }),
+    refreshConfigFromEnv: () => {
+      refreshCalls += 1;
+      mode = 'openai';
+    },
+    hasOpenAI: () => mode === 'openai',
+  });
+
+  const before = evaluateOperatorCommand('/diag', deps);
+  const reloaded = evaluateOperatorCommand('/reload', deps);
+  const after = evaluateOperatorCommand('/diag', deps);
+
+  assert.match(before ?? '', /llmBackend=openclaw/);
+  assert.equal(reloaded, 'reload: rate-limited | retryAfterSec=9');
+  assert.equal(refreshCalls, 0);
+  assert.match(after ?? '', /llmBackend=openclaw/);
+});
+
 test('runs reload and returns issues payload when validation fails', () => {
   let reloadCalls = 0;
   const result = evaluateOperatorCommand(
