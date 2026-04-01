@@ -287,12 +287,22 @@ test('returns command list payload for /commands alias', () => {
   );
 });
 
+test('returns command list payload for /? alias', () => {
+  const result = evaluateOperatorCommand('/?', makeDeps());
+  assert.equal(
+    result,
+    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+  );
+});
+
 test('rejects invalid help usage with extra args', () => {
   const viaHelp = evaluateOperatorCommand('/help now', makeDeps());
   const viaAlias = evaluateOperatorCommand('/commands now', makeDeps());
+  const viaQuestionAlias = evaluateOperatorCommand('/? now', makeDeps());
 
-  assert.equal(viaHelp, 'help: invalid usage (use /help or /commands)');
-  assert.equal(viaAlias, 'help: invalid usage (use /help or /commands)');
+  assert.equal(viaHelp, 'help: invalid usage (use /?, /help, or /commands)');
+  assert.equal(viaAlias, 'help: invalid usage (use /?, /help, or /commands)');
+  assert.equal(viaQuestionAlias, 'help: invalid usage (use /?, /help, or /commands)');
 });
 
 test('returns status payload', () => {

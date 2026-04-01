@@ -4,6 +4,7 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 const OPERATOR_COMMANDS = {
+  question: '/?',
   help: '/help',
   commands: '/commands',
   ping: '/ping',
@@ -171,14 +172,22 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`pong | uptime=${deps.formatUptime()} | model=${deps.modelName()}`);
   }
 
-  if (cmd === OPERATOR_COMMANDS.help || cmd === OPERATOR_COMMANDS.commands) {
+  if (
+    cmd === OPERATOR_COMMANDS.question ||
+    cmd === OPERATOR_COMMANDS.help ||
+    cmd === OPERATOR_COMMANDS.commands
+  ) {
     incrementCommandCount();
     return done(`commands: ${helpCommandSummary(deps)}${helpEnableHint(deps)}`);
   }
 
-  if (cmd.startsWith(`${OPERATOR_COMMANDS.help} `) || cmd.startsWith(`${OPERATOR_COMMANDS.commands} `)) {
+  if (
+    cmd.startsWith(`${OPERATOR_COMMANDS.question} `) ||
+    cmd.startsWith(`${OPERATOR_COMMANDS.help} `) ||
+    cmd.startsWith(`${OPERATOR_COMMANDS.commands} `)
+  ) {
     incrementCommandCount();
-    return done('help: invalid usage (use /help or /commands)');
+    return done('help: invalid usage (use /?, /help, or /commands)');
   }
 
   if (cmd === OPERATOR_COMMANDS.status) {
