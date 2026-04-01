@@ -59,6 +59,11 @@ function assertDiagIssues(text: string | null, issuePrefix: string): void {
   assert.match(target, new RegExp(`^diag: issues detected -> ${issuePrefix}`));
 }
 
+function assertDiagPolicyTail(text: string | null): void {
+  const target = text ?? '';
+  assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
+}
+
 function assertDiagOk(
   text: string | null,
   options: {
@@ -77,7 +82,7 @@ function assertDiagOk(
   assert.match(target, new RegExp(`\| llmBackend=${options.llmBackend} \|`));
   assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
   assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
-  assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
+  assertDiagPolicyTail(target);
   assert.match(target, new RegExp(`\| lastBackendError=${options.lastBackendError ?? 'none'}$`));
 }
 
