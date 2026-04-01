@@ -78,6 +78,11 @@ function assertDiagBackendAndGuards(
   assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
 }
 
+function assertDiagLastBackendError(text: string | null, value: string): void {
+  const target = text ?? '';
+  assert.match(target, new RegExp(`\| lastBackendError=${value}$`));
+}
+
 function assertDiagOk(
   text: string | null,
   options: {
@@ -97,7 +102,7 @@ function assertDiagOk(
   assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
   assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
   assertDiagPolicyTail(target);
-  assert.match(target, new RegExp(`\| lastBackendError=${options.lastBackendError ?? 'none'}$`));
+  assertDiagLastBackendError(target, options.lastBackendError ?? 'none');
 }
 
 function assertReloadApplied(text: string | null, summaryPrefix = 'bot=buddy'): void {
@@ -250,7 +255,7 @@ test('returns diag issues payload', () => {
     allowAuditTail: true,
   });
   assertDiagPolicyTail(result);
-  assert.match(result ?? '', /lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z/);
+  assertDiagLastBackendError(result, 'openclaw timeout @ 2026-03-31T00:20:00.000Z');
 });
 
 test('returns diag payload with openai backend mode when configured', () => {
