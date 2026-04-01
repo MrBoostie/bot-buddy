@@ -294,24 +294,57 @@ test('diag ok payload reflects availability/backend tuples (table-driven)', () =
   }
 });
 
-test('returns diag issues payload', () => {
-  const result = evaluateOperatorCommand(
-    '/diag',
-    makeDeps({
-      validateRuntime: () => ['bad env', 'missing key'],
-      backendHealthSummary: () => 'openclaw timeout @ 2026-03-31T00:20:00.000Z',
-      allowMetricsReset: () => true,
-      allowAuditTail: () => true,
-    }),
-  );
-  assertDiagIssues(result, 'bad env ; missing key');
-  assertDiagBackendAndGuards(result, {
-    llmBackend: 'openclaw',
-    allowMetricsReset: true,
-    allowAuditTail: true,
-  });
-  assertDiagPolicyTail(result);
-  assertDiagLastBackendError(result, 'openclaw timeout @ 2026-03-31T00:20:00.000Z');
+test('diag issues payload reflects availability/backend/guard tuples (table-driven)', () => {
+  const cases = [
+    {
+      issues: ['bad env', 'missing key'],
+      expectedIssuePrefix: 'bad env ; missing key',
+      hasDiscord: true,
+      hasOpenAI: false,
+      llmBackend: 'openclaw' as const,
+      allowMetricsReset: true,
+      allowAuditTail: true,
+      backendError: 'openclaw timeout @ 2026-03-31T00:20:00.000Z',
+    },
+    {
+      issues: ['OPENAI_API_KEY missing'],
+      expectedIssuePrefix: 'OPENAI_API_KEY missing',
+      hasDiscord: false,
+      hasOpenAI: true,
+      llmBackend: 'openai' as const,
+      allowMetricsReset: false,
+      allowAuditTail: false,
+      backendError: 'none',
+    },
+  ];
+
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(
+      '/diag',
+      makeDeps({
+        validateRuntime: () => c.issues,
+        hasDiscord: () => c.hasDiscord,
+        hasOpenAI: () => c.hasOpenAI,
+        llmBackend: () => c.llmBackend,
+        allowMetricsReset: () => c.allowMetricsReset,
+        allowAuditTail: () => c.allowAuditTail,
+        backendHealthSummary: () => c.backendError,
+      }),
+    );
+
+    assertDiagIssues(result, c.expectedIssuePrefix);
+    assertDiagAvailability(result, {
+      hasDiscord: c.hasDiscord,
+      hasOpenAI: c.hasOpenAI,
+    });
+    assertDiagBackendAndGuards(result, {
+      llmBackend: c.llmBackend,
+      allowMetricsReset: c.allowMetricsReset,
+      allowAuditTail: c.allowAuditTail,
+    });
+    assertDiagPolicyTail(result);
+    assertDiagLastBackendError(result, c.backendError);
+  }
 });
 
 test('diag issues assertion treats regex-like issue text as literals (table-driven)', () => {
