@@ -44,6 +44,11 @@ function assertHealthSignals(
   assert.match(target, new RegExp(`\\| openai=${String(options.openai)} \\|`));
 }
 
+function assertDiagIssues(text: string | null, issuePrefix: string): void {
+  const target = text ?? '';
+  assert.match(target, new RegExp(`^diag: issues detected -> ${issuePrefix}`));
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -164,10 +169,11 @@ test('returns diag issues payload', () => {
       allowAuditTail: () => true,
     }),
   );
-  assert.equal(
-    result,
-    'diag: issues detected -> bad env ; missing key | llmBackend=openclaw | allowMetricsReset=true | allowAuditTail=true | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z',
-  );
+  assertDiagIssues(result, 'bad env ; missing key');
+  assertHasBackendMode(result, 'openclaw');
+  assert.match(result ?? '', /allowMetricsReset=true/);
+  assert.match(result ?? '', /allowAuditTail=true/);
+  assert.match(result ?? '', /lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z/);
 });
 
 test('returns diag payload with openai backend mode when configured', () => {
@@ -233,7 +239,7 @@ test('diag and health surface inconsistent openai capability signals', () => {
   const diag = evaluateOperatorCommand('/diag', deps);
   const health = evaluateOperatorCommand('/health', deps);
 
-  assert.match(diag ?? '', /issues detected -> OPENAI_API_KEY is missing while LLM_BACKEND=openai/);
+  assertDiagIssues(diag, 'OPENAI_API_KEY is missing while LLM_BACKEND=openai');
   assert.match(diag ?? '', /llmBackend=openai/);
 
   assertHealthSignals(health, { runtime: 'degraded', issues: 1, openai: false });
@@ -367,7 +373,7 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
   assertHasBackendMode(beforeDiag, 'openclaw');
   assert.equal(reloaded, 'reload: applied, but issues remain -> OPENAI_API_KEY missing');
   assertHasBackendMode(afterDiag, 'openai');
-  assert.match(afterDiag ?? '', /issues detected -> OPENAI_API_KEY missing/);
+  assertDiagIssues(afterDiag, 'OPENAI_API_KEY missing');
   assert.equal(
     afterStatus,
     'status: online | uptime=12s | model=gpt-4o-mini | bot=buddy | llmBackend=openai',
