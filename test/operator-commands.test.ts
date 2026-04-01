@@ -265,6 +265,14 @@ test('returns help payload without disabled markers when guards are on', () => {
   );
 });
 
+test('returns command list payload for /commands alias', () => {
+  const result = evaluateOperatorCommand('/commands', makeDeps());
+  assert.equal(
+    result,
+    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled)',
+  );
+});
+
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
   assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });

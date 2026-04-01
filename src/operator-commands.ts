@@ -95,7 +95,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`pong | uptime=${deps.formatUptime()} | model=${deps.modelName()}`);
   }
 
-  if (cmd === '/help') {
+  if (cmd === '/help' || cmd === '/commands') {
     incrementCommandCount();
     return done(`commands: ${helpCommandSummary(deps)}`);
   }

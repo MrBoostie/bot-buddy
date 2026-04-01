@@ -32,6 +32,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - In-memory operator audit events now include request correlation (`rid`) and classify invalid `/audit-tail` attempts.
   - Added `/help` operator command to quickly enumerate supported operator commands in one line.
   - `/help` now reflects guard state by marking `/metrics-reset` and `/audit-tail` as disabled when their guards are off.
+  - Added `/commands` as an alias for `/help` to improve command discoverability.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
