@@ -118,6 +118,8 @@ GitHub Actions now runs `npm run check` + `npm test` on every push to `main` and
 
 - Ongoing changes are tracked in [CHANGELOG.md](./CHANGELOG.md).
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contributor workflow and changelog policy commands.
+
 ## Release checklist
 
 Before merging/releasing user-visible changes:
