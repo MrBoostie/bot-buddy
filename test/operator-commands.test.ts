@@ -143,6 +143,24 @@ test('runs reload and returns success payload', () => {
   assert.equal(result, 'reload: applied | bot=buddy | llmBackend=openclaw');
 });
 
+test('runs reload and returns success payload for openai mode summary', () => {
+  let reloadCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/reload',
+    makeDeps({
+      refreshConfigFromEnv: () => {
+        reloadCalls += 1;
+      },
+      llmBackend: () => 'openai',
+      runtimeSummary: () => 'bot=buddy | llmBackend=openai | openAIKey=set',
+      hasOpenAI: () => true,
+    }),
+  );
+
+  assert.equal(reloadCalls, 1);
+  assert.equal(result, 'reload: applied | bot=buddy | llmBackend=openai | openAIKey=set');
+});
+
 test('returns reload rate-limit payload and skips refresh', () => {
   let reloadCalls = 0;
   const result = evaluateOperatorCommand(
