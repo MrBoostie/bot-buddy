@@ -299,6 +299,17 @@ test('diag issues assertion handles bracket and pipe literals safely', () => {
   assertDiagIssues(result, 'token [OPENAI|ALT] missing');
 });
 
+test('diag issues assertion handles backslashes and anchors safely', () => {
+  const result = evaluateOperatorCommand(
+    '/diag',
+    makeDeps({
+      validateRuntime: () => ['path C:\\bot\\key ^missing$'],
+    }),
+  );
+
+  assertDiagIssues(result, 'path C:\\bot\\key ^missing$');
+});
+
 test('returns diag payload with openai backend mode when configured', () => {
   const result = evaluateOperatorCommand(
     '/diag',
