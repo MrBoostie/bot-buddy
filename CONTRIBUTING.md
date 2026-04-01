@@ -34,6 +34,12 @@ npm run test:changelog-policy
 
 Behavior-visible changes require a `CHANGELOG.md` update (unless maintainers apply the exceptional `skip-changelog` PR label).
 
+### `skip-changelog` label ownership
+
+- `skip-changelog` is maintainers-only and should be treated as an exception path, not normal flow.
+- Use only when changes are clearly non-user-visible (for example: internal CI-only refactors or metadata cleanup).
+- If there is any ambiguity about user-visible impact, prefer updating `CHANGELOG.md` instead of applying the label.
+
 Behavior-visible paths include:
 
 - `src/`
