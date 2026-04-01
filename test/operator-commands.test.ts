@@ -786,7 +786,7 @@ test('returns null for non-command input', () => {
 
 test('returns unknown command hint for unrecognized slash command', () => {
   const result = evaluateOperatorCommand('/hepl', makeDeps());
-  assert.equal(result, 'unknown command: /hepl (use /help)');
+  assert.equal(result, 'unknown command: /hepl (use /help) | did you mean /help?');
 });
 
 test('returns unknown command hint for unrecognized slash command with args', () => {

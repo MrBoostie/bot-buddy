@@ -3,6 +3,17 @@ import { incrementCommandCount, recordCommandLatencyMs } from './metrics.js';
 const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
+const KNOWN_OPERATOR_COMMANDS = [
+  '/help',
+  '/commands',
+  '/ping',
+  '/status',
+  '/diag',
+  '/health',
+  '/reload',
+  '/metrics-reset',
+  '/audit-tail',
+] as const;
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
   const commands = ['/ping', '/status', '/diag', '/health', '/reload'];
 
@@ -30,6 +41,41 @@ function helpEnableHint(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'a
   }
 
   return ` | enable: ${envToggles.join(', ')}`;
+}
+
+function levenshteinDistance(a: string, b: string): number {
+  const rows = a.length + 1;
+  const cols = b.length + 1;
+  const dp = Array.from({ length: rows }, () => Array<number>(cols).fill(0));
+
+  for (let i = 0; i < rows; i += 1) dp[i][0] = i;
+  for (let j = 0; j < cols; j += 1) dp[0][j] = j;
+
+  for (let i = 1; i < rows; i += 1) {
+    for (let j = 1; j < cols; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+    }
+  }
+
+  return dp[a.length][b.length];
+}
+
+function unknownCommandSuggestion(command: string): string {
+  let best: { command: string; distance: number } | null = null;
+
+  for (const known of KNOWN_OPERATOR_COMMANDS) {
+    const distance = levenshteinDistance(command, known);
+    if (!best || distance < best.distance) {
+      best = { command: known, distance };
+    }
+  }
+
+  if (!best || best.distance > 2) {
+    return '';
+  }
+
+  return ` | did you mean ${best.command}?`;
 }
 
 type ParseUnsignedIntInRangeResult =
@@ -213,7 +259,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd.startsWith('/')) {
     const unknown = cmd.split(/\s+/, 1)[0] || cmd;
-    return done(`unknown command: ${unknown} (use /help)`);
+    return done(`unknown command: ${unknown} (use /help)${unknownCommandSuggestion(unknown)}`);
   }
 
   return null;
