@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildOperatorCommandDeps, resolveAppVersionInfo } from '../src/discord.ts';
+import { buildOperatorCommandDeps, formatAppVersionLog, resolveAppVersionInfo } from '../src/discord.ts';
 import { config } from '../src/config.ts';
 
 test('buildOperatorCommandDeps reports consistent openclaw backend and model label', () => {
@@ -172,4 +172,14 @@ test('resolveAppVersionInfo reports unknown source when no version env is set', 
     if (prevNpm === undefined) delete process.env.npm_package_version;
     else process.env.npm_package_version = prevNpm;
   }
+});
+
+test('formatAppVersionLog renders stable key-value startup log contract', () => {
+  assert.equal(
+    formatAppVersionLog({
+      value: '2.4.1',
+      source: 'BOT_BUDDY_VERSION',
+    }),
+    'app version | value=2.4.1 | source=BOT_BUDDY_VERSION',
+  );
 });

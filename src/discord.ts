@@ -34,6 +34,13 @@ export function resolveAppVersionInfo(): { value: string; source: 'BOT_BUDDY_VER
   return { value: 'unknown', source: 'unknown' };
 }
 
+export function formatAppVersionLog(info: {
+  value: string;
+  source: 'BOT_BUDDY_VERSION' | 'npm_package_version' | 'unknown';
+}): string {
+  return `app version | value=${info.value} | source=${info.source}`;
+}
+
 export function buildOperatorCommandDeps(): OperatorCommandDeps {
   return {
     formatUptime,
@@ -69,7 +76,7 @@ export async function startDiscord(): Promise<void> {
   client.once(Events.ClientReady, (c) => {
     const version = resolveAppVersionInfo();
     logInfo(`logged in as ${c.user.tag}`, { scope: 'discord' });
-    logInfo(`app version | value=${version.value} | source=${version.source}`, { scope: 'discord' });
+    logInfo(formatAppVersionLog(version), { scope: 'discord' });
 
     if (config.metricsSnapshotIntervalSec > 0) {
       const interval = setInterval(() => {

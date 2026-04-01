@@ -61,3 +61,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Refactored operator command literals into a shared `OPERATOR_COMMANDS` constant to reduce drift between help output, command evaluation, and typo-suggestion command matching.
 - Refactored `/audit-tail` parser and validation error text to consume shared command constants, reducing future literal-drift risk when command aliases evolve.
 - Refactored help invalid-usage text to reuse shared help-usage constants so alias guidance stays synchronized across unknown-command and help-usage responses.
+- Added `formatAppVersionLog()` helper + tests to keep startup app-version log output stable and regression-resistant.
