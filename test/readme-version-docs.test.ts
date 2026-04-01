@@ -23,3 +23,11 @@ test('README documents /version fallback chain for deterministic expectations', 
     /`version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`/,
   );
 });
+
+test('README documents startup app version log metadata contract', () => {
+  const readme = readFileSync(README_PATH, 'utf8');
+  assert.match(
+    readme,
+    /On Discord startup, the bot now logs resolved app version metadata \(`value` \+ `source`\)/,
+  );
+});

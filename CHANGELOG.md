@@ -65,3 +65,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added `formatAppVersionLog()` helper + tests to keep startup app-version log output stable and regression-resistant.
 - Added README regression tests to keep `BOT_BUDDY_VERSION` systemd/docker deployment examples from drifting.
 - Expanded README regression coverage to assert `/version` fallback-chain documentation remains accurate (`BOT_BUDDY_VERSION` -> `npm_package_version` -> `unknown`).
+- Expanded README regression coverage to pin startup app-version log metadata docs (`value` + `source`) to the runtime logging contract.
