@@ -63,3 +63,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Refactored `/audit-tail` parser and validation error text to consume shared command constants, reducing future literal-drift risk when command aliases evolve.
 - Refactored help invalid-usage text to reuse shared help-usage constants so alias guidance stays synchronized across unknown-command and help-usage responses.
 - Added `formatAppVersionLog()` helper + tests to keep startup app-version log output stable and regression-resistant.
+- Added README regression tests to keep `BOT_BUDDY_VERSION` systemd/docker deployment examples from drifting.
