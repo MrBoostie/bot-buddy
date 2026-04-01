@@ -72,3 +72,41 @@ test('buildOperatorCommandDeps remains runtime-consistent across config mutation
     config.openaiModel = prevModel;
   }
 });
+
+test('buildOperatorCommandDeps appVersion prefers BOT_BUDDY_VERSION over npm_package_version', () => {
+  const prevExplicit = process.env.BOT_BUDDY_VERSION;
+  const prevNpm = process.env.npm_package_version;
+
+  process.env.BOT_BUDDY_VERSION = '2.0.0-custom';
+  process.env.npm_package_version = '1.2.3';
+
+  try {
+    const deps = buildOperatorCommandDeps();
+    assert.equal(deps.appVersion(), '2.0.0-custom');
+  } finally {
+    if (prevExplicit === undefined) delete process.env.BOT_BUDDY_VERSION;
+    else process.env.BOT_BUDDY_VERSION = prevExplicit;
+
+    if (prevNpm === undefined) delete process.env.npm_package_version;
+    else process.env.npm_package_version = prevNpm;
+  }
+});
+
+test('buildOperatorCommandDeps appVersion falls back to unknown when no version env is set', () => {
+  const prevExplicit = process.env.BOT_BUDDY_VERSION;
+  const prevNpm = process.env.npm_package_version;
+
+  delete process.env.BOT_BUDDY_VERSION;
+  delete process.env.npm_package_version;
+
+  try {
+    const deps = buildOperatorCommandDeps();
+    assert.equal(deps.appVersion(), 'unknown');
+  } finally {
+    if (prevExplicit === undefined) delete process.env.BOT_BUDDY_VERSION;
+    else process.env.BOT_BUDDY_VERSION = prevExplicit;
+
+    if (prevNpm === undefined) delete process.env.npm_package_version;
+    else process.env.npm_package_version = prevNpm;
+  }
+});

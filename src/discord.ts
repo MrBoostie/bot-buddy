@@ -24,7 +24,7 @@ export function buildOperatorCommandDeps(): OperatorCommandDeps {
   return {
     formatUptime,
     modelName: () => runtimeModelLabel(),
-    appVersion: () => process.env.npm_package_version ?? 'unknown',
+    appVersion: () => process.env.BOT_BUDDY_VERSION ?? process.env.npm_package_version ?? 'unknown',
     runtimeSummary: redactedRuntimeSummary,
     validateRuntime,
     refreshConfigFromEnv,

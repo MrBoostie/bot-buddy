@@ -58,6 +58,7 @@ Built-in operator commands (directed to bot):
 - `/ping` — fast liveness check (`pong` + uptime + model)
 - `/up` or `/uptime` — compact uptime + model check without ping wording
 - `/version` — compact build/runtime identity (`version`, `node`, `model`)
+  - `version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + guard/policy snapshot + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
