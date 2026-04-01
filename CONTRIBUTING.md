@@ -4,28 +4,30 @@ Thanks for contributing to bot-buddy.
 
 ## Before opening a PR
 
-1. Run type checks:
+Run the same command order as CI for faster parity/debugging:
+
+1. Type checks:
 
 ```bash
 npm run check
 ```
 
-2. Run full tests:
+2. Docs link consistency:
 
 ```bash
-npm test
+npm run check:docs
 ```
 
-3. For changelog policy coverage only (fast loop):
+3. Changelog policy fixtures (fast policy feedback):
 
 ```bash
 npm run test:changelog-policy
 ```
 
-4. Validate docs link consistency:
+4. Full test suite:
 
 ```bash
-npm run check:docs
+npm test
 ```
 
 ## PR checklist
