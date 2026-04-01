@@ -254,14 +254,22 @@ test('returns uptime payload for /up alias', () => {
   assert.equal(result, 'uptime=12s | model=gpt-test');
 });
 
-test('returns version payload', () => {
-  const result = evaluateOperatorCommand('/version', makeDeps());
-  assert.equal(result, `version=0.1.0-test | node=${process.version} | model=gpt-test`);
-});
+test('returns version payload across known/unknown appVersion states (table-driven)', () => {
+  const cases: Array<{ appVersion: string; expected: string }> = [
+    {
+      appVersion: '0.1.0-test',
+      expected: `version=0.1.0-test | node=${process.version} | model=gpt-test`,
+    },
+    {
+      appVersion: 'unknown',
+      expected: `version=unknown | node=${process.version} | model=gpt-test`,
+    },
+  ];
 
-test('returns version payload with unknown version when appVersion is unavailable', () => {
-  const result = evaluateOperatorCommand('/version', makeDeps({ appVersion: () => 'unknown' }));
-  assert.equal(result, `version=unknown | node=${process.version} | model=gpt-test`);
+  for (const c of cases) {
+    const result = evaluateOperatorCommand('/version', makeDeps({ appVersion: () => c.appVersion }));
+    assert.equal(result, c.expected);
+  }
 });
 
 test('returns help payload with disabled guard markers for all help aliases (table-driven)', () => {

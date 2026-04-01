@@ -73,3 +73,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Consolidated unknown-command typo suggestion assertions into a single table-driven operator-command test to reduce repetitive test blocks while keeping behavior coverage unchanged.
 - Consolidated `/help`/`/commands`/`/?` default help-output assertions into one table-driven alias test to reduce duplicate expectations while preserving coverage.
 - Consolidated invalid help-usage alias assertions into a single looped test block (`/help now`, `/commands now`, `/? now`) to reduce repetitive scaffolding.
+- Consolidated `/version` known/unknown appVersion assertions into one table-driven test for consistent operator-test style and less duplication.
