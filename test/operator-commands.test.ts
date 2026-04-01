@@ -159,6 +159,26 @@ function assertPingPayload(text: string | null, model: string): void {
   assert.equal(text, `pong | uptime=12s | model=${model}`);
 }
 
+function makeDiagTupleDeps(options: {
+  hasDiscord: boolean;
+  hasOpenAI: boolean;
+  llmBackend: 'openclaw' | 'openai';
+  allowMetricsReset?: boolean;
+  allowAuditTail?: boolean;
+  validateRuntime?: () => string[];
+  backendHealthSummary?: () => string;
+}): OperatorCommandDeps {
+  return makeDeps({
+    hasDiscord: () => options.hasDiscord,
+    hasOpenAI: () => options.hasOpenAI,
+    llmBackend: () => options.llmBackend,
+    allowMetricsReset: () => options.allowMetricsReset ?? false,
+    allowAuditTail: () => options.allowAuditTail ?? false,
+    validateRuntime: options.validateRuntime ?? (() => []),
+    backendHealthSummary: options.backendHealthSummary ?? (() => 'none'),
+  });
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -277,10 +297,10 @@ test('diag ok payload reflects availability/backend tuples (table-driven)', () =
   for (const c of cases) {
     const result = evaluateOperatorCommand(
       '/diag',
-      makeDeps({
-        hasDiscord: () => c.hasDiscord,
-        hasOpenAI: () => c.hasOpenAI,
-        llmBackend: () => c.llmBackend,
+      makeDiagTupleDeps({
+        hasDiscord: c.hasDiscord,
+        hasOpenAI: c.hasOpenAI,
+        llmBackend: c.llmBackend,
       }),
     );
 
@@ -321,13 +341,13 @@ test('diag issues payload reflects availability/backend/guard tuples (table-driv
   for (const c of cases) {
     const result = evaluateOperatorCommand(
       '/diag',
-      makeDeps({
+      makeDiagTupleDeps({
+        hasDiscord: c.hasDiscord,
+        hasOpenAI: c.hasOpenAI,
+        llmBackend: c.llmBackend,
+        allowMetricsReset: c.allowMetricsReset,
+        allowAuditTail: c.allowAuditTail,
         validateRuntime: () => c.issues,
-        hasDiscord: () => c.hasDiscord,
-        hasOpenAI: () => c.hasOpenAI,
-        llmBackend: () => c.llmBackend,
-        allowMetricsReset: () => c.allowMetricsReset,
-        allowAuditTail: () => c.allowAuditTail,
         backendHealthSummary: () => c.backendError,
       }),
     );
