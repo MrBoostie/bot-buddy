@@ -161,6 +161,27 @@ test('runs reload and returns success payload for openai mode summary', () => {
   assert.equal(result, 'reload: applied | bot=buddy | llmBackend=openai | openAIKey=set');
 });
 
+test('diag and reload stay semantically aligned on backend mode after mode switch', () => {
+  let mode: 'openclaw' | 'openai' = 'openclaw';
+
+  const deps = makeDeps({
+    llmBackend: () => mode,
+    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
+    refreshConfigFromEnv: () => {
+      mode = 'openai';
+    },
+    hasOpenAI: () => mode === 'openai',
+  });
+
+  const before = evaluateOperatorCommand('/diag', deps);
+  const reloaded = evaluateOperatorCommand('/reload', deps);
+  const after = evaluateOperatorCommand('/diag', deps);
+
+  assert.match(before ?? '', /llmBackend=openclaw/);
+  assert.equal(reloaded, 'reload: applied | bot=buddy | llmBackend=openai');
+  assert.match(after ?? '', /llmBackend=openai/);
+});
+
 test('returns reload rate-limit payload and skips refresh', () => {
   let reloadCalls = 0;
   const result = evaluateOperatorCommand(
