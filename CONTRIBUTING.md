@@ -53,6 +53,16 @@ Example:
 scripts/check-changelog-policy.sh HEAD~1 HEAD
 ```
 
+## Key files map
+
+- `src/index.ts` — process entrypoint and runtime startup wiring.
+- `src/discord.ts` — Discord adapter, message routing, and operator command execution path.
+- `src/operator-commands.ts` — operator command parsing/handling (`/diag`, `/health`, `/audit-tail`, etc.).
+- `src/operator-audit.ts` + `src/operator-audit-store.ts` — audit event classification and in-memory audit tail storage.
+- `scripts/check-changelog-policy.sh` — CI/local changelog policy enforcement script.
+- `test/changelog-policy-script.test.ts` — fixture-based policy behavior tests (fail/pass matrix).
+- `.github/workflows/ci.yml` — CI checks/order (`check`, policy fixtures, full test suite).
+
 ## Release hygiene
 
 - Keep `README.md` operator/runtime docs in sync with behavior changes.
