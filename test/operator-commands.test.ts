@@ -31,6 +31,19 @@ function assertHasBackendMode(text: string | null, mode: 'openclaw' | 'openai'):
   assert.match(text ?? '', new RegExp(backendModeToken(mode)));
 }
 
+function assertHealthSignals(
+  text: string | null,
+  options: {
+    runtime: 'ok' | 'degraded';
+    issues: number;
+    openai: boolean;
+  },
+): void {
+  const target = text ?? '';
+  assert.match(target, new RegExp(`^health \\| runtime=${options.runtime} \\| issues=${options.issues} \\|`));
+  assert.match(target, new RegExp(`\\| openai=${String(options.openai)} \\|`));
+}
+
 function makeModeSwitchDeps(options: {
   initialMode?: 'openclaw' | 'openai';
   switchedMode?: 'openclaw' | 'openai';
@@ -223,8 +236,7 @@ test('diag and health surface inconsistent openai capability signals', () => {
   assert.match(diag ?? '', /issues detected -> OPENAI_API_KEY is missing while LLM_BACKEND=openai/);
   assert.match(diag ?? '', /llmBackend=openai/);
 
-  assert.match(health ?? '', /^health \| runtime=degraded \| issues=1 \|/);
-  assert.match(health ?? '', /\| openai=false \|/);
+  assertHealthSignals(health, { runtime: 'degraded', issues: 1, openai: false });
 });
 
 test('health stays coherent across reload switch to openai', () => {
@@ -236,11 +248,8 @@ test('health stays coherent across reload switch to openai', () => {
   evaluateOperatorCommand('/reload', deps);
   const after = evaluateOperatorCommand('/health', deps);
 
-  assert.match(before ?? '', /^health \| runtime=ok \| issues=0 \|/);
-  assert.match(before ?? '', /\| openai=false \|/);
-
-  assert.match(after ?? '', /^health \| runtime=degraded \| issues=1 \|/);
-  assert.match(after ?? '', /\| openai=true \|/);
+  assertHealthSignals(before, { runtime: 'ok', issues: 0, openai: false });
+  assertHealthSignals(after, { runtime: 'degraded', issues: 1, openai: true });
 });
 
 test('runs reload and returns success payload', () => {
