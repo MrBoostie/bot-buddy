@@ -68,3 +68,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded README regression coverage to pin startup app-version log metadata docs (`value` + `source`) to the runtime logging contract.
 - Expanded runtime log-format tests to explicitly cover `formatAppVersionLog()` behavior for the `unknown` source/value path.
 - Added a table-driven `formatAppVersionLog()` test that covers all supported source variants (`BOT_BUDDY_VERSION`, `npm_package_version`, `unknown`).
+- Removed redundant single-case `formatAppVersionLog()` tests in favor of the table-driven source-variant coverage to reduce maintenance noise.

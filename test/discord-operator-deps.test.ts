@@ -174,26 +174,6 @@ test('resolveAppVersionInfo reports unknown source when no version env is set', 
   }
 });
 
-test('formatAppVersionLog renders stable key-value startup log contract', () => {
-  assert.equal(
-    formatAppVersionLog({
-      value: '2.4.1',
-      source: 'BOT_BUDDY_VERSION',
-    }),
-    'app version | value=2.4.1 | source=BOT_BUDDY_VERSION',
-  );
-});
-
-test('formatAppVersionLog renders unknown-source payload consistently', () => {
-  assert.equal(
-    formatAppVersionLog({
-      value: 'unknown',
-      source: 'unknown',
-    }),
-    'app version | value=unknown | source=unknown',
-  );
-});
-
 test('formatAppVersionLog covers all supported version sources (table-driven)', () => {
   const cases: Array<{
     info: Parameters<typeof formatAppVersionLog>[0];
