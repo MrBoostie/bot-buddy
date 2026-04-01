@@ -84,10 +84,6 @@ function levenshteinDistance(a: string, b: string): number {
 }
 
 function unknownCommandSuggestion(command: string): string {
-  if (command.length < 4) {
-    return '';
-  }
-
   let best: { command: string; distance: number } | null = null;
 
   for (const known of KNOWN_OPERATOR_COMMANDS) {
@@ -102,6 +98,12 @@ function unknownCommandSuggestion(command: string): string {
   }
 
   if (!best || best.distance > 2) {
+    return '';
+  }
+
+  const isShortCommand = command.length < 4;
+  const isShortSuggestion = best.command.length <= 3;
+  if (isShortCommand && (!isShortSuggestion || best.distance > 1)) {
     return '';
   }
 

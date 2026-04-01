@@ -819,6 +819,11 @@ test('returns unknown command hint for uptime typo', () => {
   assert.equal(result, 'unknown command: /uptim (use /?, /help, or /commands) | did you mean /uptime?');
 });
 
+test('returns unknown command hint for short uptime alias typo', () => {
+  const result = evaluateOperatorCommand('/upp', makeDeps());
+  assert.equal(result, 'unknown command: /upp (use /?, /help, or /commands) | did you mean /up?');
+});
+
 test('returns unknown command hint for unrecognized slash command with args', () => {
   const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
   assert.equal(result, 'unknown command: /mystery (use /?, /help, or /commands)');
