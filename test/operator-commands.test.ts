@@ -209,6 +209,22 @@ test('returns health payload in degraded state', () => {
   );
 });
 
+test('health stays coherent across reload switch to openai', () => {
+  const deps = makeModeSwitchDeps({
+    validateRuntime: (mode) => (mode === 'openai' ? ['OPENAI_API_KEY missing'] : []),
+  });
+
+  const before = evaluateOperatorCommand('/health', deps);
+  evaluateOperatorCommand('/reload', deps);
+  const after = evaluateOperatorCommand('/health', deps);
+
+  assert.match(before ?? '', /^health \| runtime=ok \| issues=0 \|/);
+  assert.match(before ?? '', /\| openai=false \|/);
+
+  assert.match(after ?? '', /^health \| runtime=degraded \| issues=1 \|/);
+  assert.match(after ?? '', /\| openai=true \|/);
+});
+
 test('runs reload and returns success payload', () => {
   let reloadCalls = 0;
   const result = evaluateOperatorCommand(
