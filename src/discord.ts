@@ -10,7 +10,7 @@ import {
 } from './config.js';
 import { think } from './brain.js';
 import { formatUptime } from './runtime.js';
-import { evaluateOperatorCommand } from './operator-commands.js';
+import { evaluateOperatorCommand, type OperatorCommandDeps } from './operator-commands.js';
 import { routeDiscordInput } from './discord-routing.js';
 import { executeDiscordRouting } from './discord-executor.js';
 import { createRequestId, logError, logInfo } from './log.js';
@@ -19,6 +19,26 @@ import { tryAcquireReload } from './operator-rate-limit.js';
 import { getMetricsSummary, resetMetrics } from './metrics.js';
 import { getAuditTail, getOperatorAuditEvent, recordAuditEvent } from './operator-audit.js';
 import { evaluateMetricsSnapshot } from './metrics-snapshot.js';
+
+export function buildOperatorCommandDeps(): OperatorCommandDeps {
+  return {
+    formatUptime,
+    modelName: () => runtimeModelLabel(),
+    runtimeSummary: redactedRuntimeSummary,
+    validateRuntime,
+    refreshConfigFromEnv,
+    hasDiscord,
+    hasOpenAI,
+    llmBackend: () => config.llmBackend,
+    backendHealthSummary: getBackendHealthSummary,
+    tryAcquireReload,
+    metricsSummary: getMetricsSummary,
+    allowMetricsReset: () => config.allowMetricsReset,
+    resetMetrics,
+    allowAuditTail: () => config.allowAuditTail,
+    getAuditTail,
+  };
+}
 
 export async function startDiscord(): Promise<void> {
   if (!config.discordToken) throw new Error('DISCORD_TOKEN not set');
@@ -62,24 +82,7 @@ export async function startDiscord(): Promise<void> {
       {
         botUserId: client.user!.id,
         channelLockId: config.discordChannelId,
-        evaluateCommand: (prompt) =>
-          evaluateOperatorCommand(prompt, {
-            formatUptime,
-            modelName: () => runtimeModelLabel(),
-            runtimeSummary: redactedRuntimeSummary,
-            validateRuntime,
-            refreshConfigFromEnv,
-            hasDiscord,
-            hasOpenAI,
-            llmBackend: () => config.llmBackend,
-            backendHealthSummary: getBackendHealthSummary,
-            tryAcquireReload,
-            metricsSummary: getMetricsSummary,
-            allowMetricsReset: () => config.allowMetricsReset,
-            resetMetrics,
-            allowAuditTail: () => config.allowAuditTail,
-            getAuditTail,
-          }),
+        evaluateCommand: (prompt) => evaluateOperatorCommand(prompt, buildOperatorCommandDeps()),
       },
     );
 
