@@ -239,6 +239,29 @@ test('runs reload and returns issues payload when validation fails', () => {
   assert.equal(result, 'reload: applied, but issues remain -> still broken');
 });
 
+test('reload issues branch stays mode-consistent after switch to openai', () => {
+  let mode: 'openclaw' | 'openai' = 'openclaw';
+
+  const deps = makeDeps({
+    llmBackend: () => mode,
+    runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
+    refreshConfigFromEnv: () => {
+      mode = 'openai';
+    },
+    validateRuntime: () => (mode === 'openai' ? ['OPENAI_API_KEY missing'] : []),
+    hasOpenAI: () => mode === 'openai',
+  });
+
+  const before = evaluateOperatorCommand('/diag', deps);
+  const reloaded = evaluateOperatorCommand('/reload', deps);
+  const after = evaluateOperatorCommand('/diag', deps);
+
+  assert.match(before ?? '', /llmBackend=openclaw/);
+  assert.equal(reloaded, 'reload: applied, but issues remain -> OPENAI_API_KEY missing');
+  assert.match(after ?? '', /llmBackend=openai/);
+  assert.match(after ?? '', /issues detected -> OPENAI_API_KEY missing/);
+});
+
 test('returns metrics-reset disabled payload when guard is off', () => {
   const result = evaluateOperatorCommand('/metrics-reset', makeDeps());
   assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
