@@ -233,6 +233,7 @@ test('returns diag issues payload', () => {
   assertHasBackendMode(result, 'openclaw');
   assert.match(result ?? '', /allowMetricsReset=true/);
   assert.match(result ?? '', /allowAuditTail=true/);
+  assertDiagPolicyTail(result);
   assert.match(result ?? '', /lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z/);
 });
 
@@ -308,6 +309,7 @@ test('diag and health surface inconsistent openai capability signals', () => {
 
   assertDiagIssues(diag, 'OPENAI_API_KEY is missing while LLM_BACKEND=openai');
   assert.match(diag ?? '', /llmBackend=openai/);
+  assertDiagPolicyTail(diag);
 
   assertHealthSignals(health, { runtime: 'degraded', issues: 1, openai: false });
 });
@@ -441,6 +443,7 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
   assertReloadIssuesRemain(reloaded, 'OPENAI_API_KEY missing');
   assertHasBackendMode(afterDiag, 'openai');
   assertDiagIssues(afterDiag, 'OPENAI_API_KEY missing');
+  assertDiagPolicyTail(afterDiag);
   assertStatusPayload(afterStatus, { model: 'gpt-4o-mini', llmBackend: 'openai' });
 });
 
