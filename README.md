@@ -52,7 +52,7 @@ npm start
 In Discord, buddy responds when messaged as either `buddy <prompt>`, `<@BOT_ID> <prompt>`, or `<@!BOT_ID> <prompt>`.
 
 Built-in operator commands (directed to bot):
-- `/help` — list available operator commands
+- `/help` — list available operator commands (marks guard-gated commands as disabled when not enabled)
 - `/ping` — fast liveness check (`pong` + uptime + model)
 - `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + guard/policy snapshot + last backend error

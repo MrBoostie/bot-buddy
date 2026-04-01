@@ -3,15 +3,16 @@ import { incrementCommandCount, recordCommandLatencyMs } from './metrics.js';
 const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
-const HELP_COMMAND_SUMMARY = [
-  '/ping',
-  '/status',
-  '/diag',
-  '/health',
-  '/reload',
-  '/metrics-reset',
-  '/audit-tail [1-20]',
-].join(', ');
+function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
+  const commands = ['/ping', '/status', '/diag', '/health', '/reload'];
+
+  commands.push(
+    deps.allowMetricsReset() ? '/metrics-reset' : '/metrics-reset (disabled)',
+    deps.allowAuditTail() ? '/audit-tail [1-20]' : '/audit-tail [1-20] (disabled)',
+  );
+
+  return commands.join(', ');
+}
 
 type ParseUnsignedIntInRangeResult =
   | { ok: true; value: number }
@@ -96,7 +97,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd === '/help') {
     incrementCommandCount();
-    return done(`commands: ${HELP_COMMAND_SUMMARY}`);
+    return done(`commands: ${helpCommandSummary(deps)}`);
   }
 
   if (cmd === '/status') {

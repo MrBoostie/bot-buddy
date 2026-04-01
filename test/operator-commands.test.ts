@@ -243,8 +243,22 @@ test('returns ping payload', () => {
   assertPingPayload(result, 'gpt-test');
 });
 
-test('returns help payload', () => {
+test('returns help payload with disabled guard markers when guards are off', () => {
   const result = evaluateOperatorCommand('/help', makeDeps());
+  assert.equal(
+    result,
+    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled)',
+  );
+});
+
+test('returns help payload without disabled markers when guards are on', () => {
+  const result = evaluateOperatorCommand(
+    '/help',
+    makeDeps({
+      allowMetricsReset: () => true,
+      allowAuditTail: () => true,
+    }),
+  );
   assert.equal(
     result,
     'commands: /ping, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
