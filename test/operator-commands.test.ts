@@ -252,15 +252,46 @@ test('returns ping/status payloads with openai model label', () => {
   assertStatusPayload(status, { model: 'gpt-4o-mini', llmBackend: 'openai' });
 });
 
-test('returns diag ok payload', () => {
-  const result = evaluateOperatorCommand('/diag', makeDeps());
-  assertDiagOk(result, {
-    hasDiscord: true,
-    hasOpenAI: false,
-    llmBackend: 'openclaw',
-    allowMetricsReset: false,
-    allowAuditTail: false,
-  });
+test('diag ok payload reflects availability/backend tuples (table-driven)', () => {
+  const cases = [
+    {
+      name: 'openclaw with discord available and openai unavailable',
+      hasDiscord: true,
+      hasOpenAI: false,
+      llmBackend: 'openclaw' as const,
+    },
+    {
+      name: 'openai with discord available and openai available',
+      hasDiscord: true,
+      hasOpenAI: true,
+      llmBackend: 'openai' as const,
+    },
+    {
+      name: 'openai with discord unavailable and openai available',
+      hasDiscord: false,
+      hasOpenAI: true,
+      llmBackend: 'openai' as const,
+    },
+  ];
+
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(
+      '/diag',
+      makeDeps({
+        hasDiscord: () => c.hasDiscord,
+        hasOpenAI: () => c.hasOpenAI,
+        llmBackend: () => c.llmBackend,
+      }),
+    );
+
+    assertDiagOk(result, {
+      hasDiscord: c.hasDiscord,
+      hasOpenAI: c.hasOpenAI,
+      llmBackend: c.llmBackend,
+      allowMetricsReset: false,
+      allowAuditTail: false,
+    });
+  }
 });
 
 test('returns diag issues payload', () => {
@@ -330,42 +361,6 @@ test('diag issues assertion rejects near-match issue text (single-character diff
   }
 });
 
-test('returns diag payload with openai backend mode when configured', () => {
-  const result = evaluateOperatorCommand(
-    '/diag',
-    makeDeps({
-      hasOpenAI: () => true,
-      llmBackend: () => 'openai',
-    }),
-  );
-
-  assertDiagOk(result, {
-    hasDiscord: true,
-    hasOpenAI: true,
-    llmBackend: 'openai',
-    allowMetricsReset: false,
-    allowAuditTail: false,
-  });
-});
-
-test('diag availability reflects discord-disabled/openai-enabled tuple', () => {
-  const result = evaluateOperatorCommand(
-    '/diag',
-    makeDeps({
-      hasDiscord: () => false,
-      hasOpenAI: () => true,
-      llmBackend: () => 'openai',
-    }),
-  );
-
-  assertDiagOk(result, {
-    hasDiscord: false,
-    hasOpenAI: true,
-    llmBackend: 'openai',
-    allowMetricsReset: false,
-    allowAuditTail: false,
-  });
-});
 
 test('diag reflects hasOpenAI=true after reload switches backend to openai', () => {
   const deps = makeModeSwitchDeps();
