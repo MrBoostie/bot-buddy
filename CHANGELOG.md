@@ -64,3 +64,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Refactored help invalid-usage text to reuse shared help-usage constants so alias guidance stays synchronized across unknown-command and help-usage responses.
 - Added `formatAppVersionLog()` helper + tests to keep startup app-version log output stable and regression-resistant.
 - Added README regression tests to keep `BOT_BUDDY_VERSION` systemd/docker deployment examples from drifting.
+- Expanded README regression coverage to assert `/version` fallback-chain documentation remains accurate (`BOT_BUDDY_VERSION` -> `npm_package_version` -> `unknown`).
