@@ -38,6 +38,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - `/help` and `/commands` now reject extra args with an explicit usage hint instead of silently falling through.
   - Unrecognized slash commands now return `unknown command: /<name> (use /help)` instead of falling through to LLM handling.
   - Unknown command hints now include typo suggestions for near-miss operator commands (e.g. `/hepl` suggests `/help`).
+  - Tightened unknown-command suggestion relevance: very short unknown commands no longer get noisy suggestions, and `/?` is no longer suggested for non-`/?` inputs.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).

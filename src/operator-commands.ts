@@ -75,9 +75,17 @@ function levenshteinDistance(a: string, b: string): number {
 }
 
 function unknownCommandSuggestion(command: string): string {
+  if (command.length < 4) {
+    return '';
+  }
+
   let best: { command: string; distance: number } | null = null;
 
   for (const known of KNOWN_OPERATOR_COMMANDS) {
+    if (known === OPERATOR_COMMANDS.question && !command.startsWith(OPERATOR_COMMANDS.question)) {
+      continue;
+    }
+
     const distance = levenshteinDistance(command, known);
     if (!best || distance < best.distance) {
       best = { command: known, distance };

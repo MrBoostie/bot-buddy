@@ -803,3 +803,8 @@ test('returns unknown command hint for unrecognized slash command with args', ()
   const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
   assert.equal(result, 'unknown command: /mystery (use /help)');
 });
+
+test('does not suggest /? for short unknown slash commands', () => {
+  const result = evaluateOperatorCommand('/x', makeDeps());
+  assert.equal(result, 'unknown command: /x (use /help)');
+});
