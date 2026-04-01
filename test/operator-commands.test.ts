@@ -296,6 +296,34 @@ test('diag issues assertion treats regex-like issue text as literals (table-driv
   }
 });
 
+test('diag issues assertion rejects near-match issue text (single-character diffs)', () => {
+  const cases = [
+    {
+      actual: 'missing key (OPENAI_API_KEY?)',
+      expected: 'missing key (OPENAI_API_KEY!)',
+    },
+    {
+      actual: 'token [OPENAI|ALT] missing',
+      expected: 'token [OPENAI|AL7] missing',
+    },
+    {
+      actual: 'path C:\\bot\\key ^missing$',
+      expected: 'path C:\\bot\\key ^missing!$',
+    },
+  ];
+
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(
+      '/diag',
+      makeDeps({
+        validateRuntime: () => [c.actual],
+      }),
+    );
+
+    assert.throws(() => assertDiagIssues(result, c.expected));
+  }
+});
+
 test('returns diag payload with openai backend mode when configured', () => {
   const result = evaluateOperatorCommand(
     '/diag',
