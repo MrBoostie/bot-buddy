@@ -239,10 +239,11 @@ test('runs reload and returns issues payload when validation fails', () => {
   assert.equal(result, 'reload: applied, but issues remain -> still broken');
 });
 
-test('reload issues branch stays mode-consistent after switch to openai', () => {
+test('reload issues branch keeps diag/status mode-consistent after switch to openai', () => {
   let mode: 'openclaw' | 'openai' = 'openclaw';
 
   const deps = makeDeps({
+    modelName: () => (mode === 'openai' ? 'gpt-4o-mini' : 'openclaw:main'),
     llmBackend: () => mode,
     runtimeSummary: () => `bot=buddy | llmBackend=${mode}`,
     refreshConfigFromEnv: () => {
@@ -252,14 +253,19 @@ test('reload issues branch stays mode-consistent after switch to openai', () => 
     hasOpenAI: () => mode === 'openai',
   });
 
-  const before = evaluateOperatorCommand('/diag', deps);
+  const beforeDiag = evaluateOperatorCommand('/diag', deps);
   const reloaded = evaluateOperatorCommand('/reload', deps);
-  const after = evaluateOperatorCommand('/diag', deps);
+  const afterDiag = evaluateOperatorCommand('/diag', deps);
+  const afterStatus = evaluateOperatorCommand('/status', deps);
 
-  assert.match(before ?? '', /llmBackend=openclaw/);
+  assert.match(beforeDiag ?? '', /llmBackend=openclaw/);
   assert.equal(reloaded, 'reload: applied, but issues remain -> OPENAI_API_KEY missing');
-  assert.match(after ?? '', /llmBackend=openai/);
-  assert.match(after ?? '', /issues detected -> OPENAI_API_KEY missing/);
+  assert.match(afterDiag ?? '', /llmBackend=openai/);
+  assert.match(afterDiag ?? '', /issues detected -> OPENAI_API_KEY missing/);
+  assert.equal(
+    afterStatus,
+    'status: online | uptime=12s | model=gpt-4o-mini | bot=buddy | llmBackend=openai',
+  );
 });
 
 test('returns metrics-reset disabled payload when guard is off', () => {
