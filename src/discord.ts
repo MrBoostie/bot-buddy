@@ -20,11 +20,25 @@ import { getMetricsSummary, resetMetrics } from './metrics.js';
 import { getAuditTail, getOperatorAuditEvent, recordAuditEvent } from './operator-audit.js';
 import { evaluateMetricsSnapshot } from './metrics-snapshot.js';
 
+export function resolveAppVersionInfo(): { value: string; source: 'BOT_BUDDY_VERSION' | 'npm_package_version' | 'unknown' } {
+  const explicit = process.env.BOT_BUDDY_VERSION?.trim();
+  if (explicit) {
+    return { value: explicit, source: 'BOT_BUDDY_VERSION' };
+  }
+
+  const npmVersion = process.env.npm_package_version?.trim();
+  if (npmVersion) {
+    return { value: npmVersion, source: 'npm_package_version' };
+  }
+
+  return { value: 'unknown', source: 'unknown' };
+}
+
 export function buildOperatorCommandDeps(): OperatorCommandDeps {
   return {
     formatUptime,
     modelName: () => runtimeModelLabel(),
-    appVersion: () => process.env.BOT_BUDDY_VERSION ?? process.env.npm_package_version ?? 'unknown',
+    appVersion: () => resolveAppVersionInfo().value,
     runtimeSummary: redactedRuntimeSummary,
     validateRuntime,
     refreshConfigFromEnv,
@@ -53,7 +67,9 @@ export async function startDiscord(): Promise<void> {
   });
 
   client.once(Events.ClientReady, (c) => {
+    const version = resolveAppVersionInfo();
     logInfo(`logged in as ${c.user.tag}`, { scope: 'discord' });
+    logInfo(`app version | value=${version.value} | source=${version.source}`, { scope: 'discord' });
 
     if (config.metricsSnapshotIntervalSec > 0) {
       const interval = setInterval(() => {
