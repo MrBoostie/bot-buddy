@@ -97,6 +97,19 @@ Secrets hygiene:
 - Commit `.env.example` only
 - Keep API keys in local runtime env or systemd `EnvironmentFile`
 
+Version pinning for deterministic `/version` + startup logs:
+- **systemd** (`EnvironmentFile`):
+
+  ```ini
+  BOT_BUDDY_VERSION=2026.04.01
+  ```
+
+- **docker** (`docker run`):
+
+  ```bash
+  docker run --env BOT_BUDDY_VERSION=2026.04.01 ...
+  ```
+
 ## Developer notes
 
 - `parseUnsignedIntInRange(raw, min, max)` in `src/operator-commands.ts` is the shared strict numeric parser for operator command args.

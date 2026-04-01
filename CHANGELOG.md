@@ -41,6 +41,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Added `/version` operator command for quick runtime identity checks (`version`, `node`, `model`).
   - `/version` now supports explicit version injection via `BOT_BUDDY_VERSION` (fallback chain: `BOT_BUDDY_VERSION` -> `npm_package_version` -> `unknown`).
   - Discord startup now logs resolved app version `value` + `source` for faster deployment verification and incident triage.
+  - README now includes systemd/docker `BOT_BUDDY_VERSION` examples for deterministic `/version` and startup version logs across deploy targets.
   - `/help` and `/commands` now reject extra args with an explicit usage hint instead of silently falling through.
   - Unrecognized slash commands now return `unknown command: /<name> (use /help)` instead of falling through to LLM handling.
   - Unknown command hints now include typo suggestions for near-miss operator commands (e.g. `/hepl` suggests `/help`).
