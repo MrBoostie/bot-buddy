@@ -8,6 +8,7 @@ const OPERATOR_COMMANDS = {
   help: '/help',
   commands: '/commands',
   ping: '/ping',
+  uptime: '/uptime',
   status: '/status',
   diag: '/diag',
   health: '/health',
@@ -25,6 +26,7 @@ function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' 
     OPERATOR_COMMANDS.help,
     OPERATOR_COMMANDS.commands,
     OPERATOR_COMMANDS.ping,
+    OPERATOR_COMMANDS.uptime,
     OPERATOR_COMMANDS.status,
     OPERATOR_COMMANDS.diag,
     OPERATOR_COMMANDS.health,
@@ -183,6 +185,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   if (cmd === OPERATOR_COMMANDS.ping) {
     incrementCommandCount();
     return done(`pong | uptime=${deps.formatUptime()} | model=${deps.modelName()}`);
+  }
+
+  if (cmd === OPERATOR_COMMANDS.uptime) {
+    incrementCommandCount();
+    return done(`uptime=${deps.formatUptime()} | model=${deps.modelName()}`);
   }
 
   if (
