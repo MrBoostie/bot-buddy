@@ -35,87 +35,72 @@ function runPolicy(cwd: string, baseSha: string, headSha: string): { code: numbe
   return { code: result.status ?? 1, stderr: result.stderr ?? '' };
 }
 
+function commitAndRunPolicy(
+  dir: string,
+  baseSha: string,
+  filesToAdd: string,
+  message: string,
+): { code: number; stderr: string } {
+  sh(dir, `git add ${filesToAdd}`);
+  sh(dir, `git commit -m "${message}"`);
+  const headSha = sh(dir, 'git rev-parse HEAD');
+  return runPolicy(dir, baseSha, headSha);
+}
+
+function expectPolicyFailure(result: { code: number; stderr: string }): void {
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+}
+
 test('fails when behavior-visible files change without changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'src', 'main.ts'), 'export const x = 2;\n');
-  sh(dir, 'git add src/main.ts');
-  sh(dir, 'git commit -m "change src"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+  const result = commitAndRunPolicy(dir, baseSha, 'src/main.ts', 'change src');
+  expectPolicyFailure(result);
 });
 
 test('passes when behavior-visible files change with changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'src', 'main.ts'), 'export const x = 2;\n');
   writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- updated\n');
-  sh(dir, 'git add src/main.ts CHANGELOG.md');
-  sh(dir, 'git commit -m "change src + changelog"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
+  const result = commitAndRunPolicy(dir, baseSha, 'src/main.ts CHANGELOG.md', 'change src + changelog');
   assert.equal(result.code, 0);
 });
 
 test('passes when non-behavior-visible files change without changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'notes.txt'), 'internal notes\n');
-  sh(dir, 'git add notes.txt');
-  sh(dir, 'git commit -m "notes only"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
+  const result = commitAndRunPolicy(dir, baseSha, 'notes.txt', 'notes only');
   assert.equal(result.code, 0);
 });
 
 test('fails when README behavior-visible docs change without changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'README.md'), '# test\n\nupdated operator behavior docs\n');
-  sh(dir, 'git add README.md');
-  sh(dir, 'git commit -m "readme behavior change"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+  const result = commitAndRunPolicy(dir, baseSha, 'README.md', 'readme behavior change');
+  expectPolicyFailure(result);
 });
 
 test('fails when scripts change without changelog update', () => {
   const { dir, baseSha } = setupRepo();
   mkdirSync(join(dir, 'scripts'), { recursive: true });
   writeFileSync(join(dir, 'scripts', 'helper.sh'), '#!/usr/bin/env bash\necho hi\n');
-  sh(dir, 'git add scripts/helper.sh');
-  sh(dir, 'git commit -m "script behavior change"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+  const result = commitAndRunPolicy(dir, baseSha, 'scripts/helper.sh', 'script behavior change');
+  expectPolicyFailure(result);
 });
 
 test('fails when package.json changes without changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'package.json'), '{"name":"fixture","version":"1.0.1"}\n');
-  sh(dir, 'git add package.json');
-  sh(dir, 'git commit -m "package behavior change"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+  const result = commitAndRunPolicy(dir, baseSha, 'package.json', 'package behavior change');
+  expectPolicyFailure(result);
 });
 
 test('passes when README behavior-visible docs change with changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'README.md'), '# test\n\nupdated operator behavior docs\n');
   writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- readme update\n');
-  sh(dir, 'git add README.md CHANGELOG.md');
-  sh(dir, 'git commit -m "readme + changelog"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
+  const result = commitAndRunPolicy(dir, baseSha, 'README.md CHANGELOG.md', 'readme + changelog');
   assert.equal(result.code, 0);
 });
 
@@ -124,11 +109,12 @@ test('passes when scripts change with changelog update', () => {
   mkdirSync(join(dir, 'scripts'), { recursive: true });
   writeFileSync(join(dir, 'scripts', 'helper.sh'), '#!/usr/bin/env bash\necho hi\n');
   writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- script update\n');
-  sh(dir, 'git add scripts/helper.sh CHANGELOG.md');
-  sh(dir, 'git commit -m "script + changelog"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
+  const result = commitAndRunPolicy(
+    dir,
+    baseSha,
+    'scripts/helper.sh CHANGELOG.md',
+    'script + changelog',
+  );
   assert.equal(result.code, 0);
 });
 
@@ -136,11 +122,12 @@ test('passes when package.json changes with changelog update', () => {
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'package.json'), '{"name":"fixture","version":"1.0.1"}\n');
   writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- package update\n');
-  sh(dir, 'git add package.json CHANGELOG.md');
-  sh(dir, 'git commit -m "package + changelog"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
+  const result = commitAndRunPolicy(
+    dir,
+    baseSha,
+    'package.json CHANGELOG.md',
+    'package + changelog',
+  );
   assert.equal(result.code, 0);
 });
 
@@ -148,13 +135,13 @@ test('fails on mixed behavior-visible and non-visible changes without changelog'
   const { dir, baseSha } = setupRepo();
   writeFileSync(join(dir, 'README.md'), '# test\n\nbehavior change\n');
   writeFileSync(join(dir, 'notes.txt'), 'non-visible change\n');
-  sh(dir, 'git add README.md notes.txt');
-  sh(dir, 'git commit -m "mixed visible + non-visible without changelog"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /CHANGELOG\.md must be updated/i);
+  const result = commitAndRunPolicy(
+    dir,
+    baseSha,
+    'README.md notes.txt',
+    'mixed visible + non-visible without changelog',
+  );
+  expectPolicyFailure(result);
 });
 
 test('passes on mixed behavior-visible and non-visible changes with changelog', () => {
@@ -162,10 +149,11 @@ test('passes on mixed behavior-visible and non-visible changes with changelog', 
   writeFileSync(join(dir, 'README.md'), '# test\n\nbehavior change\n');
   writeFileSync(join(dir, 'notes.txt'), 'non-visible change\n');
   writeFileSync(join(dir, 'CHANGELOG.md'), '# changelog\n- mixed update\n');
-  sh(dir, 'git add README.md notes.txt CHANGELOG.md');
-  sh(dir, 'git commit -m "mixed visible + non-visible with changelog"');
-  const headSha = sh(dir, 'git rev-parse HEAD');
-
-  const result = runPolicy(dir, baseSha, headSha);
+  const result = commitAndRunPolicy(
+    dir,
+    baseSha,
+    'README.md notes.txt CHANGELOG.md',
+    'mixed visible + non-visible with changelog',
+  );
   assert.equal(result.code, 0);
 });
