@@ -21,4 +21,8 @@ if echo "$CHANGED" | grep -Eq '^(src/|scripts/|package\.json|README\.md)'; then
     echo "Hint: run npm run test:changelog-policy and see CONTRIBUTING.md (Changelog policy + PR checklist)." >&2
     exit 1
   fi
+
+  echo "::notice::Changelog policy satisfied for behavior-visible changes."
+else
+  echo "::notice::No behavior-visible file changes detected; changelog update not required."
 fi
