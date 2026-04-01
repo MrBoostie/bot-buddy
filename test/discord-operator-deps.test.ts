@@ -183,3 +183,13 @@ test('formatAppVersionLog renders stable key-value startup log contract', () => 
     'app version | value=2.4.1 | source=BOT_BUDDY_VERSION',
   );
 });
+
+test('formatAppVersionLog renders unknown-source payload consistently', () => {
+  assert.equal(
+    formatAppVersionLog({
+      value: 'unknown',
+      source: 'unknown',
+    }),
+    'app version | value=unknown | source=unknown',
+  );
+});
