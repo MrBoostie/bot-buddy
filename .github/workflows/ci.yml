@@ -44,6 +44,9 @@ jobs:
       - name: Type check
         run: npm run check
 
+      - name: Docs link consistency check
+        run: npm run check:docs
+
       - name: Test (changelog policy fixtures)
         run: npm run test:changelog-policy
 

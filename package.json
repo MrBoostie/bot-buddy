@@ -11,7 +11,8 @@
     "buddy": "tsx src/buddy-cli.ts",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "node --import tsx --test test/**/*.test.ts",
-    "test:changelog-policy": "node --import tsx --test test/changelog-policy-script.test.ts"
+    "test:changelog-policy": "node --import tsx --test test/changelog-policy-script.test.ts",
+    "check:docs": "bash scripts/check-doc-links.sh"
   },
   "dependencies": {
     "discord.js": "^14.21.0",

@@ -22,6 +22,12 @@ npm test
 npm run test:changelog-policy
 ```
 
+4. Validate docs link consistency:
+
+```bash
+npm run check:docs
+```
+
 ## PR checklist
 
 - [ ] `npm run check` passes
