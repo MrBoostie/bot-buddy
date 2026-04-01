@@ -64,6 +64,18 @@ function assertDiagPolicyTail(text: string | null): void {
   assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
 }
 
+function assertDiagAvailability(
+  text: string | null,
+  options: {
+    hasDiscord: boolean;
+    hasOpenAI: boolean;
+  },
+): void {
+  const target = text ?? '';
+  assert.match(target, new RegExp(`\| hasDiscord=${String(options.hasDiscord)} \|`));
+  assert.match(target, new RegExp(`\| hasOpenAI=${String(options.hasOpenAI)} \|`));
+}
+
 function assertDiagBackendAndGuards(
   text: string | null,
   options: {
@@ -96,8 +108,10 @@ function assertDiagOk(
 ): void {
   const target = text ?? '';
   assert.match(target, /^diag: ok \|/);
-  assert.match(target, new RegExp(`\| hasDiscord=${String(options.hasDiscord)} \|`));
-  assert.match(target, new RegExp(`\| hasOpenAI=${String(options.hasOpenAI)} \|`));
+  assertDiagAvailability(target, {
+    hasDiscord: options.hasDiscord,
+    hasOpenAI: options.hasOpenAI,
+  });
   assert.match(target, new RegExp(`\| llmBackend=${options.llmBackend} \|`));
   assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
   assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
@@ -284,10 +298,10 @@ test('diag reflects hasOpenAI=true after reload switches backend to openai', () 
   const after = evaluateOperatorCommand('/diag', deps);
 
   assertHasBackendMode(before, 'openclaw');
-  assert.match(before ?? '', /hasOpenAI=false/);
+  assertDiagAvailability(before, { hasDiscord: true, hasOpenAI: false });
 
   assertHasBackendMode(after, 'openai');
-  assert.match(after ?? '', /hasOpenAI=true/);
+  assertDiagAvailability(after, { hasDiscord: true, hasOpenAI: true });
 });
 
 test('returns health payload in ok state', () => {
@@ -329,6 +343,7 @@ test('diag and health surface inconsistent openai capability signals', () => {
   const health = evaluateOperatorCommand('/health', deps);
 
   assertDiagIssues(diag, 'OPENAI_API_KEY is missing while LLM_BACKEND=openai');
+  assertDiagAvailability(diag, { hasDiscord: true, hasOpenAI: false });
   assertDiagBackendAndGuards(diag, {
     llmBackend: 'openai',
     allowMetricsReset: false,
