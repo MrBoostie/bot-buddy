@@ -60,6 +60,11 @@ test('parseAuditTailInput accepts tab/newline whitespace around arguments', () =
   assert.deepEqual(result, { ok: true, limit: 7 });
 });
 
+test('parseAuditTailInput accepts mixed-case command tokens', () => {
+  const result = parseAuditTailInput('/AuDiT-TaIl 7');
+  assert.deepEqual(result, { ok: true, limit: 7 });
+});
+
 test('parseAuditTailInput rejects extra args', () => {
   const result = parseAuditTailInput('/audit-tail 3 extra');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
