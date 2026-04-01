@@ -71,6 +71,7 @@ export async function startDiscord(): Promise<void> {
             refreshConfigFromEnv,
             hasDiscord,
             hasOpenAI,
+            llmBackend: () => config.llmBackend,
             backendHealthSummary: getBackendHealthSummary,
             tryAcquireReload,
             metricsSummary: getMetricsSummary,

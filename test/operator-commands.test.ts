@@ -11,6 +11,7 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     refreshConfigFromEnv: () => {},
     hasDiscord: () => true,
     hasOpenAI: () => false,
+    llmBackend: () => 'openclaw',
     backendHealthSummary: () => 'none',
     tryAcquireReload: () => ({ ok: true }),
     metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
@@ -39,7 +40,7 @@ test('returns diag ok payload', () => {
   const result = evaluateOperatorCommand('/diag', makeDeps());
   assert.equal(
     result,
-    'diag: ok | hasDiscord=true | hasOpenAI=false | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none',
+    'diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none',
   );
 });
 
@@ -55,7 +56,22 @@ test('returns diag issues payload', () => {
   );
   assert.equal(
     result,
-    'diag: issues detected -> bad env ; missing key | allowMetricsReset=true | allowAuditTail=true | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z',
+    'diag: issues detected -> bad env ; missing key | llmBackend=openclaw | allowMetricsReset=true | allowAuditTail=true | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=openclaw timeout @ 2026-03-31T00:20:00.000Z',
+  );
+});
+
+test('returns diag payload with openai backend mode when configured', () => {
+  const result = evaluateOperatorCommand(
+    '/diag',
+    makeDeps({
+      hasOpenAI: () => true,
+      llmBackend: () => 'openai',
+    }),
+  );
+
+  assert.equal(
+    result,
+    'diag: ok | hasDiscord=true | hasOpenAI=true | llmBackend=openai | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none',
   );
 });
 

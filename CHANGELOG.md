@@ -33,6 +33,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
+- `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
 
 ### Internal
 - Added shared numeric parsing helper `parseUnsignedIntInRange` for consistent strict numeric command argument validation.

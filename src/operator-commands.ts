@@ -61,6 +61,7 @@ export type OperatorCommandDeps = {
   refreshConfigFromEnv: () => void;
   hasDiscord: () => boolean;
   hasOpenAI: () => boolean;
+  llmBackend: () => string;
   backendHealthSummary: () => string;
   tryAcquireReload: () => { ok: true } | { ok: false; retryAfterSec: number };
   metricsSummary: () => string;
@@ -98,12 +99,13 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
     const auditTail = `auditTailDefault=${AUDIT_TAIL_DEFAULT_LIMIT} | auditTailMax=${AUDIT_TAIL_MAX_LIMIT}`;
     const replyPolicy = `operatorReplyMaxChars=${MAX_OPERATOR_REPLY_CHARS}`;
+    const backendMode = `llmBackend=${deps.llmBackend()}`;
     return issues.length === 0
       ? done(
-          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
+          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
         )
       : done(
-          `diag: issues detected -> ${issues.join(' ; ')} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
+          `diag: issues detected -> ${issues.join(' ; ')} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
         );
   }
 

@@ -63,7 +63,7 @@ Built-in operator commands (directed to bot):
 Sample `/diag` output:
 
 ```text
-diag: ok | hasDiscord=true | hasOpenAI=false | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
+diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
 ```
 
 Operational logging toggles:
