@@ -53,3 +53,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded parser test coverage for edge cases (whitespace variants, leading zeros, non-ASCII digits, large values, bounds).
 - Added CI changelog policy enforcement for behavior-visible PR changes, with documented local runner script and maintainers-only `skip-changelog` label bypass.
 - Refactored operator command literals into a shared `OPERATOR_COMMANDS` constant to reduce drift between help output, command evaluation, and typo-suggestion command matching.
+- Refactored `/audit-tail` parser and validation error text to consume shared command constants, reducing future literal-drift risk when command aliases evolve.

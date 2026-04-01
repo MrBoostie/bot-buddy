@@ -131,7 +131,7 @@ export function parseUnsignedIntInRange(
 export function parseAuditTailInput(input: string): AuditTailParseResult {
   const cmd = input.trim().toLowerCase();
   const parts = cmd.split(/\s+/).filter(Boolean);
-  if (parts[0] !== '/audit-tail') {
+  if (parts[0] !== OPERATOR_COMMANDS.auditTail) {
     return { ok: false, reason: 'invalid-usage' };
   }
 
@@ -272,9 +272,13 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const parsed = parseAuditTailInput(cmd);
     if (!parsed.ok) {
       if (parsed.reason === 'invalid-usage') {
-        return done('audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
+        return done(
+          `audit-tail: invalid usage (use ${OPERATOR_COMMANDS.auditTail} or ${OPERATOR_COMMANDS.auditTail} <1-20>)`,
+        );
       }
-      return done('audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
+      return done(
+        `audit-tail: invalid limit (use ${OPERATOR_COMMANDS.auditTail} or ${OPERATOR_COMMANDS.auditTail} <1-20>)`,
+      );
     }
 
     if (!deps.allowAuditTail()) {
