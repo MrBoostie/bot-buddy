@@ -259,6 +259,11 @@ test('returns version payload', () => {
   assert.equal(result, `version=0.1.0-test | node=${process.version} | model=gpt-test`);
 });
 
+test('returns version payload with unknown version when appVersion is unavailable', () => {
+  const result = evaluateOperatorCommand('/version', makeDeps({ appVersion: () => 'unknown' }));
+  assert.equal(result, `version=unknown | node=${process.version} | model=gpt-test`);
+});
+
 test('returns help payload with disabled guard markers when guards are off', () => {
   const result = evaluateOperatorCommand('/help', makeDeps());
   assert.equal(
