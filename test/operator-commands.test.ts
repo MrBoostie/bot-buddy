@@ -348,6 +348,25 @@ test('returns diag payload with openai backend mode when configured', () => {
   });
 });
 
+test('diag availability reflects discord-disabled/openai-enabled tuple', () => {
+  const result = evaluateOperatorCommand(
+    '/diag',
+    makeDeps({
+      hasDiscord: () => false,
+      hasOpenAI: () => true,
+      llmBackend: () => 'openai',
+    }),
+  );
+
+  assertDiagOk(result, {
+    hasDiscord: false,
+    hasOpenAI: true,
+    llmBackend: 'openai',
+    allowMetricsReset: false,
+    allowAuditTail: false,
+  });
+});
+
 test('diag reflects hasOpenAI=true after reload switches backend to openai', () => {
   const deps = makeModeSwitchDeps();
 
