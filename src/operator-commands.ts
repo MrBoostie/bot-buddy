@@ -10,6 +10,7 @@ const OPERATOR_COMMANDS = {
   ping: '/ping',
   up: '/up',
   uptime: '/uptime',
+  version: '/version',
   status: '/status',
   diag: '/diag',
   health: '/health',
@@ -29,6 +30,7 @@ function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' 
     OPERATOR_COMMANDS.ping,
     OPERATOR_COMMANDS.up,
     OPERATOR_COMMANDS.uptime,
+    OPERATOR_COMMANDS.version,
     OPERATOR_COMMANDS.status,
     OPERATOR_COMMANDS.diag,
     OPERATOR_COMMANDS.health,
@@ -162,6 +164,7 @@ export function parseAuditTailInput(input: string): AuditTailParseResult {
 export type OperatorCommandDeps = {
   formatUptime: () => string;
   modelName: () => string;
+  appVersion: () => string;
   runtimeSummary: () => string;
   validateRuntime: () => string[];
   refreshConfigFromEnv: () => void;
@@ -194,6 +197,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   if (cmd === OPERATOR_COMMANDS.up || cmd === OPERATOR_COMMANDS.uptime) {
     incrementCommandCount();
     return done(`uptime=${deps.formatUptime()} | model=${deps.modelName()}`);
+  }
+
+  if (cmd === OPERATOR_COMMANDS.version) {
+    incrementCommandCount();
+    return done(`version=${deps.appVersion()} | node=${process.version} | model=${deps.modelName()}`);
   }
 
   if (
