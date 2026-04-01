@@ -243,6 +243,14 @@ test('returns ping payload', () => {
   assertPingPayload(result, 'gpt-test');
 });
 
+test('returns help payload', () => {
+  const result = evaluateOperatorCommand('/help', makeDeps());
+  assert.equal(
+    result,
+    'commands: /ping, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+  );
+});
+
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
   assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });

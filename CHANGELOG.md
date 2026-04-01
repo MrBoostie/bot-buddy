@@ -30,6 +30,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Safe `/audit-tail` response truncation to Discord-safe length.
   - `/diag` now includes operator guard/policy fields (`allowMetricsReset`, `allowAuditTail`, `auditTailDefault`, `auditTailMax`, `operatorReplyMaxChars`).
   - In-memory operator audit events now include request correlation (`rid`) and classify invalid `/audit-tail` attempts.
+  - Added `/help` operator command to quickly enumerate supported operator commands in one line.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
