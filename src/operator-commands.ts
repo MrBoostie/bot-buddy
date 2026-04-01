@@ -3,23 +3,35 @@ import { incrementCommandCount, recordCommandLatencyMs } from './metrics.js';
 const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
-const KNOWN_OPERATOR_COMMANDS = [
-  '/help',
-  '/commands',
-  '/ping',
-  '/status',
-  '/diag',
-  '/health',
-  '/reload',
-  '/metrics-reset',
-  '/audit-tail',
-] as const;
+const OPERATOR_COMMANDS = {
+  help: '/help',
+  commands: '/commands',
+  ping: '/ping',
+  status: '/status',
+  diag: '/diag',
+  health: '/health',
+  reload: '/reload',
+  metricsReset: '/metrics-reset',
+  auditTail: '/audit-tail',
+} as const;
+
+const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
-  const commands = ['/ping', '/status', '/diag', '/health', '/reload'];
+  const commands: string[] = [
+    OPERATOR_COMMANDS.ping,
+    OPERATOR_COMMANDS.status,
+    OPERATOR_COMMANDS.diag,
+    OPERATOR_COMMANDS.health,
+    OPERATOR_COMMANDS.reload,
+  ];
 
   commands.push(
-    deps.allowMetricsReset() ? '/metrics-reset' : '/metrics-reset (disabled)',
-    deps.allowAuditTail() ? '/audit-tail [1-20]' : '/audit-tail [1-20] (disabled)',
+    deps.allowMetricsReset()
+      ? OPERATOR_COMMANDS.metricsReset
+      : `${OPERATOR_COMMANDS.metricsReset} (disabled)`,
+    deps.allowAuditTail()
+      ? `${OPERATOR_COMMANDS.auditTail} [1-20]`
+      : `${OPERATOR_COMMANDS.auditTail} [1-20] (disabled)`,
   );
 
   return commands.join(', ');
@@ -154,29 +166,29 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return text;
   };
 
-  if (cmd === '/ping') {
+  if (cmd === OPERATOR_COMMANDS.ping) {
     incrementCommandCount();
     return done(`pong | uptime=${deps.formatUptime()} | model=${deps.modelName()}`);
   }
 
-  if (cmd === '/help' || cmd === '/commands') {
+  if (cmd === OPERATOR_COMMANDS.help || cmd === OPERATOR_COMMANDS.commands) {
     incrementCommandCount();
     return done(`commands: ${helpCommandSummary(deps)}${helpEnableHint(deps)}`);
   }
 
-  if (cmd.startsWith('/help ') || cmd.startsWith('/commands ')) {
+  if (cmd.startsWith(`${OPERATOR_COMMANDS.help} `) || cmd.startsWith(`${OPERATOR_COMMANDS.commands} `)) {
     incrementCommandCount();
     return done('help: invalid usage (use /help or /commands)');
   }
 
-  if (cmd === '/status') {
+  if (cmd === OPERATOR_COMMANDS.status) {
     incrementCommandCount();
     return done(
       `status: online | uptime=${deps.formatUptime()} | model=${deps.modelName()} | ${deps.runtimeSummary()}`,
     );
   }
 
-  if (cmd === '/diag') {
+  if (cmd === OPERATOR_COMMANDS.diag) {
     incrementCommandCount();
     const issues = deps.validateRuntime();
     const backend = deps.backendHealthSummary();
@@ -193,7 +205,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
         );
   }
 
-  if (cmd === '/health') {
+  if (cmd === OPERATOR_COMMANDS.health) {
     incrementCommandCount();
     const issues = deps.validateRuntime();
     const runtime = issues.length === 0 ? 'ok' : 'degraded';
@@ -210,7 +222,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     );
   }
 
-  if (cmd === '/reload') {
+  if (cmd === OPERATOR_COMMANDS.reload) {
     incrementCommandCount();
     const gate = deps.tryAcquireReload();
     if (!gate.ok) {
@@ -225,7 +237,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`reload: applied | ${deps.runtimeSummary()}`);
   }
 
-  if (cmd === '/metrics-reset') {
+  if (cmd === OPERATOR_COMMANDS.metricsReset) {
     incrementCommandCount();
     if (!deps.allowMetricsReset()) {
       return done('metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
@@ -234,7 +246,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`metrics-reset: ok | ${deps.metricsSummary()}`);
   }
 
-  if (cmd.startsWith('/audit-tail')) {
+  if (cmd.startsWith(OPERATOR_COMMANDS.auditTail)) {
     incrementCommandCount();
     const parsed = parseAuditTailInput(cmd);
     if (!parsed.ok) {
