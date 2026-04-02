@@ -917,3 +917,8 @@ test('does not emit noisy backend suggestions for distant unknown commands', () 
   const result = evaluateOperatorCommand('/beacon', makeDeps());
   assert.equal(result, 'unknown command: /beacon (use /?, /help, or /commands)');
 });
+
+test('does not emit noisy runtime suggestions for distant run-prefixed unknown commands', () => {
+  const result = evaluateOperatorCommand('/runner', makeDeps());
+  assert.equal(result, 'unknown command: /runner (use /?, /help, or /commands)');
+});
