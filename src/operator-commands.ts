@@ -75,7 +75,7 @@ function helpEnableHint(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'a
   return ` | enable: ${envToggles.join(', ')}`;
 }
 
-function levenshteinDistance(a: string, b: string): number {
+function damerauLevenshteinDistance(a: string, b: string): number {
   const rows = a.length + 1;
   const cols = b.length + 1;
   const dp = Array.from({ length: rows }, () => Array<number>(cols).fill(0));
@@ -87,6 +87,10 @@ function levenshteinDistance(a: string, b: string): number {
     for (let j = 1; j < cols; j += 1) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
       dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + 1);
+      }
     }
   }
 
@@ -96,12 +100,19 @@ function levenshteinDistance(a: string, b: string): number {
 function unknownCommandSuggestion(command: string): string {
   let best: { command: string; distance: number } | null = null;
 
+  const unknownToken = command.slice(1);
+
   for (const known of KNOWN_OPERATOR_COMMANDS) {
     if (known === OPERATOR_COMMANDS.question && !command.startsWith(OPERATOR_COMMANDS.question)) {
       continue;
     }
 
-    const distance = levenshteinDistance(command, known);
+    const knownToken = known.slice(1);
+    if (unknownToken.slice(0, 1) !== knownToken.slice(0, 1)) {
+      continue;
+    }
+
+    const distance = damerauLevenshteinDistance(command, known);
     if (!best || distance < best.distance) {
       best = { command: known, distance };
     }
@@ -111,10 +122,22 @@ function unknownCommandSuggestion(command: string): string {
     return '';
   }
 
+  if (best.distance === 2 && Math.abs(command.length - best.command.length) >= 1) {
+    return '';
+  }
+
   const isShortCommand = command.length < 4;
   const isShortSuggestion = best.command.length <= 3;
-  if (isShortCommand && (!isShortSuggestion || best.distance > 1)) {
-    return '';
+  if (isShortCommand) {
+    if (!isShortSuggestion || best.distance > 1) {
+      return '';
+    }
+
+    const shortCommandToken = command.slice(1);
+    const shortSuggestionToken = best.command.slice(1);
+    if (!shortCommandToken.startsWith(shortSuggestionToken.slice(0, 1))) {
+      return '';
+    }
   }
 
   return ` | did you mean ${best.command}?`;

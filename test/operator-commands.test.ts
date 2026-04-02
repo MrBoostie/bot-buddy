@@ -997,14 +997,13 @@ test('does not suggest /? for short unknown slash commands', () => {
   assert.equal(result, 'unknown command: /x (use /?, /help, or /commands)');
 });
 
-test('does not emit noisy backend suggestions for distant unknown commands', () => {
-  const result = evaluateOperatorCommand('/beacon', makeDeps());
-  assert.equal(result, 'unknown command: /beacon (use /?, /help, or /commands)');
-});
+test('does not emit noisy suggestions for unrelated or broad unknown commands (table-driven)', () => {
+  const inputs = ['/beacon', '/runner', '/beep', '/hello', '/mod'];
 
-test('does not emit noisy runtime suggestions for distant run-prefixed unknown commands', () => {
-  const result = evaluateOperatorCommand('/runner', makeDeps());
-  assert.equal(result, 'unknown command: /runner (use /?, /help, or /commands)');
+  for (const input of inputs) {
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.equal(result, `unknown command: ${input} (use /?, /help, or /commands)`);
+  }
 });
 
 test('does not suggest /id for short transposition typo due short-command noise guard', () => {
