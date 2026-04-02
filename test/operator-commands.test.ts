@@ -936,8 +936,30 @@ test('supports tab/newline whitespace for audit-tail command detection', () => {
   assert.equal(result, 'audit-tail: tail');
 });
 
+test('supports mixed-case audit-tail command token in evaluator routing', () => {
+  let calledWith: number | undefined;
+  const result = evaluateOperatorCommand(
+    '/AUDIT-TAIL 3',
+    makeDeps({
+      allowAuditTail: () => true,
+      getAuditTail: (limit) => {
+        calledWith = limit;
+        return 'tail';
+      },
+    }),
+  );
+
+  assert.equal(calledWith, 3);
+  assert.equal(result, 'audit-tail: tail');
+});
+
 test('treats audit-tail with trailing tab as audit-tail command (not unknown command)', () => {
   const result = evaluateOperatorCommand('/audit-tail\t', makeDeps());
+  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+});
+
+test('treats mixed-case audit-tail token as guard-gated command when disabled', () => {
+  const result = evaluateOperatorCommand('/AUDIT-TAIL 3', makeDeps());
   assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
 });
 
