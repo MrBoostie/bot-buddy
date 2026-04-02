@@ -3,6 +3,7 @@ import { incrementCommandCount, recordCommandLatencyMs } from './metrics.js';
 const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
+const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
 const OPERATOR_COMMANDS = {
   question: '/?',
   help: '/help',
@@ -341,7 +342,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`metrics-reset: ok | ${deps.metricsSummary()}`);
   }
 
-  if (new RegExp(`^${OPERATOR_COMMANDS.auditTail}(?:\\s|$)`).test(cmd)) {
+  if (AUDIT_TAIL_COMMAND_RE.test(cmd)) {
     incrementCommandCount();
     const parsed = parseAuditTailInput(cmd);
     if (!parsed.ok) {

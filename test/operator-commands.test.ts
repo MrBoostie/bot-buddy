@@ -916,6 +916,11 @@ test('supports tab/newline whitespace for audit-tail command detection', () => {
   assert.equal(result, 'audit-tail: tail');
 });
 
+test('treats audit-tail with trailing tab as audit-tail command (not unknown command)', () => {
+  const result = evaluateOperatorCommand('/audit-tail\t', makeDeps());
+  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+});
+
 test('rejects extra audit-tail args', () => {
   const result = evaluateOperatorCommand('/audit-tail 3 extra', makeDeps());
   assert.equal(result, 'audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');

@@ -96,6 +96,8 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Consolidated noisy unknown-command suggestion regressions into a table-driven test (`/beacon`, `/runner`, `/beep`, `/hello`, `/mod`) to keep relevance-guard coverage compact.
 - Added regression coverage for guard-aware typo suggestions (disabled guards suppress `/metrics-reset`/`/audit-tail` suggestions; enabled guards allow them).
 - Added regression coverage to ensure `/audit-tail` command routing accepts tab/newline-separated limits (not just spaces).
+- Added regression coverage ensuring `/audit-tail` with trailing tab is routed as audit-tail (disabled response) instead of unknown-command fallback.
+- Hoisted `/audit-tail` command-detection regex into a shared constant to avoid per-command regex allocation and reduce routing drift risk.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
