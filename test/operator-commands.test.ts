@@ -239,19 +239,26 @@ test('makeModeSwitchDeps honors initial/switched mode permutations', () => {
   }
 });
 
-test('returns ping payload', () => {
-  const result = evaluateOperatorCommand('/ping', makeDeps());
-  assertPingPayload(result, 'gpt-test');
-});
+test('returns base liveness payloads for ping/uptime commands (table-driven)', () => {
+  const cases: Array<{ input: string; expected: string }> = [
+    {
+      input: '/ping',
+      expected: 'pong | uptime=12s | model=gpt-test',
+    },
+    {
+      input: '/uptime',
+      expected: 'uptime=12s | model=gpt-test',
+    },
+    {
+      input: '/up',
+      expected: 'uptime=12s | model=gpt-test',
+    },
+  ];
 
-test('returns uptime payload', () => {
-  const result = evaluateOperatorCommand('/uptime', makeDeps());
-  assert.equal(result, 'uptime=12s | model=gpt-test');
-});
-
-test('returns uptime payload for /up alias', () => {
-  const result = evaluateOperatorCommand('/up', makeDeps());
-  assert.equal(result, 'uptime=12s | model=gpt-test');
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(c.input, makeDeps());
+    assert.equal(result, c.expected);
+  }
 });
 
 test('returns version payload across known/unknown appVersion states (table-driven)', () => {
