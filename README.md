@@ -92,6 +92,20 @@ diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=true | hasOpenAI=fa
 - `operatorReplyMaxChars` — max operator response length before truncation safety applies.
 - `lastBackendError` — latest backend health summary string (`none` when healthy).
 
+Sample `/health` output:
+
+```text
+health | runtime=ok | issues=0 | discord=true | openai=false | backend=none | metrics=commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0
+```
+
+`/health` field glossary (quick operator reference):
+
+- `runtime` — overall status (`ok` when no validation issues, else `degraded`).
+- `issues` — count of active runtime validation issues.
+- `discord` / `openai` — capability booleans surfaced in health context.
+- `backend` — latest backend health summary token/string.
+- `metrics` — in-memory counters + latency distributions used by operator diagnostics.
+
 Operational logging toggles:
 - `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)
 - Set `METRICS_SNAPSHOT_INTERVAL_SEC` to a positive value to emit periodic `metrics snapshot` log lines
