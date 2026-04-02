@@ -334,6 +334,36 @@ test('returns help payload with disabled guard markers for all help aliases (tab
   }
 });
 
+test('help output preserves canonical command ordering for operator discoverability', () => {
+  const result = evaluateOperatorCommand('/help', makeDeps());
+  assert.ok(result);
+
+  const commandsPart = result
+    .replace(/^commands:\s*/, '')
+    .split(' | enable: ', 1)[0]
+    .split(', ');
+
+  assert.deepEqual(commandsPart, [
+    '/?',
+    '/help',
+    '/commands',
+    '/ping',
+    '/up',
+    '/uptime',
+    '/version',
+    '/id',
+    '/model',
+    '/backend',
+    '/status',
+    '/runtime',
+    '/diag',
+    '/health',
+    '/reload',
+    '/metrics-reset (disabled)',
+    '/audit-tail [1-20] (disabled)',
+  ]);
+});
+
 test('returns help payload across guard-state combinations (table-driven)', () => {
   const cases: Array<{
     allowMetricsReset: boolean;
