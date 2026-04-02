@@ -67,6 +67,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document no-arg invalid-usage behavior (and include test coverage to prevent doc drift).
 - `/audit-tail` now prioritizes guard denial when disabled (even with malformed args/limits), returning `audit-tail: disabled ...` consistently until enabled.
 - `/metrics-reset` now mirrors guard-first behavior for arg-suffixed invocations when disabled (`/metrics-reset now` -> disabled response); when enabled, extra args still return invalid usage.
+- README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
 - Refactored Discord operator command dependency wiring into `buildOperatorCommandDeps()` to reduce drift risk between backend mode and model label wiring.
