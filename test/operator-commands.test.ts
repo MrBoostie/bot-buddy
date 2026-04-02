@@ -22,8 +22,18 @@ const HELP_ALL_DISABLED =
 const HELP_METRICS_ENABLED_AUDIT_DISABLED =
   `${HELP_BASE_COMMANDS}, ${HELP_METRICS_RESET_ENABLED}, ${HELP_AUDIT_TAIL_DISABLED}${HELP_ENABLE_AUDIT_HINT}`;
 
+const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
+
 function commandsLine(commands: string): string {
   return `commands: ${commands}`;
+}
+
+function unknownCommandLine(command: string): string {
+  return `unknown command: ${command} ${UNKNOWN_COMMAND_USAGE_HINT}`;
+}
+
+function unknownCommandWithSuggestion(command: string, suggestion: string): string {
+  return `${unknownCommandLine(command)} | did you mean ${suggestion}?`;
 }
 
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
@@ -546,7 +556,7 @@ test('does not treat help-alias-prefixed tokens as help invalid-usage (table-dri
 
   for (const input of inputs) {
     const result = evaluateOperatorCommand(input, makeDeps());
-    assert.ok(result?.startsWith(`unknown command: ${input} (use /?, /help, or /commands)`));
+    assert.ok(result?.startsWith(unknownCommandLine(input)));
     assert.ok(!result?.startsWith('help: invalid usage'));
   }
 });
@@ -1084,7 +1094,7 @@ test('rejects extra audit-tail args when guard is on (space/tab/newline + mixed-
 
 test('treats audit-tail-prefixed unknown commands as unknown command hints', () => {
   const result = evaluateOperatorCommand('/audit-tailing', makeDeps());
-  assert.equal(result, 'unknown command: /audit-tailing (use /?, /help, or /commands)');
+  assert.equal(result, unknownCommandLine('/audit-tailing'));
 });
 
 test('returns disabled for invalid audit-tail limit when guard is off', () => {
@@ -1136,47 +1146,47 @@ test('returns unknown command hint for near-miss slash-command typos (table-driv
   const cases: Array<{ input: string; expected: string }> = [
     {
       input: '/hepl',
-      expected: 'unknown command: /hepl (use /?, /help, or /commands) | did you mean /help?',
+      expected: unknownCommandWithSuggestion('/hepl', '/help'),
     },
     {
       input: '/stauts',
-      expected: 'unknown command: /stauts (use /?, /help, or /commands) | did you mean /status?',
+      expected: unknownCommandWithSuggestion('/stauts', '/status'),
     },
     {
       input: '/uptim',
-      expected: 'unknown command: /uptim (use /?, /help, or /commands) | did you mean /uptime?',
+      expected: unknownCommandWithSuggestion('/uptim', '/uptime'),
     },
     {
       input: '/upp',
-      expected: 'unknown command: /upp (use /?, /help, or /commands) | did you mean /up?',
+      expected: unknownCommandWithSuggestion('/upp', '/up'),
     },
     {
       input: '/verison',
-      expected: 'unknown command: /verison (use /?, /help, or /commands) | did you mean /version?',
+      expected: unknownCommandWithSuggestion('/verison', '/version'),
     },
     {
       input: '/modle',
-      expected: 'unknown command: /modle (use /?, /help, or /commands) | did you mean /model?',
+      expected: unknownCommandWithSuggestion('/modle', '/model'),
     },
     {
       input: '/backedn',
-      expected: 'unknown command: /backedn (use /?, /help, or /commands) | did you mean /backend?',
+      expected: unknownCommandWithSuggestion('/backedn', '/backend'),
     },
     {
       input: '/runtmie',
-      expected: 'unknown command: /runtmie (use /?, /help, or /commands) | did you mean /runtime?',
+      expected: unknownCommandWithSuggestion('/runtmie', '/runtime'),
     },
     {
       input: '/relaod',
-      expected: 'unknown command: /relaod (use /?, /help, or /commands) | did you mean /reload?',
+      expected: unknownCommandWithSuggestion('/relaod', '/reload'),
     },
     {
       input: '/commnads',
-      expected: 'unknown command: /commnads (use /?, /help, or /commands) | did you mean /commands?',
+      expected: unknownCommandWithSuggestion('/commnads', '/commands'),
     },
     {
       input: '/healht',
-      expected: 'unknown command: /healht (use /?, /help, or /commands) | did you mean /health?',
+      expected: unknownCommandWithSuggestion('/healht', '/health'),
     },
   ];
 
@@ -1188,7 +1198,7 @@ test('returns unknown command hint for near-miss slash-command typos (table-driv
 
 test('returns unknown command hint for unrecognized slash command with args', () => {
   const result = evaluateOperatorCommand('/mystery abc 123', makeDeps());
-  assert.equal(result, 'unknown command: /mystery (use /?, /help, or /commands)');
+  assert.equal(result, unknownCommandLine('/mystery'));
 });
 
 test('returns explicit invalid-usage guidance for known no-arg commands with extra args', () => {
@@ -1243,7 +1253,7 @@ test('does not suggest /? for short unknown slash commands', () => {
 
   for (const input of inputs) {
     const result = evaluateOperatorCommand(input, makeDeps());
-    assert.equal(result, `unknown command: ${input} (use /?, /help, or /commands)`);
+    assert.equal(result, unknownCommandLine(input));
   }
 });
 
@@ -1252,7 +1262,7 @@ test('does not emit noisy suggestions for unrelated or broad unknown commands (t
 
   for (const input of inputs) {
     const result = evaluateOperatorCommand(input, makeDeps());
-    assert.equal(result, `unknown command: ${input} (use /?, /help, or /commands)`);
+    assert.equal(result, unknownCommandLine(input));
   }
 });
 
@@ -1261,7 +1271,7 @@ test('does not suggest guard-gated commands when the guards are disabled', () =>
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps());
-    assert.equal(result, `unknown command: ${input.toLowerCase()} (use /?, /help, or /commands)`);
+    assert.equal(result, unknownCommandLine(input.toLowerCase()));
   }
 });
 
@@ -1283,7 +1293,7 @@ test('suggests guard-gated commands when the guards are enabled', () => {
     const result = evaluateOperatorCommand(c.input, deps);
     assert.equal(
       result,
-      `unknown command: ${normalized} (use /?, /help, or /commands) | did you mean ${c.suggestion}?`,
+      unknownCommandWithSuggestion(normalized, c.suggestion),
     );
   }
 });
@@ -1307,7 +1317,7 @@ test('enforces suggestion policy across command classes (table-driven)', () => {
 
   for (const c of cases) {
     const result = evaluateOperatorCommand(c.input, c.deps);
-    assert.ok(result?.startsWith(`unknown command: ${c.input} (use /?, /help, or /commands)`));
+    assert.ok(result?.startsWith(unknownCommandLine(c.input)));
     const hasSuggestion = (result ?? '').includes('| did you mean ');
     assert.equal(hasSuggestion, c.shouldSuggest, `${c.input} suggestion mismatch`);
   }
@@ -1315,5 +1325,5 @@ test('enforces suggestion policy across command classes (table-driven)', () => {
 
 test('does not suggest /id for short transposition typo due short-command noise guard', () => {
   const result = evaluateOperatorCommand('/di', makeDeps());
-  assert.equal(result, 'unknown command: /di (use /?, /help, or /commands)');
+  assert.equal(result, unknownCommandLine('/di'));
 });
