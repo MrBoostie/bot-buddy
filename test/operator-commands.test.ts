@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { evaluateOperatorCommand, type OperatorCommandDeps } from '../src/operator-commands.ts';
 
+const METRICS_SUMMARY_BASE =
+  'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0';
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',
@@ -15,7 +18,7 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     llmBackend: () => 'openclaw',
     backendHealthSummary: () => 'none',
     tryAcquireReload: () => ({ ok: true }),
-    metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
+    metricsSummary: () => METRICS_SUMMARY_BASE,
     allowMetricsReset: () => false,
     resetMetrics: () => {},
     allowAuditTail: () => false,
@@ -661,12 +664,8 @@ test('returns health payload in ok state', () => {
   const result = evaluateOperatorCommand('/health', makeDeps());
   assertHealthSignals(result, { runtime: 'ok', issues: 0, openai: false });
   assertHealthBackendSummary(result, 'none');
-  assertHealthMetricsSuffix(
-    result,
-    'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
-  );
+  assertHealthMetricsSuffix(result, METRICS_SUMMARY_BASE);
 });
-
 test('returns health payload in degraded state', () => {
   const result = evaluateOperatorCommand(
     '/health',
@@ -863,17 +862,13 @@ test('resets metrics when metrics-reset guard is on', () => {
       resetMetrics: () => {
         resetCalls += 1;
       },
-      metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
+      metricsSummary: () => METRICS_SUMMARY_BASE,
     }),
   );
 
   assert.equal(resetCalls, 1);
-  assert.equal(
-    result,
-    'metrics-reset: ok | commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
-  );
+  assert.equal(result, `metrics-reset: ok | ${METRICS_SUMMARY_BASE}`);
 });
-
 test('supports mixed-case metrics-reset token when guard is on', () => {
   let resetCalls = 0;
   const result = evaluateOperatorCommand(
@@ -883,17 +878,13 @@ test('supports mixed-case metrics-reset token when guard is on', () => {
       resetMetrics: () => {
         resetCalls += 1;
       },
-      metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
+      metricsSummary: () => METRICS_SUMMARY_BASE,
     }),
   );
 
   assert.equal(resetCalls, 1);
-  assert.equal(
-    result,
-    'metrics-reset: ok | commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
-  );
+  assert.equal(result, `metrics-reset: ok | ${METRICS_SUMMARY_BASE}`);
 });
-
 test('returns audit-tail disabled payload when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail', makeDeps());
   assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
