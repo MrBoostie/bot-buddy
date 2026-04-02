@@ -84,6 +84,55 @@ test('reload assertion helpers enforce canonical reload response lines', () => {
   assertAssertionFailure(() => assertReloadIssuesRemain('reload: applied, but issues remain -> wrong', 'OPENAI_API_KEY missing'));
 });
 
+test('health assertion helpers enforce canonical signal formatting and reject near-misses', () => {
+  const healthLine =
+    'health | runtime=degraded | issues=2 | openai=true | backend=timeout | metrics=commands=9,llmCalls=9';
+
+  assertHealthSignals(healthLine, { runtime: 'degraded', issues: 2, openai: true });
+  assertHealthBackendSummary(healthLine, 'timeout');
+  assertHealthMetricsSuffix(healthLine, 'commands=9,llmCalls=9');
+
+  assertAssertionFailure(() => assertHealthSignals(healthLine, { runtime: 'ok', issues: 2, openai: true }));
+  assertAssertionFailure(() => assertHealthBackendSummary(healthLine, 'none'));
+  assertAssertionFailure(() => assertHealthMetricsSuffix(healthLine, 'commands=9,llmCalls=8'));
+});
+
+test('diag assertion helpers enforce canonical formatting and reject near-misses', () => {
+  const diagOkLine =
+    'diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=true | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none';
+  assertDiagOk(diagOkLine, {
+    hasDiscord: true,
+    hasOpenAI: false,
+    llmBackend: 'openclaw',
+    allowMetricsReset: false,
+    allowAuditTail: true,
+  });
+
+  const diagIssuesLine =
+    'diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=false | hasOpenAI=true | llmBackend=openai | allowMetricsReset=true | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=timeout';
+  assertDiagIssues(diagIssuesLine, 'OPENAI_API_KEY missing');
+  assertDiagAvailability(diagIssuesLine, { hasDiscord: false, hasOpenAI: true });
+  assertDiagBackendAndGuards(diagIssuesLine, {
+    llmBackend: 'openai',
+    allowMetricsReset: true,
+    allowAuditTail: false,
+  });
+  assertDiagPolicyTail(diagIssuesLine);
+  assertDiagLastBackendError(diagIssuesLine, 'timeout');
+
+  assertAssertionFailure(() =>
+    assertDiagOk(diagOkLine, {
+      hasDiscord: false,
+      hasOpenAI: false,
+      llmBackend: 'openclaw',
+      allowMetricsReset: false,
+      allowAuditTail: true,
+    }),
+  );
+  assertAssertionFailure(() => assertDiagIssues(diagIssuesLine, 'OPENAI_API_KEY mismatch'));
+  assertAssertionFailure(() => assertDiagLastBackendError(diagIssuesLine, 'none'));
+});
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',
@@ -190,8 +239,8 @@ function assertDiagAvailability(
   },
 ): void {
   const target = text ?? '';
-  assert.match(target, new RegExp(`\| hasDiscord=${String(options.hasDiscord)} \|`));
-  assert.match(target, new RegExp(`\| hasOpenAI=${String(options.hasOpenAI)} \|`));
+  assert.match(target, new RegExp(`\\| hasDiscord=${String(options.hasDiscord)} \\|`));
+  assert.match(target, new RegExp(`\\| hasOpenAI=${String(options.hasOpenAI)} \\|`));
 }
 
 function assertDiagBackendAndGuards(
@@ -204,13 +253,13 @@ function assertDiagBackendAndGuards(
 ): void {
   const target = text ?? '';
   assertHasBackendMode(target, options.llmBackend);
-  assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
-  assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
+  assert.match(target, new RegExp(`\\| allowMetricsReset=${String(options.allowMetricsReset)} \\|`));
+  assert.match(target, new RegExp(`\\| allowAuditTail=${String(options.allowAuditTail)} \\|`));
 }
 
 function assertDiagLastBackendError(text: string | null, value: string): void {
   const target = text ?? '';
-  assert.match(target, new RegExp(`\| lastBackendError=${value}$`));
+  assert.match(target, new RegExp(`\\| lastBackendError=${value}$`));
 }
 
 function assertDiagOk(
@@ -230,9 +279,9 @@ function assertDiagOk(
     hasDiscord: options.hasDiscord,
     hasOpenAI: options.hasOpenAI,
   });
-  assert.match(target, new RegExp(`\| llmBackend=${options.llmBackend} \|`));
-  assert.match(target, new RegExp(`\| allowMetricsReset=${String(options.allowMetricsReset)} \|`));
-  assert.match(target, new RegExp(`\| allowAuditTail=${String(options.allowAuditTail)} \|`));
+  assert.match(target, new RegExp(`\\| llmBackend=${options.llmBackend} \\|`));
+  assert.match(target, new RegExp(`\\| allowMetricsReset=${String(options.allowMetricsReset)} \\|`));
+  assert.match(target, new RegExp(`\\| allowAuditTail=${String(options.allowAuditTail)} \\|`));
   assertDiagPolicyTail(target);
   assertDiagLastBackendError(target, options.lastBackendError ?? 'none');
 }

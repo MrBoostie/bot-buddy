@@ -336,7 +336,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
           `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
         )
       : done(
-          `diag: issues detected -> ${issues.join(' ; ')} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
+          `diag: issues detected -> ${issues.join(' ; ')} | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
         );
   }
 

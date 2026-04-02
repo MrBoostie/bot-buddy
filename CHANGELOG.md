@@ -156,6 +156,9 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added `auditTailLine()` helper in operator tests and switched audit-tail success assertions to use it (`tail`, `short tail`, sample entry payload), reducing repeated response-wrapper literals.
 - Added a small regression test covering shared operator line-format helpers (`commandsLine`, unknown-command helpers, `noArgInvalidUsageLine`, `auditTailLine`) to pin canonical response-prefix formatting.
 - Added direct regression coverage for reload assertion helpers (`assertReloadApplied`, `assertReloadRateLimited`, `assertReloadIssuesRemain`), including near-miss rejection checks.
+- Added direct canonical/near-miss regression coverage for health/diag assertion helpers (`assertHealth*`, `assertDiag*`) to pin helper-level formatting contracts.
+- Fixed diag assertion helper regex matchers to escape literal `|` separators correctly, so near-miss failure tests now validate real delimiter matching instead of permissive alternation behavior.
+- `/diag` issues payload now includes `hasDiscord` and `hasOpenAI` fields (matching the `diag: ok` shape) for consistent diagnostics across healthy/degraded runtime states.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
