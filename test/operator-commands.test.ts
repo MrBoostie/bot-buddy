@@ -26,6 +26,9 @@ const AUDIT_TAIL_USAGE_SUFFIX = '(use /audit-tail or /audit-tail <1-20>)';
 const AUDIT_TAIL_INVALID_USAGE_LINE = `audit-tail: invalid usage ${AUDIT_TAIL_USAGE_SUFFIX}`;
 const AUDIT_TAIL_INVALID_LIMIT_LINE = `audit-tail: invalid limit ${AUDIT_TAIL_USAGE_SUFFIX}`;
 
+const METRICS_RESET_DISABLED_LINE = 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
+const METRICS_RESET_INVALID_USAGE_LINE = 'metrics-reset: invalid usage (use /metrics-reset)';
+
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
 const HELP_INVALID_USAGE_LINE = `help: invalid usage ${UNKNOWN_COMMAND_USAGE_HINT}`;
 
@@ -949,12 +952,12 @@ test('reload issues branch keeps diag/status mode-consistent after switch to ope
 
 test('returns metrics-reset disabled payload when guard is off', () => {
   const result = evaluateOperatorCommand('/metrics-reset', makeDeps());
-  assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+  assert.equal(result, METRICS_RESET_DISABLED_LINE);
 });
 
 test('treats mixed-case metrics-reset token as guard-gated command when disabled', () => {
   const result = evaluateOperatorCommand('/METRICS-RESET', makeDeps());
-  assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+  assert.equal(result, METRICS_RESET_DISABLED_LINE);
 });
 
 test('resets metrics when metrics-reset guard is on', () => {
@@ -1220,13 +1223,13 @@ test('returns explicit invalid-usage guidance for known no-arg commands with ext
     { input: '/diag now', expected: 'diag: invalid usage (use /diag)' },
     { input: '/health now', expected: 'health: invalid usage (use /health)' },
     { input: '/reload now', expected: 'reload: invalid usage (use /reload)' },
-    { input: '/metrics-reset now', expected: 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)' },
+    { input: '/metrics-reset now', expected: METRICS_RESET_DISABLED_LINE },
     { input: '/ping\tnow', expected: 'ping: invalid usage (use /ping)' },
     { input: '/status\nnow', expected: 'status: invalid usage (use /status)' },
     { input: '/PING now', expected: 'ping: invalid usage (use /ping)' },
     { input: '/Status now', expected: 'status: invalid usage (use /status)' },
     { input: '/Reload now', expected: 'reload: invalid usage (use /reload)' },
-    { input: '/Metrics-Reset now', expected: 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)' },
+    { input: '/Metrics-Reset now', expected: METRICS_RESET_DISABLED_LINE },
   ];
 
   for (const c of cases) {
@@ -1240,7 +1243,7 @@ test('returns invalid usage for metrics-reset extra args when guard is on', () =
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps({ allowMetricsReset: () => true }));
-    assert.equal(result, 'metrics-reset: invalid usage (use /metrics-reset)');
+    assert.equal(result, METRICS_RESET_INVALID_USAGE_LINE);
   }
 });
 
@@ -1249,7 +1252,7 @@ test('returns disabled for metrics-reset extra args with whitespace variants whe
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps());
-    assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+    assert.equal(result, METRICS_RESET_DISABLED_LINE);
   }
 });
 
