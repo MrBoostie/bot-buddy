@@ -891,6 +891,10 @@ test('returns unknown command hint for near-miss slash-command typos (table-driv
       input: '/backedn',
       expected: 'unknown command: /backedn (use /?, /help, or /commands) | did you mean /backend?',
     },
+    {
+      input: '/runtmie',
+      expected: 'unknown command: /runtmie (use /?, /help, or /commands) | did you mean /runtime?',
+    },
   ];
 
   for (const c of cases) {

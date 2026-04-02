@@ -83,3 +83,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded unknown-command typo-suggestion regression coverage to include `/model` near-miss handling (`/modle` -> `/model`).
 - Expanded unknown-command typo-suggestion regression coverage to include `/backend` near-miss handling (`/backedn` -> `/backend`).
 - Added a negative regression case to ensure distant unknown commands (e.g. `/beacon`) do not trigger noisy `/backend` suggestions.
+- Expanded unknown-command typo-suggestion regression coverage to include `/runtime` near-miss handling (`/runtmie` -> `/runtime`).
