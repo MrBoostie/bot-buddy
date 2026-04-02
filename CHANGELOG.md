@@ -121,6 +121,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Unknown-command suggestions no longer propose the `/?` alias, avoiding noisy outputs like `did you mean /??` for inputs such as `/?x`.
 - Added a table-driven suggestion-policy regression test across help aliases, short-alias noise guards, and guard-gated commands (enabled vs disabled) to prevent typo-suggestion drift.
 - Expanded `/metrics-reset` guard-state regressions to cover tab/newline argument separators, ensuring disabled-vs-invalid-usage behavior remains consistent across whitespace variants.
+- Expanded enabled-guard `/audit-tail` invalid-input regressions to cover tab/newline separator variants for both extra-arg and invalid-limit paths.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
