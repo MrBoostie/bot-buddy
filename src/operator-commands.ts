@@ -41,21 +41,6 @@ const OPERATOR_COMMANDS = {
 } as const;
 
 const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
-const NO_ARG_OPERATOR_COMMANDS = new Set<string>([
-  OPERATOR_COMMANDS.ping,
-  OPERATOR_COMMANDS.up,
-  OPERATOR_COMMANDS.uptime,
-  OPERATOR_COMMANDS.version,
-  OPERATOR_COMMANDS.id,
-  OPERATOR_COMMANDS.model,
-  OPERATOR_COMMANDS.backend,
-  OPERATOR_COMMANDS.status,
-  OPERATOR_COMMANDS.runtime,
-  OPERATOR_COMMANDS.diag,
-  OPERATOR_COMMANDS.health,
-  OPERATOR_COMMANDS.reload,
-  OPERATOR_COMMANDS.metricsReset,
-]);
 const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
 const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
 const BASE_HELP_COMMANDS: string[] = [
@@ -75,6 +60,13 @@ const BASE_HELP_COMMANDS: string[] = [
   OPERATOR_COMMANDS.health,
   OPERATOR_COMMANDS.reload,
 ];
+const NO_ARG_OPERATOR_COMMANDS = new Set<string>([
+  ...BASE_HELP_COMMANDS.filter(
+    (cmd) =>
+      cmd !== OPERATOR_COMMANDS.question && cmd !== OPERATOR_COMMANDS.help && cmd !== OPERATOR_COMMANDS.commands,
+  ),
+  OPERATOR_COMMANDS.metricsReset,
+]);
 
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
   const commands: string[] = [...BASE_HELP_COMMANDS];
