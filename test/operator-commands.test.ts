@@ -49,6 +49,11 @@ function unknownCommandWithSuggestion(command: string, suggestion: string): stri
   return `${unknownCommandLine(command)} | did you mean ${suggestion}?`;
 }
 
+function noArgInvalidUsageLine(command: string): string {
+  const normalized = command.startsWith('/') ? command.slice(1) : command;
+  return `${normalized}: invalid usage (use /${normalized})`;
+}
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',
@@ -1216,24 +1221,24 @@ test('returns unknown command hint for unrecognized slash command with args', ()
 
 test('returns explicit invalid-usage guidance for known no-arg commands with extra args', () => {
   const cases: Array<{ input: string; expected: string }> = [
-    { input: '/ping now', expected: 'ping: invalid usage (use /ping)' },
-    { input: '/up now', expected: 'up: invalid usage (use /up)' },
-    { input: '/uptime now', expected: 'uptime: invalid usage (use /uptime)' },
-    { input: '/version now', expected: 'version: invalid usage (use /version)' },
-    { input: '/id now', expected: 'id: invalid usage (use /id)' },
-    { input: '/model now', expected: 'model: invalid usage (use /model)' },
-    { input: '/backend now', expected: 'backend: invalid usage (use /backend)' },
-    { input: '/status now', expected: 'status: invalid usage (use /status)' },
-    { input: '/runtime now', expected: 'runtime: invalid usage (use /runtime)' },
-    { input: '/diag now', expected: 'diag: invalid usage (use /diag)' },
-    { input: '/health now', expected: 'health: invalid usage (use /health)' },
-    { input: '/reload now', expected: 'reload: invalid usage (use /reload)' },
+    { input: '/ping now', expected: noArgInvalidUsageLine('/ping') },
+    { input: '/up now', expected: noArgInvalidUsageLine('/up') },
+    { input: '/uptime now', expected: noArgInvalidUsageLine('/uptime') },
+    { input: '/version now', expected: noArgInvalidUsageLine('/version') },
+    { input: '/id now', expected: noArgInvalidUsageLine('/id') },
+    { input: '/model now', expected: noArgInvalidUsageLine('/model') },
+    { input: '/backend now', expected: noArgInvalidUsageLine('/backend') },
+    { input: '/status now', expected: noArgInvalidUsageLine('/status') },
+    { input: '/runtime now', expected: noArgInvalidUsageLine('/runtime') },
+    { input: '/diag now', expected: noArgInvalidUsageLine('/diag') },
+    { input: '/health now', expected: noArgInvalidUsageLine('/health') },
+    { input: '/reload now', expected: noArgInvalidUsageLine('/reload') },
     { input: '/metrics-reset now', expected: METRICS_RESET_DISABLED_LINE },
-    { input: '/ping\tnow', expected: 'ping: invalid usage (use /ping)' },
-    { input: '/status\nnow', expected: 'status: invalid usage (use /status)' },
-    { input: '/PING now', expected: 'ping: invalid usage (use /ping)' },
-    { input: '/Status now', expected: 'status: invalid usage (use /status)' },
-    { input: '/Reload now', expected: 'reload: invalid usage (use /reload)' },
+    { input: '/ping\tnow', expected: noArgInvalidUsageLine('/ping') },
+    { input: '/status\nnow', expected: noArgInvalidUsageLine('/status') },
+    { input: '/PING now', expected: noArgInvalidUsageLine('/ping') },
+    { input: '/Status now', expected: noArgInvalidUsageLine('/status') },
+    { input: '/Reload now', expected: noArgInvalidUsageLine('/reload') },
     { input: '/Metrics-Reset now', expected: METRICS_RESET_DISABLED_LINE },
   ];
 
