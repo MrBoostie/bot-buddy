@@ -460,54 +460,52 @@ test('returns help payload across guard-state combinations (table-driven)', () =
   }
 });
 
-test('help command summaries do not leak state across dynamic guard toggles', () => {
-  let allowMetricsReset = false;
-  let allowAuditTail = false;
+test('help command summaries do not leak state across guard toggles (table-driven)', () => {
+  const cases: Array<{
+    name: string;
+    start: { allowMetricsReset: boolean; allowAuditTail: boolean };
+    next: { allowMetricsReset: boolean; allowAuditTail: boolean };
+    expectedFirst: string;
+    expectedSecond: string;
+  }> = [
+    {
+      name: 'disabled->enabled',
+      start: { allowMetricsReset: false, allowAuditTail: false },
+      next: { allowMetricsReset: true, allowAuditTail: true },
+      expectedFirst:
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+      expectedSecond:
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+    },
+    {
+      name: 'enabled->disabled',
+      start: { allowMetricsReset: true, allowAuditTail: true },
+      next: { allowMetricsReset: false, allowAuditTail: false },
+      expectedFirst:
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+      expectedSecond:
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+    },
+  ];
 
-  const deps = makeDeps({
-    allowMetricsReset: () => allowMetricsReset,
-    allowAuditTail: () => allowAuditTail,
-  });
+  for (const c of cases) {
+    let allowMetricsReset = c.start.allowMetricsReset;
+    let allowAuditTail = c.start.allowAuditTail;
 
-  const first = evaluateOperatorCommand('/help', deps);
+    const deps = makeDeps({
+      allowMetricsReset: () => allowMetricsReset,
+      allowAuditTail: () => allowAuditTail,
+    });
 
-  allowMetricsReset = true;
-  allowAuditTail = true;
-  const second = evaluateOperatorCommand('/help', deps);
+    const first = evaluateOperatorCommand('/help', deps);
 
-  assert.equal(
-    first,
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
-  );
-  assert.equal(
-    second,
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
-  );
-});
+    allowMetricsReset = c.next.allowMetricsReset;
+    allowAuditTail = c.next.allowAuditTail;
+    const second = evaluateOperatorCommand('/help', deps);
 
-test('help command summaries do not leak state across reverse guard toggles', () => {
-  let allowMetricsReset = true;
-  let allowAuditTail = true;
-
-  const deps = makeDeps({
-    allowMetricsReset: () => allowMetricsReset,
-    allowAuditTail: () => allowAuditTail,
-  });
-
-  const first = evaluateOperatorCommand('/help', deps);
-
-  allowMetricsReset = false;
-  allowAuditTail = false;
-  const second = evaluateOperatorCommand('/help', deps);
-
-  assert.equal(
-    first,
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
-  );
-  assert.equal(
-    second,
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
-  );
+    assert.equal(first, c.expectedFirst, `${c.name} first help mismatch`);
+    assert.equal(second, c.expectedSecond, `${c.name} second help mismatch`);
+  }
 });
 
 test('rejects invalid help usage with extra args (space/tab/newline + mixed-case)', () => {
