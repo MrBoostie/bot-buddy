@@ -938,3 +938,8 @@ test('does not emit noisy runtime suggestions for distant run-prefixed unknown c
   const result = evaluateOperatorCommand('/runner', makeDeps());
   assert.equal(result, 'unknown command: /runner (use /?, /help, or /commands)');
 });
+
+test('does not suggest /id for short transposition typo due short-command noise guard', () => {
+  const result = evaluateOperatorCommand('/di', makeDeps());
+  assert.equal(result, 'unknown command: /di (use /?, /help, or /commands)');
+});

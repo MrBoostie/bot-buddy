@@ -86,3 +86,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added a negative regression case to ensure distant unknown commands (e.g. `/beacon`) do not trigger noisy `/backend` suggestions.
 - Expanded unknown-command typo-suggestion regression coverage to include `/runtime` near-miss handling (`/runtmie` -> `/runtime`).
 - Added a negative regression case to ensure distant run-prefixed commands (e.g. `/runner`) do not trigger noisy `/runtime` suggestions.
+- Added short-token regression coverage confirming `/di` does not suggest `/id` under the short-command noise guard.
