@@ -139,6 +139,10 @@ function unknownCommandSuggestion(
     return '';
   }
 
+  if (best.command === command) {
+    return '';
+  }
+
   if (best.distance === 2 && Math.abs(command.length - best.command.length) >= 1) {
     return '';
   }

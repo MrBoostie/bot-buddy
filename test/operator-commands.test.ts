@@ -1036,6 +1036,16 @@ test('returns unknown command hint for unrecognized slash command with args', ()
   assert.equal(result, 'unknown command: /mystery (use /?, /help, or /commands)');
 });
 
+test('does not suggest identical known command when extra args make usage invalid', () => {
+  const cases = ['/ping now', '/status now', '/reload now'];
+
+  for (const input of cases) {
+    const command = input.split(/\s+/, 1)[0];
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.equal(result, `unknown command: ${command} (use /?, /help, or /commands)`);
+  }
+});
+
 test('does not suggest /? for short unknown slash commands', () => {
   const result = evaluateOperatorCommand('/x', makeDeps());
   assert.equal(result, 'unknown command: /x (use /?, /help, or /commands)');
