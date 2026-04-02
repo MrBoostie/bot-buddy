@@ -19,6 +19,8 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /Guard-first behavior: while disabled, malformed forms \(e\.g\. `\/audit-tail 21`, `\/audit-tail 3 extra`\) return `audit-tail: disabled \(set ALLOW_AUDIT_TAIL=true to enable\)`; validation errors apply when enabled\./,
     /Extra args are rejected \(`\/help now` -> `help: invalid usage \(use \/\?, \/help, or \/commands\)`\) to keep operator command parsing predictable\./,
     /Unknown slash commands now return an explicit hint \(`unknown command: \/<name> \(use \/\?, \/help, or \/commands\)`\)/,
+    /`\/diag` — quick configuration health report \+ availability signals \(`hasDiscord`\/`hasOpenAI`\) \+ guard\/policy snapshot \+ last backend error/,
+    /diag: issues detected -> OPENAI_API_KEY missing \| hasDiscord=true \| hasOpenAI=false \| llmBackend=openai \| allowMetricsReset=false \| allowAuditTail=false \| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \| lastBackendError=none/,
   ];
 
   for (const pattern of patterns) {

@@ -65,7 +65,7 @@ Built-in operator commands (directed to bot):
 - `/status` or `/runtime` — uptime + model + redacted runtime summary
 
 On Discord startup, the bot now logs resolved app version metadata (`value` + `source`) to simplify deployment/debug verification.
-- `/diag` — quick configuration health report + guard/policy snapshot + last backend error
+- `/diag` — quick configuration health report + availability signals (`hasDiscord`/`hasOpenAI`) + guard/policy snapshot + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
@@ -80,6 +80,7 @@ Sample `/diag` output:
 
 ```text
 diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
+diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=true | hasOpenAI=false | llmBackend=openai | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
 ```
 
 Operational logging toggles:
