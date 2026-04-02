@@ -904,6 +904,11 @@ test('rejects extra audit-tail args', () => {
   assert.equal(result, 'audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
 });
 
+test('treats audit-tail-prefixed unknown commands as unknown command hints', () => {
+  const result = evaluateOperatorCommand('/audit-tailing', makeDeps());
+  assert.equal(result, 'unknown command: /audit-tailing (use /?, /help, or /commands)');
+});
+
 test('rejects invalid audit-tail limit', () => {
   const result = evaluateOperatorCommand('/audit-tail 21', makeDeps());
   assert.equal(result, 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');

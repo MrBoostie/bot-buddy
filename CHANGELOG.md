@@ -50,6 +50,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - `/help` and `/commands` now reject extra args with an explicit usage hint instead of silently falling through.
   - Unrecognized slash commands now return `unknown command: /<name> (use /help)` instead of falling through to LLM handling.
   - Unknown command hints now include typo suggestions for near-miss operator commands (e.g. `/hepl` suggests `/help`).
+  - `/audit-tail` no longer captures similarly-prefixed unknown commands (e.g. `/audit-tailing` now returns the standard unknown-command hint).
   - Tightened unknown-command suggestion relevance: very short unknown commands no longer get noisy suggestions, and `/?` is no longer suggested for non-`/?` inputs.
   - Unknown command fallback hint now references all supported help aliases (`/?`, `/help`, `/commands`) for faster operator recovery.
   - Unknown command suggestion logic now supports close typos of short aliases (e.g. `/upp` suggests `/up`) while still suppressing noisy unrelated short-command suggestions.
@@ -88,6 +89,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded unknown-command typo-suggestion regression coverage to include `/runtime` near-miss handling (`/runtmie` -> `/runtime`).
 - Added a negative regression case to ensure distant run-prefixed commands (e.g. `/runner`) do not trigger noisy `/runtime` suggestions.
 - Added short-token regression coverage confirming `/di` does not suggest `/id` under the short-command noise guard.
+- Added regression coverage to ensure `/audit-tail` only matches exact command/arg forms and does not swallow similarly-prefixed unknown commands.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

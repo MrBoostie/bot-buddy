@@ -307,7 +307,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`metrics-reset: ok | ${deps.metricsSummary()}`);
   }
 
-  if (cmd.startsWith(OPERATOR_COMMANDS.auditTail)) {
+  if (cmd === OPERATOR_COMMANDS.auditTail || cmd.startsWith(`${OPERATOR_COMMANDS.auditTail} `)) {
     incrementCommandCount();
     const parsed = parseAuditTailInput(cmd);
     if (!parsed.ok) {
