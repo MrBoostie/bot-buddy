@@ -14,6 +14,7 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /`version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`/,
     /On Discord startup, the bot now logs resolved app version metadata \(`value` \+ `source`\)/,
     /Command order is intentional: fast identity\/liveness\/diagnostics first, higher-impact guard-gated commands at the end\./,
+    /Known no-arg operator commands now return explicit usage guidance when called with extra args \(e\.g\. `\/ping now` -> `ping: invalid usage \(use \/ping\)`\) instead of generic unknown-command fallback\./,
   ];
 
   for (const pattern of patterns) {
