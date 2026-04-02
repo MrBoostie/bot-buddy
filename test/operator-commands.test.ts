@@ -107,6 +107,7 @@ test('diag assertion helpers enforce canonical formatting and reject near-misses
     allowMetricsReset: false,
     allowAuditTail: true,
   });
+  assertDiagCoreFieldOrder(diagOkLine);
 
   const diagIssuesLine =
     'diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=false | hasOpenAI=true | llmBackend=openai | allowMetricsReset=true | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=timeout';
@@ -119,6 +120,7 @@ test('diag assertion helpers enforce canonical formatting and reject near-misses
   });
   assertDiagPolicyTail(diagIssuesLine);
   assertDiagLastBackendError(diagIssuesLine, 'timeout');
+  assertDiagCoreFieldOrder(diagIssuesLine);
 
   assertAssertionFailure(() =>
     assertDiagOk(diagOkLine, {
@@ -131,6 +133,22 @@ test('diag assertion helpers enforce canonical formatting and reject near-misses
   );
   assertAssertionFailure(() => assertDiagIssues(diagIssuesLine, 'OPENAI_API_KEY mismatch'));
   assertAssertionFailure(() => assertDiagLastBackendError(diagIssuesLine, 'none'));
+});
+
+test('diag ok/issues outputs preserve shared core field ordering', () => {
+  const ok = evaluateOperatorCommand('/diag', makeDeps());
+  const issues = evaluateOperatorCommand(
+    '/diag',
+    makeDeps({
+      validateRuntime: () => ['OPENAI_API_KEY missing'],
+      llmBackend: () => 'openai',
+      hasOpenAI: () => false,
+      runtimeSummary: () => 'bot=buddy | llmBackend=openai',
+    }),
+  );
+
+  assertDiagCoreFieldOrder(ok);
+  assertDiagCoreFieldOrder(issues);
 });
 
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
@@ -260,6 +278,29 @@ function assertDiagBackendAndGuards(
 function assertDiagLastBackendError(text: string | null, value: string): void {
   const target = text ?? '';
   assert.match(target, new RegExp(`\\| lastBackendError=${value}$`));
+}
+
+function assertDiagCoreFieldOrder(text: string | null): void {
+  const target = text ?? '';
+  const fragments = [
+    '| hasDiscord=',
+    '| hasOpenAI=',
+    '| llmBackend=',
+    '| allowMetricsReset=',
+    '| allowAuditTail=',
+    '| auditTailDefault=',
+    '| auditTailMax=',
+    '| operatorReplyMaxChars=',
+    '| lastBackendError=',
+  ];
+
+  let cursor = -1;
+  for (const fragment of fragments) {
+    const index = target.indexOf(fragment);
+    assert.ok(index >= 0, `missing diag fragment: ${fragment}`);
+    assert.ok(index > cursor, `out-of-order diag fragment: ${fragment}`);
+    cursor = index;
+  }
 }
 
 function assertDiagOk(

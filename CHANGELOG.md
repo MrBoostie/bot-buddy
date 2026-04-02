@@ -159,6 +159,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added direct canonical/near-miss regression coverage for health/diag assertion helpers (`assertHealth*`, `assertDiag*`) to pin helper-level formatting contracts.
 - Fixed diag assertion helper regex matchers to escape literal `|` separators correctly, so near-miss failure tests now validate real delimiter matching instead of permissive alternation behavior.
 - `/diag` issues payload now includes `hasDiscord` and `hasOpenAI` fields (matching the `diag: ok` shape) for consistent diagnostics across healthy/degraded runtime states.
+- Added diag core-field ordering regression checks for both helper-level fixtures and live `/diag` outputs, pinning consistent field order across `diag: ok` and `diag: issues detected` paths.
 - README operator docs now explicitly document `/diag` availability signals and include a degraded `diag: issues detected` sample with `hasDiscord`/`hasOpenAI` fields.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
