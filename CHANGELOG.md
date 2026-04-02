@@ -65,6 +65,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Unknown-command fallback no longer emits self-suggestions when a known command is invoked with extra args (e.g. `/ping now` no longer says `did you mean /ping?`).
 - Known no-arg operator commands with extra args now return explicit invalid-usage guidance (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.
 - README operator command docs now explicitly document no-arg invalid-usage behavior (and include test coverage to prevent doc drift).
+- `/audit-tail` now prioritizes guard denial when disabled (even with malformed args/limits), returning `audit-tail: disabled ...` consistently until enabled.
 
 ### Internal
 - Refactored Discord operator command dependency wiring into `buildOperatorCommandDeps()` to reduce drift risk between backend mode and model label wiring.
@@ -109,6 +110,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded no-arg invalid-usage regression coverage to include tab/newline-separated args (e.g. `/ping\tnow`, `/status\nnow`).
 - Expanded no-arg invalid-usage regression coverage across all primary no-arg operator commands and aliases (`/up`, `/uptime`, `/version`, `/id`, `/model`, `/backend`, `/runtime`, `/diag`, `/health`, etc.) to prevent alias drift.
 - Added mixed-case no-arg invalid-usage regressions (`/PING now`, `/Status now`, `/Reload now`, `/Metrics-Reset now`) to pin case-normalized operator handling.
+- Split `/audit-tail` invalid-input coverage by guard state: disabled guard now returns consistent disabled response; enabled guard continues to enforce invalid-usage/invalid-limit parsing.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

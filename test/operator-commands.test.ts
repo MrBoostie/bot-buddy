@@ -931,8 +931,13 @@ test('treats audit-tail with trailing tab as audit-tail command (not unknown com
   assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
 });
 
-test('rejects extra audit-tail args', () => {
+test('returns disabled for audit-tail with extra args when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail 3 extra', makeDeps());
+  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+});
+
+test('rejects extra audit-tail args when guard is on', () => {
+  const result = evaluateOperatorCommand('/audit-tail 3 extra', makeDeps({ allowAuditTail: () => true }));
   assert.equal(result, 'audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
 });
 
@@ -941,8 +946,13 @@ test('treats audit-tail-prefixed unknown commands as unknown command hints', () 
   assert.equal(result, 'unknown command: /audit-tailing (use /?, /help, or /commands)');
 });
 
-test('rejects invalid audit-tail limit', () => {
+test('returns disabled for invalid audit-tail limit when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail 21', makeDeps());
+  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+});
+
+test('rejects invalid audit-tail limit when guard is on', () => {
+  const result = evaluateOperatorCommand('/audit-tail 21', makeDeps({ allowAuditTail: () => true }));
   assert.equal(result, 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
 });
 

@@ -368,6 +368,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (AUDIT_TAIL_COMMAND_RE.test(cmd)) {
     incrementCommandCount();
+
+    if (!deps.allowAuditTail()) {
+      return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+    }
+
     const parsed = parseAuditTailInput(cmd);
     if (!parsed.ok) {
       if (parsed.reason === 'invalid-usage') {
@@ -378,10 +383,6 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
       return done(
         `audit-tail: invalid limit (use ${OPERATOR_COMMANDS.auditTail} or ${OPERATOR_COMMANDS.auditTail} <1-20>)`,
       );
-    }
-
-    if (!deps.allowAuditTail()) {
-      return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
     }
 
     const payload = `audit-tail: ${deps.getAuditTail(parsed.limit)}`;
