@@ -13,6 +13,7 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /docker run --env BOT_BUDDY_VERSION=2026\.04\.01 \.\.\./,
     /`version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`/,
     /On Discord startup, the bot now logs resolved app version metadata \(`value` \+ `source`\)/,
+    /Command order is intentional: fast identity\/liveness\/diagnostics first, higher-impact guard-gated commands at the end\./,
   ];
 
   for (const pattern of patterns) {

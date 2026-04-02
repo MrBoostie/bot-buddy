@@ -90,3 +90,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added short-token regression coverage confirming `/di` does not suggest `/id` under the short-command noise guard.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
+- Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
