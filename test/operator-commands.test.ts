@@ -69,6 +69,21 @@ test('line-format helpers produce canonical operator response prefixes', () => {
   assert.equal(auditTailLine('tail'), 'audit-tail: tail');
 });
 
+test('reload assertion helpers enforce canonical reload response lines', () => {
+  assertReloadApplied('reload: applied | bot=buddy');
+  assertReloadApplied(
+    'reload: applied | bot=buddy | llmBackend=openai | openAIKey=set',
+    'bot=buddy | llmBackend=openai | openAIKey=set',
+  );
+
+  assertReloadRateLimited('reload: rate-limited | retryAfterSec=12', 12);
+  assertReloadIssuesRemain('reload: applied, but issues remain -> OPENAI_API_KEY missing', 'OPENAI_API_KEY missing');
+
+  assertAssertionFailure(() => assertReloadApplied('reload: applied | bot=other | llmBackend=openclaw'));
+  assertAssertionFailure(() => assertReloadRateLimited('reload: rate-limited | retryAfterSec=13', 12));
+  assertAssertionFailure(() => assertReloadIssuesRemain('reload: applied, but issues remain -> wrong', 'OPENAI_API_KEY missing'));
+});
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',
