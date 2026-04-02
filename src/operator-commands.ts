@@ -56,24 +56,26 @@ const NO_ARG_OPERATOR_COMMANDS = new Set<string>([
 ]);
 const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
 const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
+const BASE_HELP_COMMANDS: string[] = [
+  OPERATOR_COMMANDS.question,
+  OPERATOR_COMMANDS.help,
+  OPERATOR_COMMANDS.commands,
+  OPERATOR_COMMANDS.ping,
+  OPERATOR_COMMANDS.up,
+  OPERATOR_COMMANDS.uptime,
+  OPERATOR_COMMANDS.version,
+  OPERATOR_COMMANDS.id,
+  OPERATOR_COMMANDS.model,
+  OPERATOR_COMMANDS.backend,
+  OPERATOR_COMMANDS.status,
+  OPERATOR_COMMANDS.runtime,
+  OPERATOR_COMMANDS.diag,
+  OPERATOR_COMMANDS.health,
+  OPERATOR_COMMANDS.reload,
+];
+
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
-  const commands: string[] = [
-    OPERATOR_COMMANDS.question,
-    OPERATOR_COMMANDS.help,
-    OPERATOR_COMMANDS.commands,
-    OPERATOR_COMMANDS.ping,
-    OPERATOR_COMMANDS.up,
-    OPERATOR_COMMANDS.uptime,
-    OPERATOR_COMMANDS.version,
-    OPERATOR_COMMANDS.id,
-    OPERATOR_COMMANDS.model,
-    OPERATOR_COMMANDS.backend,
-    OPERATOR_COMMANDS.status,
-    OPERATOR_COMMANDS.runtime,
-    OPERATOR_COMMANDS.diag,
-    OPERATOR_COMMANDS.health,
-    OPERATOR_COMMANDS.reload,
-  ];
+  const commands: string[] = [...BASE_HELP_COMMANDS];
 
   commands.push(
     deps.allowMetricsReset()
