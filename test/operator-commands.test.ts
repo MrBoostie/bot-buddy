@@ -449,9 +449,14 @@ test('rejects invalid help usage with extra args (space/tab/newline separators)'
   }
 });
 
-test('does not treat help-prefixed tokens as help invalid-usage', () => {
-  const result = evaluateOperatorCommand('/helping', makeDeps());
-  assert.equal(result, 'unknown command: /helping (use /?, /help, or /commands)');
+test('does not treat help-alias-prefixed tokens as help invalid-usage (table-driven)', () => {
+  const inputs = ['/helping', '/commandsx', '/?x'];
+
+  for (const input of inputs) {
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.ok(result?.startsWith(`unknown command: ${input} (use /?, /help, or /commands)`));
+    assert.ok(!result?.startsWith('help: invalid usage'));
+  }
 });
 
 test('returns status payload', () => {
