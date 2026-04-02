@@ -30,6 +30,21 @@ const OPERATOR_COMMANDS = {
 } as const;
 
 const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
+const NO_ARG_OPERATOR_COMMANDS = new Set<string>([
+  OPERATOR_COMMANDS.ping,
+  OPERATOR_COMMANDS.up,
+  OPERATOR_COMMANDS.uptime,
+  OPERATOR_COMMANDS.version,
+  OPERATOR_COMMANDS.id,
+  OPERATOR_COMMANDS.model,
+  OPERATOR_COMMANDS.backend,
+  OPERATOR_COMMANDS.status,
+  OPERATOR_COMMANDS.runtime,
+  OPERATOR_COMMANDS.diag,
+  OPERATOR_COMMANDS.health,
+  OPERATOR_COMMANDS.reload,
+  OPERATOR_COMMANDS.metricsReset,
+]);
 const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
 const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
 function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>): string {
@@ -380,6 +395,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd.startsWith('/')) {
     const unknown = cmd.split(/\s+/, 1)[0] || cmd;
+
+    if (unknown !== cmd && NO_ARG_OPERATOR_COMMANDS.has(unknown)) {
+      return done(`${unknown.slice(1)}: invalid usage (use ${unknown})`);
+    }
+
     return done(`unknown command: ${unknown} ${HELP_USAGE_HINT}${unknownCommandSuggestion(unknown, deps)}`);
   }
 
