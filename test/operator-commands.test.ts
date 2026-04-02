@@ -1135,6 +1135,31 @@ test('suggests guard-gated commands when the guards are enabled', () => {
   );
 });
 
+test('enforces suggestion policy across command classes (table-driven)', () => {
+  const disabledDeps = makeDeps();
+  const enabledDeps = makeDeps({ allowMetricsReset: () => true, allowAuditTail: () => true });
+
+  const cases: Array<{ input: string; deps: typeof disabledDeps; shouldSuggest: boolean }> = [
+    // help aliases
+    { input: '/hepl', deps: disabledDeps, shouldSuggest: true },
+    { input: '/?x', deps: disabledDeps, shouldSuggest: false },
+    // short alias noise guard
+    { input: '/di', deps: disabledDeps, shouldSuggest: false },
+    // guarded commands (off => suppress, on => allow)
+    { input: '/metricsresest', deps: disabledDeps, shouldSuggest: false },
+    { input: '/metricsresest', deps: enabledDeps, shouldSuggest: true },
+    { input: '/audit-tailx', deps: disabledDeps, shouldSuggest: false },
+    { input: '/audit-tailx', deps: enabledDeps, shouldSuggest: true },
+  ];
+
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(c.input, c.deps);
+    assert.ok(result?.startsWith(`unknown command: ${c.input} (use /?, /help, or /commands)`));
+    const hasSuggestion = (result ?? '').includes('| did you mean ');
+    assert.equal(hasSuggestion, c.shouldSuggest, `${c.input} suggestion mismatch`);
+  }
+});
+
 test('does not suggest /id for short transposition typo due short-command noise guard', () => {
   const result = evaluateOperatorCommand('/di', makeDeps());
   assert.equal(result, 'unknown command: /di (use /?, /help, or /commands)');
