@@ -14,6 +14,7 @@ const OPERATOR_COMMANDS = {
   model: '/model',
   backend: '/backend',
   status: '/status',
+  runtime: '/runtime',
   diag: '/diag',
   health: '/health',
   reload: '/reload',
@@ -36,6 +37,7 @@ function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' 
     OPERATOR_COMMANDS.model,
     OPERATOR_COMMANDS.backend,
     OPERATOR_COMMANDS.status,
+    OPERATOR_COMMANDS.runtime,
     OPERATOR_COMMANDS.diag,
     OPERATOR_COMMANDS.health,
     OPERATOR_COMMANDS.reload,
@@ -231,7 +233,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(HELP_INVALID_USAGE);
   }
 
-  if (cmd === OPERATOR_COMMANDS.status) {
+  if (cmd === OPERATOR_COMMANDS.status || cmd === OPERATOR_COMMANDS.runtime) {
     incrementCommandCount();
     return done(
       `status: online | uptime=${deps.formatUptime()} | model=${deps.modelName()} | ${deps.runtimeSummary()}`,

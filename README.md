@@ -60,9 +60,9 @@ Built-in operator commands (directed to bot):
 - `/version` — compact build/runtime identity (`version`, `node`, `model`)
   - `version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`
 - `/model` or `/backend` — quick model/backend identity (`model`, `backend`)
+- `/status` or `/runtime` — uptime + model + redacted runtime summary
 
 On Discord startup, the bot now logs resolved app version metadata (`value` + `source`) to simplify deployment/debug verification.
-- `/status` — uptime + model + redacted runtime summary
 - `/diag` — quick configuration health report + guard/policy snapshot + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)

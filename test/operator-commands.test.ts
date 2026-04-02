@@ -310,7 +310,7 @@ test('returns model payload with current backend', () => {
 test('returns help payload with disabled guard markers for all help aliases (table-driven)', () => {
   const cases = ['/help', '/commands', '/?'];
   const expected =
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true';
+    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true';
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps());
@@ -328,13 +328,13 @@ test('returns help payload across guard-state combinations (table-driven)', () =
       allowMetricsReset: true,
       allowAuditTail: true,
       expected:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
     },
     {
       allowMetricsReset: true,
       allowAuditTail: false,
       expected:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
     },
   ];
 
@@ -362,6 +362,11 @@ test('rejects invalid help usage with extra args', () => {
 
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
+  assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });
+});
+
+test('returns runtime payload as status alias', () => {
+  const result = evaluateOperatorCommand('/runtime', makeDeps());
   assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });
 });
 
