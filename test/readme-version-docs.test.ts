@@ -18,6 +18,7 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /Guard-first behavior: while disabled, arg-suffixed forms \(e\.g\. `\/metrics-reset now`\) return `metrics-reset: disabled \(set ALLOW_METRICS_RESET=true to enable\)`; once enabled, extra args return invalid usage\./,
     /Guard-first behavior: while disabled, malformed forms \(e\.g\. `\/audit-tail 21`, `\/audit-tail 3 extra`\) return `audit-tail: disabled \(set ALLOW_AUDIT_TAIL=true to enable\)`; validation errors apply when enabled\./,
     /Guard-first summary: for guard-gated commands, disabled guards always return deterministic `\.\.\.: disabled \(\.\.\.\)` responses before deeper argument validation\./,
+    /Safe hot-refresh contract: applies environment changes in-process, never restarts the bot process, and is cooldown-limited \(`reload: rate-limited \| retryAfterSec=<n>`\)\./,
     /Extra args are rejected \(`\/help now` -> `help: invalid usage \(use \/\?, \/help, or \/commands\)`\) to keep operator command parsing predictable\./,
     /Unknown slash commands now return an explicit hint \(`unknown command: \/<name> \(use \/\?, \/help, or \/commands\)`\)/,
     /In operator mode, unknown slash commands are handled deterministically and do \*\*not\*\* route to LLM chat generation\./,
