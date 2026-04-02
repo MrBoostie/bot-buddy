@@ -1053,6 +1053,10 @@ test('returns explicit invalid-usage guidance for known no-arg commands with ext
     { input: '/metrics-reset now', expected: 'metrics-reset: invalid usage (use /metrics-reset)' },
     { input: '/ping\tnow', expected: 'ping: invalid usage (use /ping)' },
     { input: '/status\nnow', expected: 'status: invalid usage (use /status)' },
+    { input: '/PING now', expected: 'ping: invalid usage (use /ping)' },
+    { input: '/Status now', expected: 'status: invalid usage (use /status)' },
+    { input: '/Reload now', expected: 'reload: invalid usage (use /reload)' },
+    { input: '/Metrics-Reset now', expected: 'metrics-reset: invalid usage (use /metrics-reset)' },
   ];
 
   for (const c of cases) {

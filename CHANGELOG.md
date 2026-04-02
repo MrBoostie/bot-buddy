@@ -108,6 +108,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added regression coverage for explicit invalid-usage responses on known no-arg commands with extra args (`/ping`, `/status`, `/reload`, `/metrics-reset`).
 - Expanded no-arg invalid-usage regression coverage to include tab/newline-separated args (e.g. `/ping\tnow`, `/status\nnow`).
 - Expanded no-arg invalid-usage regression coverage across all primary no-arg operator commands and aliases (`/up`, `/uptime`, `/version`, `/id`, `/model`, `/backend`, `/runtime`, `/diag`, `/health`, etc.) to prevent alias drift.
+- Added mixed-case no-arg invalid-usage regressions (`/PING now`, `/Status now`, `/Reload now`, `/Metrics-Reset now`) to pin case-normalized operator handling.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
