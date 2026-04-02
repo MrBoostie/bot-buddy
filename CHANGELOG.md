@@ -80,3 +80,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Consolidated backend-specific `/ping` + `/status` model-label assertions into one table-driven test covering openclaw/openai modes.
 - Consolidated `/help` guard-state output assertions into a table-driven test across guard combinations, reducing duplicate setup/expectation blocks.
 - Expanded unknown-command typo-suggestion regression coverage to include `/model` near-miss handling (`/modle` -> `/model`).
+- Expanded unknown-command typo-suggestion regression coverage to include `/backend` near-miss handling (`/backedn` -> `/backend`).
