@@ -1130,11 +1130,12 @@ test('does not emit noisy suggestions for unrelated or broad unknown commands (t
 });
 
 test('does not suggest guard-gated commands when the guards are disabled', () => {
-  const metricsResult = evaluateOperatorCommand('/metricsresest', makeDeps());
-  assert.equal(metricsResult, 'unknown command: /metricsresest (use /?, /help, or /commands)');
+  const cases = ['/metricsresest', '/MetricsResest', '/audit-tailx', '/AUDIT-TAILX'];
 
-  const auditTailResult = evaluateOperatorCommand('/audit-tailx', makeDeps());
-  assert.equal(auditTailResult, 'unknown command: /audit-tailx (use /?, /help, or /commands)');
+  for (const input of cases) {
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.equal(result, `unknown command: ${input.toLowerCase()} (use /?, /help, or /commands)`);
+  }
 });
 
 test('suggests guard-gated commands when the guards are enabled', () => {
@@ -1143,17 +1144,21 @@ test('suggests guard-gated commands when the guards are enabled', () => {
     allowAuditTail: () => true,
   });
 
-  const metricsResult = evaluateOperatorCommand('/metricsresest', deps);
-  assert.equal(
-    metricsResult,
-    'unknown command: /metricsresest (use /?, /help, or /commands) | did you mean /metrics-reset?',
-  );
+  const cases: Array<{ input: string; suggestion: string }> = [
+    { input: '/metricsresest', suggestion: '/metrics-reset' },
+    { input: '/MetricsResest', suggestion: '/metrics-reset' },
+    { input: '/audit-tailx', suggestion: '/audit-tail' },
+    { input: '/AUDIT-TAILX', suggestion: '/audit-tail' },
+  ];
 
-  const auditTailResult = evaluateOperatorCommand('/audit-tailx', deps);
-  assert.equal(
-    auditTailResult,
-    'unknown command: /audit-tailx (use /?, /help, or /commands) | did you mean /audit-tail?',
-  );
+  for (const c of cases) {
+    const normalized = c.input.toLowerCase();
+    const result = evaluateOperatorCommand(c.input, deps);
+    assert.equal(
+      result,
+      `unknown command: ${normalized} (use /?, /help, or /commands) | did you mean ${c.suggestion}?`,
+    );
+  }
 });
 
 test('enforces suggestion policy across command classes (table-driven)', () => {
