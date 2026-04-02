@@ -171,6 +171,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Clarified README that `/?` is still a direct help alias but intentionally excluded from typo suggestion targets; pinned via docs regression coverage.
 - Added a concise guard-first summary line in README for guard-gated commands and pinned it in docs regression tests.
 - Clarified `/reload` safe hot-refresh contract in README (in-process apply, no restart, cooldown-limited) and pinned it in docs regression tests.
+- Added README clarification for `/reload` validation-failure response shape (`reload: applied, but issues remain -> ...`) and pinned it via docs regression tests.
 - README operator docs now explicitly document `/diag` availability signals and include a degraded `diag: issues detected` sample with `hasDiscord`/`hasOpenAI` fields.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.

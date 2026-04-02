@@ -69,6 +69,7 @@ On Discord startup, the bot now logs resolved app version metadata (`value` + `s
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
   - Safe hot-refresh contract: applies environment changes in-process, never restarts the bot process, and is cooldown-limited (`reload: rate-limited | retryAfterSec=<n>`).
+  - Validation-failure contract: if refresh applies but runtime checks still fail, response is `reload: applied, but issues remain -> ...` (with inline issue summary).
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
   - Guard-first behavior: while disabled, arg-suffixed forms (e.g. `/metrics-reset now`) return `metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)`; once enabled, extra args return invalid usage.
 - `/audit-tail` or `/audit-tail <1-20>` — show recent in-memory operator audit events (disabled by default; enable with `ALLOW_AUDIT_TAIL=true`; limit must be an unsigned integer; invalid extra args are rejected)
