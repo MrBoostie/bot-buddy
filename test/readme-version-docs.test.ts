@@ -36,6 +36,9 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /`discord` \/ `openai` — capability booleans surfaced in health context\./,
     /`backend` — latest backend health summary token\/string\./,
     /`metrics` — in-memory counters \+ latency distributions used by operator diagnostics\./,
+    /When to use which:/,
+    /Use `\/health` for quick one-line status checks and machine-friendly monitoring\/grep pipelines\./,
+    /Use `\/diag` for deeper operator triage \(capabilities, guard flags, policy limits, and backend error context\)\./,
   ];
 
   for (const pattern of patterns) {

@@ -163,6 +163,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Refactored `/diag` response assembly through a shared `diagCoreFields()` helper to keep ok/issues field composition centralized and reduce formatting drift risk.
 - Added a `/diag` field glossary to README (capabilities, backend mode, guards, policy limits, reply cap, backend error) and pinned it via docs regression tests.
 - Added a `/health` sample + field glossary to README (runtime, issue count, capability flags, backend summary, metrics payload) and pinned it via docs regression tests.
+- Added a concise `/health` vs `/diag` “when to use which” note to README and pinned it in docs regression tests for operator guidance consistency.
 - README operator docs now explicitly document `/diag` availability signals and include a degraded `diag: issues detected` sample with `hasDiscord`/`hasOpenAI` fields.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
