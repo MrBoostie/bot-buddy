@@ -47,7 +47,24 @@ const HELP_ALIASES: string[] = [
   OPERATOR_COMMANDS.commands,
 ];
 const HELP_ALIAS_SET = new Set<string>(HELP_ALIASES);
-const HELP_USAGE_HINT = `(use ${HELP_ALIASES[0]}, ${HELP_ALIASES[1]}, or ${HELP_ALIASES[2]})`;
+
+export function formatCommandListWithOr(commands: readonly string[]): string {
+  if (commands.length === 0) {
+    return '';
+  }
+
+  if (commands.length === 1) {
+    return commands[0];
+  }
+
+  if (commands.length === 2) {
+    return `${commands[0]} or ${commands[1]}`;
+  }
+
+  return `${commands.slice(0, -1).join(', ')}, or ${commands[commands.length - 1]}`;
+}
+
+const HELP_USAGE_HINT = `(use ${formatCommandListWithOr(HELP_ALIASES)})`;
 const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
 const BASE_HELP_COMMANDS: string[] = [
   ...HELP_ALIASES,

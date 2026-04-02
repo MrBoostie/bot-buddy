@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateOperatorCommand, type OperatorCommandDeps } from '../src/operator-commands.ts';
+import {
+  evaluateOperatorCommand,
+  formatCommandListWithOr,
+  type OperatorCommandDeps,
+} from '../src/operator-commands.ts';
 
 const METRICS_SUMMARY_BASE =
   'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0';
@@ -26,6 +30,19 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     ...overrides,
   };
 }
+
+test('formatCommandListWithOr handles 0/1/2/n command lists (table-driven)', () => {
+  const cases: Array<{ input: string[]; expected: string }> = [
+    { input: [], expected: '' },
+    { input: ['/help'], expected: '/help' },
+    { input: ['/help', '/commands'], expected: '/help or /commands' },
+    { input: ['/?', '/help', '/commands'], expected: '/?, /help, or /commands' },
+  ];
+
+  for (const c of cases) {
+    assert.equal(formatCommandListWithOr(c.input), c.expected);
+  }
+});
 
 function backendModeToken(mode: 'openclaw' | 'openai'): string {
   return `llmBackend=${mode}`;
