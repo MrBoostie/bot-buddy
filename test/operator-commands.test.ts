@@ -23,6 +23,7 @@ const HELP_METRICS_ENABLED_AUDIT_DISABLED =
   `${HELP_BASE_COMMANDS}, ${HELP_METRICS_RESET_ENABLED}, ${HELP_AUDIT_TAIL_DISABLED}${HELP_ENABLE_AUDIT_HINT}`;
 
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
+const HELP_INVALID_USAGE_LINE = `help: invalid usage ${UNKNOWN_COMMAND_USAGE_HINT}`;
 
 function commandsLine(commands: string): string {
   return `commands: ${commands}`;
@@ -543,7 +544,7 @@ test('rejects invalid help usage with extra args (space/tab/newline + mixed-case
     '/Help now',
     '/Commands now',
   ];
-  const expected = 'help: invalid usage (use /?, /help, or /commands)';
+  const expected = HELP_INVALID_USAGE_LINE;
 
   for (const input of inputs) {
     const result = evaluateOperatorCommand(input, makeDeps());
@@ -557,7 +558,7 @@ test('does not treat help-alias-prefixed tokens as help invalid-usage (table-dri
   for (const input of inputs) {
     const result = evaluateOperatorCommand(input, makeDeps());
     assert.ok(result?.startsWith(unknownCommandLine(input)));
-    assert.ok(!result?.startsWith('help: invalid usage'));
+    assert.ok(!result?.startsWith(HELP_INVALID_USAGE_LINE));
   }
 });
 
