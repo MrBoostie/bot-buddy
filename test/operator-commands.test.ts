@@ -28,6 +28,7 @@ const AUDIT_TAIL_INVALID_LIMIT_LINE = `audit-tail: invalid limit ${AUDIT_TAIL_US
 
 const METRICS_RESET_DISABLED_LINE = 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
 const METRICS_RESET_INVALID_USAGE_LINE = 'metrics-reset: invalid usage (use /metrics-reset)';
+const METRICS_RESET_OK_LINE = `metrics-reset: ok | ${METRICS_SUMMARY_BASE}`;
 const AUDIT_TAIL_DISABLED_LINE = 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)';
 
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
@@ -975,7 +976,7 @@ test('resets metrics when metrics-reset guard is on', () => {
   );
 
   assert.equal(resetCalls, 1);
-  assert.equal(result, `metrics-reset: ok | ${METRICS_SUMMARY_BASE}`);
+  assert.equal(result, METRICS_RESET_OK_LINE);
 });
 test('supports mixed-case metrics-reset token when guard is on', () => {
   let resetCalls = 0;
@@ -991,7 +992,7 @@ test('supports mixed-case metrics-reset token when guard is on', () => {
   );
 
   assert.equal(resetCalls, 1);
-  assert.equal(result, `metrics-reset: ok | ${METRICS_SUMMARY_BASE}`);
+  assert.equal(result, METRICS_RESET_OK_LINE);
 });
 test('returns audit-tail disabled payload when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail', makeDeps());
