@@ -10,11 +10,13 @@ const METRICS_SUMMARY_BASE =
   'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0';
 const HELP_BASE_COMMANDS =
   '/?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload';
+const HELP_ENABLE_BOTH_HINT = ' | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true';
+const HELP_ENABLE_AUDIT_HINT = ' | enable: ALLOW_AUDIT_TAIL=true';
 const HELP_ALL_ENABLED = `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20]`;
 const HELP_ALL_DISABLED =
-  `${HELP_BASE_COMMANDS}, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true`;
+  `${HELP_BASE_COMMANDS}, /metrics-reset (disabled), /audit-tail [1-20] (disabled)${HELP_ENABLE_BOTH_HINT}`;
 const HELP_METRICS_ENABLED_AUDIT_DISABLED =
-  `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true`;
+  `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20] (disabled)${HELP_ENABLE_AUDIT_HINT}`;
 
 function commandsLine(commands: string): string {
   return `commands: ${commands}`;
