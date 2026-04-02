@@ -144,6 +144,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Centralized the remaining mixed guard-state help fixture (`metrics enabled + audit disabled`) into a named test constant to complete help-summary expected-string de-duplication.
 - Added a small `commandsLine()` test helper and switched help-summary fixtures to use it, reducing repeated `commands: ...` wrapper literals.
 - Centralized help-summary enable-hint suffix fixtures (`ALLOW_METRICS_RESET`/`ALLOW_AUDIT_TAIL`) into shared test constants to reduce repeated hint-literal drift.
+- Centralized help-summary guarded command tokens (`/metrics-reset` and `/audit-tail [1-20]`, enabled/disabled forms) into shared test constants to reduce repeated literal drift.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
