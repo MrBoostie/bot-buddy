@@ -74,6 +74,12 @@ On Discord startup, the bot now logs resolved app version metadata (`value` + `s
   - Guard-first behavior: while disabled, malformed forms (e.g. `/audit-tail 21`, `/audit-tail 3 extra`) return `audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)`; validation errors apply when enabled.
 
 Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /?, /help, or /commands)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`). In operator mode, unknown slash commands are handled deterministically and do **not** route to LLM chat generation.
+
+Typo-suggestion boundaries (operator mode):
+
+- Suggestions are provided for close, relevant typos of known commands (including common transpositions like `/stauts` -> `/status`).
+- Suggestions are intentionally suppressed for noisy/ambiguous cases (very short low-signal tokens, unrelated commands, and `/?` alias-style noise).
+- Guard-gated commands (`/metrics-reset`, `/audit-tail`) are only suggested when their guards are enabled.
 Known no-arg operator commands now return explicit usage guidance when called with extra args (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.
 
 Operator command contract:
