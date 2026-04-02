@@ -22,6 +22,10 @@ const HELP_ALL_DISABLED =
 const HELP_METRICS_ENABLED_AUDIT_DISABLED =
   `${HELP_BASE_COMMANDS}, ${HELP_METRICS_RESET_ENABLED}, ${HELP_AUDIT_TAIL_DISABLED}${HELP_ENABLE_AUDIT_HINT}`;
 
+const AUDIT_TAIL_USAGE_SUFFIX = '(use /audit-tail or /audit-tail <1-20>)';
+const AUDIT_TAIL_INVALID_USAGE_LINE = `audit-tail: invalid usage ${AUDIT_TAIL_USAGE_SUFFIX}`;
+const AUDIT_TAIL_INVALID_LIMIT_LINE = `audit-tail: invalid limit ${AUDIT_TAIL_USAGE_SUFFIX}`;
+
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
 const HELP_INVALID_USAGE_LINE = `help: invalid usage ${UNKNOWN_COMMAND_USAGE_HINT}`;
 
@@ -1089,7 +1093,7 @@ test('rejects extra audit-tail args when guard is on (space/tab/newline + mixed-
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps({ allowAuditTail: () => true }));
-    assert.equal(result, 'audit-tail: invalid usage (use /audit-tail or /audit-tail <1-20>)');
+    assert.equal(result, AUDIT_TAIL_INVALID_USAGE_LINE);
   }
 });
 
@@ -1108,7 +1112,7 @@ test('rejects invalid audit-tail limit when guard is on (space/tab/newline + mix
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps({ allowAuditTail: () => true }));
-    assert.equal(result, 'audit-tail: invalid limit (use /audit-tail or /audit-tail <1-20>)');
+    assert.equal(result, AUDIT_TAIL_INVALID_LIMIT_LINE);
   }
 });
 

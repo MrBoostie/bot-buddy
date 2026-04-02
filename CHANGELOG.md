@@ -147,6 +147,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Centralized help-summary guarded command tokens (`/metrics-reset` and `/audit-tail [1-20]`, enabled/disabled forms) into shared test constants to reduce repeated literal drift.
 - Added shared unknown-command test helpers (`unknownCommandLine`, `unknownCommandWithSuggestion`) and switched operator typo/unknown assertions to use them, reducing repeated hint-literal boilerplate.
 - Centralized help invalid-usage expected text in tests (`HELP_INVALID_USAGE_LINE`) and reused it across help-invalid/false-positive assertions to reduce wording drift.
+- Centralized `/audit-tail` invalid-usage and invalid-limit expected strings in operator tests to reduce repeated error-text literals.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
