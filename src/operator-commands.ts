@@ -4,8 +4,10 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
-const METRICS_RESET_DISABLED_MESSAGE = 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
-const AUDIT_TAIL_DISABLED_MESSAGE = 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)';
+const ENV_ALLOW_METRICS_RESET = 'ALLOW_METRICS_RESET=true';
+const ENV_ALLOW_AUDIT_TAIL = 'ALLOW_AUDIT_TAIL=true';
+const METRICS_RESET_DISABLED_MESSAGE = `metrics-reset: disabled (set ${ENV_ALLOW_METRICS_RESET} to enable)`;
+const AUDIT_TAIL_DISABLED_MESSAGE = `audit-tail: disabled (set ${ENV_ALLOW_AUDIT_TAIL} to enable)`;
 const AUDIT_TAIL_USAGE_HINT = `/audit-tail or /audit-tail <1-${AUDIT_TAIL_MAX_LIMIT}>`;
 const AUDIT_TAIL_INVALID_USAGE_MESSAGE = `audit-tail: invalid usage (use ${AUDIT_TAIL_USAGE_HINT})`;
 const AUDIT_TAIL_INVALID_LIMIT_MESSAGE = `audit-tail: invalid limit (use ${AUDIT_TAIL_USAGE_HINT})`;
@@ -93,11 +95,11 @@ function helpEnableHint(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'a
   const envToggles: string[] = [];
 
   if (!deps.allowMetricsReset()) {
-    envToggles.push('ALLOW_METRICS_RESET=true');
+    envToggles.push(ENV_ALLOW_METRICS_RESET);
   }
 
   if (!deps.allowAuditTail()) {
-    envToggles.push('ALLOW_AUDIT_TAIL=true');
+    envToggles.push(ENV_ALLOW_AUDIT_TAIL);
   }
 
   if (envToggles.length === 0) {
