@@ -123,6 +123,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded `/metrics-reset` guard-state regressions to cover tab/newline argument separators, ensuring disabled-vs-invalid-usage behavior remains consistent across whitespace variants.
 - Expanded enabled-guard `/audit-tail` invalid-input regressions to cover tab/newline separator variants for both extra-arg and invalid-limit paths.
 - Expanded guard-gated typo-suggestion regressions to include mixed-case unknown inputs, pinning case-normalized suggestion behavior for `/metrics-reset` and `/audit-tail` across enabled/disabled guard states.
+- Hoisted guard-denied operator response literals (`metrics-reset`, `audit-tail`) into shared constants to reduce duplicated string drift across command branches.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

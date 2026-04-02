@@ -4,6 +4,8 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
+const METRICS_RESET_DISABLED_MESSAGE = 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
+const AUDIT_TAIL_DISABLED_MESSAGE = 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)';
 
 function hasCommandArgs(input: string, command: string): boolean {
   if (!input.startsWith(command)) {
@@ -364,7 +366,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   if (cmd === OPERATOR_COMMANDS.metricsReset) {
     incrementCommandCount();
     if (!deps.allowMetricsReset()) {
-      return done('metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+      return done(METRICS_RESET_DISABLED_MESSAGE);
     }
     deps.resetMetrics();
     return done(`metrics-reset: ok | ${deps.metricsSummary()}`);
@@ -374,7 +376,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     incrementCommandCount();
 
     if (!deps.allowAuditTail()) {
-      return done('audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+      return done(AUDIT_TAIL_DISABLED_MESSAGE);
     }
 
     const parsed = parseAuditTailInput(cmd);
@@ -402,7 +404,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const unknown = cmd.split(/\s+/, 1)[0] || cmd;
 
     if (unknown !== cmd && unknown === OPERATOR_COMMANDS.metricsReset && !deps.allowMetricsReset()) {
-      return done('metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+      return done(METRICS_RESET_DISABLED_MESSAGE);
     }
 
     if (unknown !== cmd && NO_ARG_OPERATOR_COMMANDS.has(unknown)) {
