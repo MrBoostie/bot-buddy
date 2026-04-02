@@ -13,6 +13,8 @@ const HELP_BASE_COMMANDS =
 const HELP_ALL_ENABLED = `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20]`;
 const HELP_ALL_DISABLED =
   `${HELP_BASE_COMMANDS}, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true`;
+const HELP_METRICS_ENABLED_AUDIT_DISABLED =
+  `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true`;
 
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
@@ -447,8 +449,7 @@ test('returns help payload across guard-state combinations (table-driven)', () =
     {
       allowMetricsReset: true,
       allowAuditTail: false,
-      expected:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
+      expected: `commands: ${HELP_METRICS_ENABLED_AUDIT_DISABLED}`,
     },
   ];
 

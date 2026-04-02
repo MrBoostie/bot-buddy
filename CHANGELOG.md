@@ -141,6 +141,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded `formatCommandListWithOr()` regression coverage with a 4-item command list case to pin Oxford-comma formatting for longer operator hint lists.
 - Added regression coverage ensuring `formatCommandListWithOr()` is non-mutating (input arrays remain unchanged after formatting).
 - Consolidated `/help` guard-toggle statelessness checks into a single table-driven regression covering both disabled→enabled and enabled→disabled transitions.
+- Centralized the remaining mixed guard-state help fixture (`metrics enabled + audit disabled`) into a named test constant to complete help-summary expected-string de-duplication.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
