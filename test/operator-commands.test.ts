@@ -290,32 +290,36 @@ test('returns help payload with disabled guard markers for all help aliases (tab
   }
 });
 
-test('returns help payload without disabled markers when guards are on', () => {
-  const result = evaluateOperatorCommand(
-    '/help',
-    makeDeps({
-      allowMetricsReset: () => true,
-      allowAuditTail: () => true,
-    }),
-  );
-  assert.equal(
-    result,
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
-  );
-});
+test('returns help payload across guard-state combinations (table-driven)', () => {
+  const cases: Array<{
+    allowMetricsReset: boolean;
+    allowAuditTail: boolean;
+    expected: string;
+  }> = [
+    {
+      allowMetricsReset: true,
+      allowAuditTail: true,
+      expected:
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+    },
+    {
+      allowMetricsReset: true,
+      allowAuditTail: false,
+      expected:
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
+    },
+  ];
 
-test('returns help payload with targeted enable hint when only one guard is off', () => {
-  const result = evaluateOperatorCommand(
-    '/help',
-    makeDeps({
-      allowMetricsReset: () => true,
-      allowAuditTail: () => false,
-    }),
-  );
-  assert.equal(
-    result,
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /status, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
-  );
+  for (const c of cases) {
+    const result = evaluateOperatorCommand(
+      '/help',
+      makeDeps({
+        allowMetricsReset: () => c.allowMetricsReset,
+        allowAuditTail: () => c.allowAuditTail,
+      }),
+    );
+    assert.equal(result, c.expected);
+  }
 });
 
 test('rejects invalid help usage with extra args', () => {

@@ -76,3 +76,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Consolidated `/version` known/unknown appVersion assertions into one table-driven test for consistent operator-test style and less duplication.
 - Consolidated `/ping`, `/uptime`, and `/up` baseline liveness assertions into one table-driven test to reduce repetitive command-output checks.
 - Consolidated backend-specific `/ping` + `/status` model-label assertions into one table-driven test covering openclaw/openai modes.
+- Consolidated `/help` guard-state output assertions into a table-driven test across guard combinations, reducing duplicate setup/expectation blocks.
