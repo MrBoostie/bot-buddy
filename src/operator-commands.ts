@@ -6,8 +6,12 @@ const AUDIT_TAIL_MAX_LIMIT = 20;
 const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
 
 function hasCommandArgs(input: string, command: string): boolean {
-  const escapedCommand = command.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`^${escapedCommand}\\s+`).test(input);
+  if (!input.startsWith(command)) {
+    return false;
+  }
+
+  const next = input.slice(command.length, command.length + 1);
+  return next.length > 0 && /\s/.test(next);
 }
 const OPERATOR_COMMANDS = {
   question: '/?',

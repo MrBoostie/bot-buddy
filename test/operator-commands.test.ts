@@ -449,6 +449,11 @@ test('rejects invalid help usage with extra args (space/tab/newline separators)'
   }
 });
 
+test('does not treat help-prefixed tokens as help invalid-usage', () => {
+  const result = evaluateOperatorCommand('/helping', makeDeps());
+  assert.equal(result, 'unknown command: /helping (use /?, /help, or /commands)');
+});
+
 test('returns status payload', () => {
   const result = evaluateOperatorCommand('/status', makeDeps());
   assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });

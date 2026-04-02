@@ -116,6 +116,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Split `/audit-tail` invalid-input coverage by guard state: disabled guard now returns consistent disabled response; enabled guard continues to enforce invalid-usage/invalid-limit parsing.
 - Added guard-state regression coverage for `/metrics-reset` arg-suffixed invocation (`disabled` vs `invalid usage` when enabled).
 - Added regression coverage for metrics-reset invalid-usage audit mapping (`operator metrics reset denied (invalid usage)`).
+- Simplified help-arg detection to avoid per-call regex allocation and added regression coverage ensuring help-prefixed tokens (e.g. `/helping`) stay in unknown-command handling.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
