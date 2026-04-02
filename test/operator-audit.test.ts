@@ -20,6 +20,14 @@ test('returns denied audit event for metrics reset when disabled', () => {
   assert.equal(event, 'operator metrics reset denied (disabled)');
 });
 
+test('returns denied audit event for metrics reset invalid usage', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'metrics-reset: invalid usage (use /metrics-reset)',
+  });
+  assert.equal(event, 'operator metrics reset denied (invalid usage)');
+});
+
 test('returns audit event for audit-tail disabled', () => {
   const event = getOperatorAuditEvent({
     kind: 'command',

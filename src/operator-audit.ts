@@ -14,6 +14,10 @@ export function getOperatorAuditEvent(result: DiscordRoutingResult): string | nu
     return 'operator metrics reset denied (disabled)';
   }
 
+  if (result.text.startsWith('metrics-reset: invalid usage')) {
+    return 'operator metrics reset denied (invalid usage)';
+  }
+
   if (result.text.startsWith('audit-tail: disabled')) {
     return 'operator audit tail denied (disabled)';
   }

@@ -67,6 +67,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document no-arg invalid-usage behavior (and include test coverage to prevent doc drift).
 - `/audit-tail` now prioritizes guard denial when disabled (even with malformed args/limits), returning `audit-tail: disabled ...` consistently until enabled.
 - `/metrics-reset` now mirrors guard-first behavior for arg-suffixed invocations when disabled (`/metrics-reset now` -> disabled response); when enabled, extra args still return invalid usage.
+- Operator audit mapping now records `metrics-reset: invalid usage ...` as a denied metrics-reset audit event for clearer denied-attempt visibility.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
@@ -114,6 +115,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added mixed-case no-arg invalid-usage regressions (`/PING now`, `/Status now`, `/Reload now`, `/Metrics-Reset now`) to pin case-normalized operator handling.
 - Split `/audit-tail` invalid-input coverage by guard state: disabled guard now returns consistent disabled response; enabled guard continues to enforce invalid-usage/invalid-limit parsing.
 - Added guard-state regression coverage for `/metrics-reset` arg-suffixed invocation (`disabled` vs `invalid usage` when enabled).
+- Added regression coverage for metrics-reset invalid-usage audit mapping (`operator metrics reset denied (invalid usage)`).
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
