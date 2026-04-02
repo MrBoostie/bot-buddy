@@ -16,6 +16,10 @@ const HELP_ALL_DISABLED =
 const HELP_METRICS_ENABLED_AUDIT_DISABLED =
   `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true`;
 
+function commandsLine(commands: string): string {
+  return `commands: ${commands}`;
+}
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',
@@ -444,12 +448,12 @@ test('returns help payload across guard-state combinations (table-driven)', () =
     {
       allowMetricsReset: true,
       allowAuditTail: true,
-      expected: `commands: ${HELP_ALL_ENABLED}`,
+      expected: commandsLine(HELP_ALL_ENABLED),
     },
     {
       allowMetricsReset: true,
       allowAuditTail: false,
-      expected: `commands: ${HELP_METRICS_ENABLED_AUDIT_DISABLED}`,
+      expected: commandsLine(HELP_METRICS_ENABLED_AUDIT_DISABLED),
     },
   ];
 
@@ -477,15 +481,15 @@ test('help command summaries do not leak state across guard toggles (table-drive
       name: 'disabled->enabled',
       start: { allowMetricsReset: false, allowAuditTail: false },
       next: { allowMetricsReset: true, allowAuditTail: true },
-      expectedFirst: `commands: ${HELP_ALL_DISABLED}`,
-      expectedSecond: `commands: ${HELP_ALL_ENABLED}`,
+      expectedFirst: commandsLine(HELP_ALL_DISABLED),
+      expectedSecond: commandsLine(HELP_ALL_ENABLED),
     },
     {
       name: 'enabled->disabled',
       start: { allowMetricsReset: true, allowAuditTail: true },
       next: { allowMetricsReset: false, allowAuditTail: false },
-      expectedFirst: `commands: ${HELP_ALL_ENABLED}`,
-      expectedSecond: `commands: ${HELP_ALL_DISABLED}`,
+      expectedFirst: commandsLine(HELP_ALL_ENABLED),
+      expectedSecond: commandsLine(HELP_ALL_DISABLED),
     },
   ];
 
