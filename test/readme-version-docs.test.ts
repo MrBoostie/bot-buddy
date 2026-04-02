@@ -21,6 +21,13 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /Unknown slash commands now return an explicit hint \(`unknown command: \/<name> \(use \/\?, \/help, or \/commands\)`\)/,
     /`\/diag` — quick configuration health report \+ availability signals \(`hasDiscord`\/`hasOpenAI`\) \+ guard\/policy snapshot \+ last backend error/,
     /diag: issues detected -> OPENAI_API_KEY missing \| hasDiscord=true \| hasOpenAI=false \| llmBackend=openai \| allowMetricsReset=false \| allowAuditTail=false \| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \| lastBackendError=none/,
+    /`\/diag` field glossary \(quick operator reference\):/,
+    /`hasDiscord` \/ `hasOpenAI` — runtime capability checks for configured integrations\./,
+    /`llmBackend` — active backend mode \(`openclaw` or `openai`\)\./,
+    /`allowMetricsReset` \/ `allowAuditTail` — guard toggles for sensitive operator commands\./,
+    /`auditTailDefault` \/ `auditTailMax` — configured audit-tail limit policy\./,
+    /`operatorReplyMaxChars` — max operator response length before truncation safety applies\./,
+    /`lastBackendError` — latest backend health summary string \(`none` when healthy\)\./,
   ];
 
   for (const pattern of patterns) {

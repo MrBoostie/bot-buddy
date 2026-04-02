@@ -161,6 +161,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - `/diag` issues payload now includes `hasDiscord` and `hasOpenAI` fields (matching the `diag: ok` shape) for consistent diagnostics across healthy/degraded runtime states.
 - Added diag core-field ordering regression checks for both helper-level fixtures and live `/diag` outputs, pinning consistent field order across `diag: ok` and `diag: issues detected` paths.
 - Refactored `/diag` response assembly through a shared `diagCoreFields()` helper to keep ok/issues field composition centralized and reduce formatting drift risk.
+- Added a `/diag` field glossary to README (capabilities, backend mode, guards, policy limits, reply cap, backend error) and pinned it via docs regression tests.
 - README operator docs now explicitly document `/diag` availability signals and include a degraded `diag: issues detected` sample with `hasDiscord`/`hasOpenAI` fields.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.

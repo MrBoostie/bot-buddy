@@ -83,6 +83,15 @@ diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetric
 diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=true | hasOpenAI=false | llmBackend=openai | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
 ```
 
+`/diag` field glossary (quick operator reference):
+
+- `hasDiscord` / `hasOpenAI` — runtime capability checks for configured integrations.
+- `llmBackend` — active backend mode (`openclaw` or `openai`).
+- `allowMetricsReset` / `allowAuditTail` — guard toggles for sensitive operator commands.
+- `auditTailDefault` / `auditTailMax` — configured audit-tail limit policy.
+- `operatorReplyMaxChars` — max operator response length before truncation safety applies.
+- `lastBackendError` — latest backend health summary string (`none` when healthy).
+
 Operational logging toggles:
 - `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)
 - Set `METRICS_SNAPSHOT_INTERVAL_SEC` to a positive value to emit periodic `metrics snapshot` log lines
