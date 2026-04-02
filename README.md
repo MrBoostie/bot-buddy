@@ -111,6 +111,11 @@ When to use which:
 - Use `/health` for quick one-line status checks and machine-friendly monitoring/grep pipelines.
 - Use `/diag` for deeper operator triage (capabilities, guard flags, policy limits, and backend error context).
 
+Operator command output style (quick map):
+
+- Machine-grep-friendly: `/health`, `/status`, `/runtime`, `/ping`, `/uptime`, `/up`, `/version`, `/id`, `/model`, `/backend`
+- Human-triage-oriented: `/diag`, `/help`, `/commands`, `/?`, `/reload`, `/metrics-reset`, `/audit-tail`
+
 Operational logging toggles:
 - `METRICS_SNAPSHOT_INTERVAL_SEC=0` disables periodic metric logs (default)
 - Set `METRICS_SNAPSHOT_INTERVAL_SEC` to a positive value to emit periodic `metrics snapshot` log lines
