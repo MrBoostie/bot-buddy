@@ -98,6 +98,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added regression coverage to ensure `/audit-tail` command routing accepts tab/newline-separated limits (not just spaces).
 - Added regression coverage ensuring `/audit-tail` with trailing tab is routed as audit-tail (disabled response) instead of unknown-command fallback.
 - Hoisted `/audit-tail` command-detection regex into a shared constant to avoid per-command regex allocation and reduce routing drift risk.
+- Expanded typo-suggestion regression coverage for transposition edits across key operator commands (`/reload`, `/commands`, `/health`).
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

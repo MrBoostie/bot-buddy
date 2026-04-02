@@ -1001,6 +1001,18 @@ test('returns unknown command hint for near-miss slash-command typos (table-driv
       input: '/runtmie',
       expected: 'unknown command: /runtmie (use /?, /help, or /commands) | did you mean /runtime?',
     },
+    {
+      input: '/relaod',
+      expected: 'unknown command: /relaod (use /?, /help, or /commands) | did you mean /reload?',
+    },
+    {
+      input: '/commnads',
+      expected: 'unknown command: /commnads (use /?, /help, or /commands) | did you mean /commands?',
+    },
+    {
+      input: '/healht',
+      expected: 'unknown command: /healht (use /?, /help, or /commands) | did you mean /health?',
+    },
   ];
 
   for (const c of cases) {
