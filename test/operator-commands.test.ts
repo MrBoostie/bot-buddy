@@ -30,6 +30,9 @@ const METRICS_RESET_DISABLED_LINE = 'metrics-reset: disabled (set ALLOW_METRICS_
 const METRICS_RESET_INVALID_USAGE_LINE = 'metrics-reset: invalid usage (use /metrics-reset)';
 const METRICS_RESET_OK_LINE = `metrics-reset: ok | ${METRICS_SUMMARY_BASE}`;
 const AUDIT_TAIL_DISABLED_LINE = 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)';
+const AUDIT_TAIL_SAMPLE_ENTRY = '2026-03-31T03:30:00.000Z operator metrics reset executed';
+const AUDIT_TAIL_TAIL_LINE = 'audit-tail: tail';
+const AUDIT_TAIL_SHORT_LINE = 'audit-tail: short tail';
 
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
 const HELP_INVALID_USAGE_LINE = `help: invalid usage ${UNKNOWN_COMMAND_USAGE_HINT}`;
@@ -1004,10 +1007,10 @@ test('returns audit tail when guard is on', () => {
     '/audit-tail',
     makeDeps({
       allowAuditTail: () => true,
-      getAuditTail: () => '2026-03-31T03:30:00.000Z operator metrics reset executed',
+      getAuditTail: () => AUDIT_TAIL_SAMPLE_ENTRY,
     }),
   );
-  assert.equal(result, 'audit-tail: 2026-03-31T03:30:00.000Z operator metrics reset executed');
+  assert.equal(result, `audit-tail: ${AUDIT_TAIL_SAMPLE_ENTRY}`);
 });
 
 test('supports custom audit-tail limit in valid range', () => {
@@ -1024,7 +1027,7 @@ test('supports custom audit-tail limit in valid range', () => {
   );
 
   assert.equal(calledWith, 12);
-  assert.equal(result, 'audit-tail: tail');
+  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
 });
 
 test('supports extra whitespace around audit-tail limit', () => {
@@ -1041,7 +1044,7 @@ test('supports extra whitespace around audit-tail limit', () => {
   );
 
   assert.equal(calledWith, 3);
-  assert.equal(result, 'audit-tail: tail');
+  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
 });
 
 test('supports tab/newline whitespace for audit-tail command detection', () => {
@@ -1058,7 +1061,7 @@ test('supports tab/newline whitespace for audit-tail command detection', () => {
   );
 
   assert.equal(calledWith, 3);
-  assert.equal(result, 'audit-tail: tail');
+  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
 });
 
 test('supports mixed-case audit-tail command token in evaluator routing', () => {
@@ -1075,7 +1078,7 @@ test('supports mixed-case audit-tail command token in evaluator routing', () => 
   );
 
   assert.equal(calledWith, 3);
-  assert.equal(result, 'audit-tail: tail');
+  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
 });
 
 test('treats audit-tail with trailing tab as audit-tail command (not unknown command)', () => {
@@ -1144,7 +1147,7 @@ test('does not truncate normal audit-tail response', () => {
     }),
   );
 
-  assert.equal(result, 'audit-tail: short tail');
+  assert.equal(result, AUDIT_TAIL_SHORT_LINE);
 });
 
 test('returns null for non-command input', () => {
