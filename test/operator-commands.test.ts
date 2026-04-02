@@ -333,28 +333,35 @@ test('returns status payload', () => {
   assertStatusPayload(result, { model: 'gpt-test', llmBackend: 'openclaw' });
 });
 
-test('returns ping/status payloads with openclaw agent model label', () => {
-  const deps = makeDeps({ modelName: () => 'openclaw:gremlin' });
+test('returns ping/status payloads with backend-specific model labels (table-driven)', () => {
+  const cases: Array<{
+    deps: OperatorCommandDeps;
+    model: string;
+    llmBackend: 'openclaw' | 'openai';
+  }> = [
+    {
+      deps: makeDeps({ modelName: () => 'openclaw:gremlin' }),
+      model: 'openclaw:gremlin',
+      llmBackend: 'openclaw',
+    },
+    {
+      deps: makeDeps({
+        modelName: () => 'gpt-4o-mini',
+        llmBackend: () => 'openai',
+        runtimeSummary: () => 'bot=buddy | llmBackend=openai',
+      }),
+      model: 'gpt-4o-mini',
+      llmBackend: 'openai',
+    },
+  ];
 
-  const ping = evaluateOperatorCommand('/ping', deps);
-  const status = evaluateOperatorCommand('/status', deps);
+  for (const c of cases) {
+    const ping = evaluateOperatorCommand('/ping', c.deps);
+    const status = evaluateOperatorCommand('/status', c.deps);
 
-  assertPingPayload(ping, 'openclaw:gremlin');
-  assertStatusPayload(status, { model: 'openclaw:gremlin', llmBackend: 'openclaw' });
-});
-
-test('returns ping/status payloads with openai model label', () => {
-  const deps = makeDeps({
-    modelName: () => 'gpt-4o-mini',
-    llmBackend: () => 'openai',
-    runtimeSummary: () => 'bot=buddy | llmBackend=openai',
-  });
-
-  const ping = evaluateOperatorCommand('/ping', deps);
-  const status = evaluateOperatorCommand('/status', deps);
-
-  assertPingPayload(ping, 'gpt-4o-mini');
-  assertStatusPayload(status, { model: 'gpt-4o-mini', llmBackend: 'openai' });
+    assertPingPayload(ping, c.model);
+    assertStatusPayload(status, { model: c.model, llmBackend: c.llmBackend });
+  }
 });
 
 test('diag ok payload reflects availability/backend tuples (table-driven)', () => {
