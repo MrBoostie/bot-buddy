@@ -134,6 +134,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Centralized guard-enable env toggle literals (`ALLOW_METRICS_RESET=true`, `ALLOW_AUDIT_TAIL=true`) into shared constants reused by help enable hints and guard-denied command responses.
 - Expanded invalid help-usage regressions to include mixed-case help aliases (`/Help now`, `/Commands now`) to pin case-normalized handling.
 - Derived `NO_ARG_OPERATOR_COMMANDS` from the shared baseline help command list (plus guarded `/metrics-reset`) to reduce no-arg policy drift when help-list commands evolve.
+- Added shared `HELP_ALIASES`/`HELP_ALIAS_SET` constants and refactored help alias checks (exact-match + arg-suffixed invalid usage + usage hint rendering) to one source of truth.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

@@ -41,12 +41,16 @@ const OPERATOR_COMMANDS = {
 } as const;
 
 const KNOWN_OPERATOR_COMMANDS = Object.values(OPERATOR_COMMANDS);
-const HELP_USAGE_HINT = `(use ${OPERATOR_COMMANDS.question}, ${OPERATOR_COMMANDS.help}, or ${OPERATOR_COMMANDS.commands})`;
-const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
-const BASE_HELP_COMMANDS: string[] = [
+const HELP_ALIASES: string[] = [
   OPERATOR_COMMANDS.question,
   OPERATOR_COMMANDS.help,
   OPERATOR_COMMANDS.commands,
+];
+const HELP_ALIAS_SET = new Set<string>(HELP_ALIASES);
+const HELP_USAGE_HINT = `(use ${HELP_ALIASES[0]}, ${HELP_ALIASES[1]}, or ${HELP_ALIASES[2]})`;
+const HELP_INVALID_USAGE = `help: invalid usage ${HELP_USAGE_HINT}`;
+const BASE_HELP_COMMANDS: string[] = [
+  ...HELP_ALIASES,
   OPERATOR_COMMANDS.ping,
   OPERATOR_COMMANDS.up,
   OPERATOR_COMMANDS.uptime,
@@ -61,10 +65,7 @@ const BASE_HELP_COMMANDS: string[] = [
   OPERATOR_COMMANDS.reload,
 ];
 const NO_ARG_OPERATOR_COMMANDS = new Set<string>([
-  ...BASE_HELP_COMMANDS.filter(
-    (cmd) =>
-      cmd !== OPERATOR_COMMANDS.question && cmd !== OPERATOR_COMMANDS.help && cmd !== OPERATOR_COMMANDS.commands,
-  ),
+  ...BASE_HELP_COMMANDS.filter((cmd) => !HELP_ALIAS_SET.has(cmd)),
   OPERATOR_COMMANDS.metricsReset,
 ]);
 
@@ -288,20 +289,12 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     return done(`model=${deps.modelName()} | backend=${deps.llmBackend()}`);
   }
 
-  if (
-    cmd === OPERATOR_COMMANDS.question ||
-    cmd === OPERATOR_COMMANDS.help ||
-    cmd === OPERATOR_COMMANDS.commands
-  ) {
+  if (HELP_ALIAS_SET.has(cmd)) {
     incrementCommandCount();
     return done(`commands: ${helpCommandSummary(deps)}${helpEnableHint(deps)}`);
   }
 
-  if (
-    hasCommandArgs(cmd, OPERATOR_COMMANDS.question) ||
-    hasCommandArgs(cmd, OPERATOR_COMMANDS.help) ||
-    hasCommandArgs(cmd, OPERATOR_COMMANDS.commands)
-  ) {
+  if (HELP_ALIASES.some((alias) => hasCommandArgs(cmd, alias))) {
     incrementCommandCount();
     return done(HELP_INVALID_USAGE);
   }
