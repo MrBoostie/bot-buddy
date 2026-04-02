@@ -1006,6 +1006,33 @@ test('does not emit noisy suggestions for unrelated or broad unknown commands (t
   }
 });
 
+test('does not suggest guard-gated commands when the guards are disabled', () => {
+  const metricsResult = evaluateOperatorCommand('/metricsresest', makeDeps());
+  assert.equal(metricsResult, 'unknown command: /metricsresest (use /?, /help, or /commands)');
+
+  const auditTailResult = evaluateOperatorCommand('/audit-tailx', makeDeps());
+  assert.equal(auditTailResult, 'unknown command: /audit-tailx (use /?, /help, or /commands)');
+});
+
+test('suggests guard-gated commands when the guards are enabled', () => {
+  const deps = makeDeps({
+    allowMetricsReset: () => true,
+    allowAuditTail: () => true,
+  });
+
+  const metricsResult = evaluateOperatorCommand('/metricsresest', deps);
+  assert.equal(
+    metricsResult,
+    'unknown command: /metricsresest (use /?, /help, or /commands) | did you mean /metrics-reset?',
+  );
+
+  const auditTailResult = evaluateOperatorCommand('/audit-tailx', deps);
+  assert.equal(
+    auditTailResult,
+    'unknown command: /audit-tailx (use /?, /help, or /commands) | did you mean /audit-tail?',
+  );
+});
+
 test('does not suggest /id for short transposition typo due short-command noise guard', () => {
   const result = evaluateOperatorCommand('/di', makeDeps());
   assert.equal(result, 'unknown command: /di (use /?, /help, or /commands)');

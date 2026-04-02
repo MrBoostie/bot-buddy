@@ -97,12 +97,23 @@ function damerauLevenshteinDistance(a: string, b: string): number {
   return dp[a.length][b.length];
 }
 
-function unknownCommandSuggestion(command: string): string {
+function unknownCommandSuggestion(
+  command: string,
+  deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'allowAuditTail'>,
+): string {
   let best: { command: string; distance: number } | null = null;
 
   const unknownToken = command.slice(1);
 
   for (const known of KNOWN_OPERATOR_COMMANDS) {
+    if (known === OPERATOR_COMMANDS.metricsReset && !deps.allowMetricsReset()) {
+      continue;
+    }
+
+    if (known === OPERATOR_COMMANDS.auditTail && !deps.allowAuditTail()) {
+      continue;
+    }
+
     if (known === OPERATOR_COMMANDS.question && !command.startsWith(OPERATOR_COMMANDS.question)) {
       continue;
     }
@@ -359,7 +370,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
 
   if (cmd.startsWith('/')) {
     const unknown = cmd.split(/\s+/, 1)[0] || cmd;
-    return done(`unknown command: ${unknown} ${HELP_USAGE_HINT}${unknownCommandSuggestion(unknown)}`);
+    return done(`unknown command: ${unknown} ${HELP_USAGE_HINT}${unknownCommandSuggestion(unknown, deps)}`);
   }
 
   return null;

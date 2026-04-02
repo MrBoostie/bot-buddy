@@ -55,6 +55,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Unknown command fallback hint now references all supported help aliases (`/?`, `/help`, `/commands`) for faster operator recovery.
   - Unknown command suggestion logic now supports close typos of short aliases (e.g. `/upp` suggests `/up`) while still suppressing noisy unrelated short-command suggestions.
   - Unknown command suggestion matching now uses transposition-aware distance with tighter relevance gates to suppress noisy hints for unrelated commands (e.g. `/beep`, `/hello`, `/mod`).
+  - Unknown command typo suggestions now respect guard state: disabled guard-gated commands (`/metrics-reset`, `/audit-tail`) are excluded from suggestions until enabled.
 
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
@@ -92,6 +93,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added short-token regression coverage confirming `/di` does not suggest `/id` under the short-command noise guard.
 - Added regression coverage to ensure `/audit-tail` only matches exact command/arg forms and does not swallow similarly-prefixed unknown commands.
 - Consolidated noisy unknown-command suggestion regressions into a table-driven test (`/beacon`, `/runner`, `/beep`, `/hello`, `/mod`) to keep relevance-guard coverage compact.
+- Added regression coverage for guard-aware typo suggestions (disabled guards suppress `/metrics-reset`/`/audit-tail` suggestions; enabled guards allow them).
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
