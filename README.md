@@ -79,6 +79,7 @@ Typo-suggestion boundaries (operator mode):
 
 - Suggestions are provided for close, relevant typos of known commands (including common transpositions like `/stauts` -> `/status`).
 - Suggestions are intentionally suppressed for noisy/ambiguous cases (very short low-signal tokens, unrelated commands, and `/?` alias-style noise).
+- `/?` remains a first-class help alias for direct use, but it is intentionally excluded from typo suggestion targets (to avoid outputs like `did you mean /??`).
 - Guard-gated commands (`/metrics-reset`, `/audit-tail`) are only suggested when their guards are enabled.
 Known no-arg operator commands now return explicit usage guidance when called with extra args (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.
 

@@ -23,6 +23,7 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /Typo-suggestion boundaries \(operator mode\):/,
     /Suggestions are provided for close, relevant typos of known commands \(including common transpositions like `\/stauts` -> `\/status`\)\./,
     /Suggestions are intentionally suppressed for noisy\/ambiguous cases \(very short low-signal tokens, unrelated commands, and `\/\?` alias-style noise\)\./,
+    /`\/\?` remains a first-class help alias for direct use, but it is intentionally excluded from typo suggestion targets \(to avoid outputs like `did you mean \/\?\?`\)\./,
     /Guard-gated commands \(`\/metrics-reset`, `\/audit-tail`\) are only suggested when their guards are enabled\./,
     /Operator command contract:/,
     /Slash commands are case-insensitive \(`\/PING`, `\/Help`, `\/AUDIT-TAIL` are normalized\)\./,

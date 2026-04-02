@@ -168,6 +168,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Clarified README operator behavior that unknown slash commands are deterministic and never fall through to LLM chat generation; pinned via docs regression coverage.
 - Added an explicit operator command contract section to README (case-insensitive slash commands + normalized whitespace argument parsing) and pinned it via docs regression tests.
 - Added README typo-suggestion boundary notes (what is suggested vs intentionally suppressed, including guard-gated behavior) and pinned them via docs regression tests.
+- Clarified README that `/?` is still a direct help alias but intentionally excluded from typo suggestion targets; pinned via docs regression coverage.
 - README operator docs now explicitly document `/diag` availability signals and include a degraded `diag: issues detected` sample with `hasDiscord`/`hasOpenAI` fields.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
