@@ -73,7 +73,7 @@ On Discord startup, the bot now logs resolved app version metadata (`value` + `s
 - `/audit-tail` or `/audit-tail <1-20>` — show recent in-memory operator audit events (disabled by default; enable with `ALLOW_AUDIT_TAIL=true`; limit must be an unsigned integer; invalid extra args are rejected)
   - Guard-first behavior: while disabled, malformed forms (e.g. `/audit-tail 21`, `/audit-tail 3 extra`) return `audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)`; validation errors apply when enabled.
 
-Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /?, /help, or /commands)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`).
+Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /?, /help, or /commands)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`). In operator mode, unknown slash commands are handled deterministically and do **not** route to LLM chat generation.
 Known no-arg operator commands now return explicit usage guidance when called with extra args (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.
 
 Sample `/diag` output:
