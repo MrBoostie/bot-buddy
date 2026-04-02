@@ -105,6 +105,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added `hasCommandArgs()` helper + regression coverage so help alias invalid-usage detection consistently handles whitespace separators (`space`, `tab`, `newline`).
 - Added regression coverage ensuring unknown-command fallback suppresses identical-command suggestions for arg-suffixed known commands.
 - Added regression coverage for explicit invalid-usage responses on known no-arg commands with extra args (`/ping`, `/status`, `/reload`, `/metrics-reset`).
+- Expanded no-arg invalid-usage regression coverage to include tab/newline-separated args (e.g. `/ping\tnow`, `/status\nnow`).
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
