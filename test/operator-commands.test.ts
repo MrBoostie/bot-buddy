@@ -485,6 +485,31 @@ test('help command summaries do not leak state across dynamic guard toggles', ()
   );
 });
 
+test('help command summaries do not leak state across reverse guard toggles', () => {
+  let allowMetricsReset = true;
+  let allowAuditTail = true;
+
+  const deps = makeDeps({
+    allowMetricsReset: () => allowMetricsReset,
+    allowAuditTail: () => allowAuditTail,
+  });
+
+  const first = evaluateOperatorCommand('/help', deps);
+
+  allowMetricsReset = false;
+  allowAuditTail = false;
+  const second = evaluateOperatorCommand('/help', deps);
+
+  assert.equal(
+    first,
+    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+  );
+  assert.equal(
+    second,
+    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+  );
+});
+
 test('rejects invalid help usage with extra args (space/tab/newline + mixed-case)', () => {
   const inputs = [
     '/help now',
