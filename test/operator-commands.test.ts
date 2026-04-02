@@ -8,6 +8,11 @@ import {
 
 const METRICS_SUMMARY_BASE =
   'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0';
+const HELP_BASE_COMMANDS =
+  '/?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload';
+const HELP_ALL_ENABLED = `${HELP_BASE_COMMANDS}, /metrics-reset, /audit-tail [1-20]`;
+const HELP_ALL_DISABLED =
+  `${HELP_BASE_COMMANDS}, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true`;
 
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
@@ -437,8 +442,7 @@ test('returns help payload across guard-state combinations (table-driven)', () =
     {
       allowMetricsReset: true,
       allowAuditTail: true,
-      expected:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+      expected: `commands: ${HELP_ALL_ENABLED}`,
     },
     {
       allowMetricsReset: true,
@@ -472,19 +476,15 @@ test('help command summaries do not leak state across guard toggles (table-drive
       name: 'disabled->enabled',
       start: { allowMetricsReset: false, allowAuditTail: false },
       next: { allowMetricsReset: true, allowAuditTail: true },
-      expectedFirst:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
-      expectedSecond:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+      expectedFirst: `commands: ${HELP_ALL_DISABLED}`,
+      expectedSecond: `commands: ${HELP_ALL_ENABLED}`,
     },
     {
       name: 'enabled->disabled',
       start: { allowMetricsReset: true, allowAuditTail: true },
       next: { allowMetricsReset: false, allowAuditTail: false },
-      expectedFirst:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
-      expectedSecond:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true',
+      expectedFirst: `commands: ${HELP_ALL_ENABLED}`,
+      expectedSecond: `commands: ${HELP_ALL_DISABLED}`,
     },
   ];
 
