@@ -1086,8 +1086,21 @@ test('returns explicit invalid-usage guidance for known no-arg commands with ext
 });
 
 test('returns invalid usage for metrics-reset extra args when guard is on', () => {
-  const result = evaluateOperatorCommand('/metrics-reset now', makeDeps({ allowMetricsReset: () => true }));
-  assert.equal(result, 'metrics-reset: invalid usage (use /metrics-reset)');
+  const cases = ['/metrics-reset now', '/metrics-reset\tnow', '/metrics-reset\nnow'];
+
+  for (const input of cases) {
+    const result = evaluateOperatorCommand(input, makeDeps({ allowMetricsReset: () => true }));
+    assert.equal(result, 'metrics-reset: invalid usage (use /metrics-reset)');
+  }
+});
+
+test('returns disabled for metrics-reset extra args with whitespace variants when guard is off', () => {
+  const cases = ['/metrics-reset now', '/metrics-reset\tnow', '/metrics-reset\nnow'];
+
+  for (const input of cases) {
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+  }
 });
 
 test('does not suggest /? for short unknown slash commands', () => {
