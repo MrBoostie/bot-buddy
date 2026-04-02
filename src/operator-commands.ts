@@ -6,6 +6,9 @@ const AUDIT_TAIL_MAX_LIMIT = 20;
 const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
 const METRICS_RESET_DISABLED_MESSAGE = 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
 const AUDIT_TAIL_DISABLED_MESSAGE = 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)';
+const AUDIT_TAIL_USAGE_HINT = `/audit-tail or /audit-tail <1-${AUDIT_TAIL_MAX_LIMIT}>`;
+const AUDIT_TAIL_INVALID_USAGE_MESSAGE = `audit-tail: invalid usage (use ${AUDIT_TAIL_USAGE_HINT})`;
+const AUDIT_TAIL_INVALID_LIMIT_MESSAGE = `audit-tail: invalid limit (use ${AUDIT_TAIL_USAGE_HINT})`;
 
 function hasCommandArgs(input: string, command: string): boolean {
   if (!input.startsWith(command)) {
@@ -382,13 +385,9 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     const parsed = parseAuditTailInput(cmd);
     if (!parsed.ok) {
       if (parsed.reason === 'invalid-usage') {
-        return done(
-          `audit-tail: invalid usage (use ${OPERATOR_COMMANDS.auditTail} or ${OPERATOR_COMMANDS.auditTail} <1-20>)`,
-        );
+        return done(AUDIT_TAIL_INVALID_USAGE_MESSAGE);
       }
-      return done(
-        `audit-tail: invalid limit (use ${OPERATOR_COMMANDS.auditTail} or ${OPERATOR_COMMANDS.auditTail} <1-20>)`,
-      );
+      return done(AUDIT_TAIL_INVALID_LIMIT_MESSAGE);
     }
 
     const payload = `audit-tail: ${deps.getAuditTail(parsed.limit)}`;
