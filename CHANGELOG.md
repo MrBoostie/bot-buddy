@@ -89,3 +89,4 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added a negative regression case to ensure distant run-prefixed commands (e.g. `/runner`) do not trigger noisy `/runtime` suggestions.
 - Added short-token regression coverage confirming `/di` does not suggest `/id` under the short-command noise guard.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
+- Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.

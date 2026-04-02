@@ -364,6 +364,39 @@ test('help output preserves canonical command ordering for operator discoverabil
   ]);
 });
 
+test('help output preserves canonical ordering when guard-gated commands are enabled', () => {
+  const result = evaluateOperatorCommand(
+    '/help',
+    makeDeps({
+      allowMetricsReset: () => true,
+      allowAuditTail: () => true,
+    }),
+  );
+  assert.ok(result);
+
+  const commandsPart = result.replace(/^commands:\s*/, '').split(', ');
+
+  assert.deepEqual(commandsPart, [
+    '/?',
+    '/help',
+    '/commands',
+    '/ping',
+    '/up',
+    '/uptime',
+    '/version',
+    '/id',
+    '/model',
+    '/backend',
+    '/status',
+    '/runtime',
+    '/diag',
+    '/health',
+    '/reload',
+    '/metrics-reset',
+    '/audit-tail [1-20]',
+  ]);
+});
+
 test('returns help payload across guard-state combinations (table-driven)', () => {
   const cases: Array<{
     allowMetricsReset: boolean;
