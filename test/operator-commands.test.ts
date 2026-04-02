@@ -903,3 +903,8 @@ test('does not suggest /? for short unknown slash commands', () => {
   const result = evaluateOperatorCommand('/x', makeDeps());
   assert.equal(result, 'unknown command: /x (use /?, /help, or /commands)');
 });
+
+test('does not emit noisy backend suggestions for distant unknown commands', () => {
+  const result = evaluateOperatorCommand('/beacon', makeDeps());
+  assert.equal(result, 'unknown command: /beacon (use /?, /help, or /commands)');
+});
