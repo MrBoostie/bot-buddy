@@ -397,6 +397,10 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   if (cmd.startsWith('/')) {
     const unknown = cmd.split(/\s+/, 1)[0] || cmd;
 
+    if (unknown !== cmd && unknown === OPERATOR_COMMANDS.metricsReset && !deps.allowMetricsReset()) {
+      return done('metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+    }
+
     if (unknown !== cmd && NO_ARG_OPERATOR_COMMANDS.has(unknown)) {
       return done(`${unknown.slice(1)}: invalid usage (use ${unknown})`);
     }

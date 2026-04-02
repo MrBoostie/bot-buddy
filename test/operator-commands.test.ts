@@ -1060,19 +1060,24 @@ test('returns explicit invalid-usage guidance for known no-arg commands with ext
     { input: '/diag now', expected: 'diag: invalid usage (use /diag)' },
     { input: '/health now', expected: 'health: invalid usage (use /health)' },
     { input: '/reload now', expected: 'reload: invalid usage (use /reload)' },
-    { input: '/metrics-reset now', expected: 'metrics-reset: invalid usage (use /metrics-reset)' },
+    { input: '/metrics-reset now', expected: 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)' },
     { input: '/ping\tnow', expected: 'ping: invalid usage (use /ping)' },
     { input: '/status\nnow', expected: 'status: invalid usage (use /status)' },
     { input: '/PING now', expected: 'ping: invalid usage (use /ping)' },
     { input: '/Status now', expected: 'status: invalid usage (use /status)' },
     { input: '/Reload now', expected: 'reload: invalid usage (use /reload)' },
-    { input: '/Metrics-Reset now', expected: 'metrics-reset: invalid usage (use /metrics-reset)' },
+    { input: '/Metrics-Reset now', expected: 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)' },
   ];
 
   for (const c of cases) {
     const result = evaluateOperatorCommand(c.input, makeDeps());
     assert.equal(result, c.expected);
   }
+});
+
+test('returns invalid usage for metrics-reset extra args when guard is on', () => {
+  const result = evaluateOperatorCommand('/metrics-reset now', makeDeps({ allowMetricsReset: () => true }));
+  assert.equal(result, 'metrics-reset: invalid usage (use /metrics-reset)');
 });
 
 test('does not suggest /? for short unknown slash commands', () => {
