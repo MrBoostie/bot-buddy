@@ -76,6 +76,11 @@ On Discord startup, the bot now logs resolved app version metadata (`value` + `s
 Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /?, /help, or /commands)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`). In operator mode, unknown slash commands are handled deterministically and do **not** route to LLM chat generation.
 Known no-arg operator commands now return explicit usage guidance when called with extra args (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.
 
+Operator command contract:
+
+- Slash commands are case-insensitive (`/PING`, `/Help`, `/AUDIT-TAIL` are normalized).
+- Whitespace separators are normalized for argument parsing (spaces, tabs, and newlines are treated consistently).
+
 Sample `/diag` output:
 
 ```text

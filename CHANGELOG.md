@@ -166,6 +166,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added a concise `/health` vs `/diag` “when to use which” note to README and pinned it in docs regression tests for operator guidance consistency.
 - Added a quick operator output-style map in README (`machine-grep-friendly` vs `human-triage-oriented` commands) and pinned it in docs regression tests.
 - Clarified README operator behavior that unknown slash commands are deterministic and never fall through to LLM chat generation; pinned via docs regression coverage.
+- Added an explicit operator command contract section to README (case-insensitive slash commands + normalized whitespace argument parsing) and pinned it via docs regression tests.
 - README operator docs now explicitly document `/diag` availability signals and include a degraded `diag: issues detected` sample with `hasDiscord`/`hasOpenAI` fields.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
