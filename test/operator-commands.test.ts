@@ -37,6 +37,7 @@ test('formatCommandListWithOr handles 0/1/2/n command lists (table-driven)', () 
     { input: ['/help'], expected: '/help' },
     { input: ['/help', '/commands'], expected: '/help or /commands' },
     { input: ['/?', '/help', '/commands'], expected: '/?, /help, or /commands' },
+    { input: ['/ping', '/status', '/diag', '/reload'], expected: '/ping, /status, /diag, or /reload' },
   ];
 
   for (const c of cases) {
