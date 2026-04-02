@@ -1039,7 +1039,16 @@ test('returns unknown command hint for unrecognized slash command with args', ()
 test('returns explicit invalid-usage guidance for known no-arg commands with extra args', () => {
   const cases: Array<{ input: string; expected: string }> = [
     { input: '/ping now', expected: 'ping: invalid usage (use /ping)' },
+    { input: '/up now', expected: 'up: invalid usage (use /up)' },
+    { input: '/uptime now', expected: 'uptime: invalid usage (use /uptime)' },
+    { input: '/version now', expected: 'version: invalid usage (use /version)' },
+    { input: '/id now', expected: 'id: invalid usage (use /id)' },
+    { input: '/model now', expected: 'model: invalid usage (use /model)' },
+    { input: '/backend now', expected: 'backend: invalid usage (use /backend)' },
     { input: '/status now', expected: 'status: invalid usage (use /status)' },
+    { input: '/runtime now', expected: 'runtime: invalid usage (use /runtime)' },
+    { input: '/diag now', expected: 'diag: invalid usage (use /diag)' },
+    { input: '/health now', expected: 'health: invalid usage (use /health)' },
     { input: '/reload now', expected: 'reload: invalid usage (use /reload)' },
     { input: '/metrics-reset now', expected: 'metrics-reset: invalid usage (use /metrics-reset)' },
     { input: '/ping\tnow', expected: 'ping: invalid usage (use /ping)' },
