@@ -1132,7 +1132,7 @@ test('returns explicit invalid-usage guidance for known no-arg commands with ext
 });
 
 test('returns invalid usage for metrics-reset extra args when guard is on', () => {
-  const cases = ['/metrics-reset now', '/metrics-reset\tnow', '/metrics-reset\nnow'];
+  const cases = ['/metrics-reset now', '/metrics-reset\tnow', '/metrics-reset\nnow', '/Metrics-Reset now'];
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps({ allowMetricsReset: () => true }));

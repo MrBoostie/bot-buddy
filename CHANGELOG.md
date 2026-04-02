@@ -128,6 +128,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added evaluator-level mixed-case `/audit-tail` routing regressions (enabled + disabled guard states) to pin parser/router case-normalization behavior.
 - Added evaluator-level mixed-case `/metrics-reset` guard-gated routing regressions (enabled + disabled states) to pin command normalization behavior.
 - De-duplicated operator test metrics-summary fixture text behind a shared constant to reduce assertion drift and maintenance noise.
+- Expanded enabled-guard `/metrics-reset` invalid-usage regressions to include mixed-case command token variants (e.g. `/Metrics-Reset now`).
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
