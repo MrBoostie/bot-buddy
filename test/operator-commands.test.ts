@@ -432,7 +432,7 @@ test('returns help payload across guard-state combinations (table-driven)', () =
   }
 });
 
-test('rejects invalid help usage with extra args (space/tab/newline separators)', () => {
+test('rejects invalid help usage with extra args (space/tab/newline + mixed-case)', () => {
   const inputs = [
     '/help now',
     '/commands now',
@@ -443,6 +443,8 @@ test('rejects invalid help usage with extra args (space/tab/newline separators)'
     '/help\nnow',
     '/commands\nnow',
     '/?\nnow',
+    '/Help now',
+    '/Commands now',
   ];
   const expected = 'help: invalid usage (use /?, /help, or /commands)';
 
