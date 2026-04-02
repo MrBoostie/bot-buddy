@@ -69,9 +69,9 @@ On Discord startup, the bot now logs resolved app version metadata (`value` + `s
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
 - `/metrics-reset` — reset in-memory metrics (disabled by default; enable with `ALLOW_METRICS_RESET=true`)
-  - Guard-first behavior: while disabled, arg-suffixed forms (e.g. `/metrics-reset now`) return the disabled response; once enabled, extra args return invalid usage.
+  - Guard-first behavior: while disabled, arg-suffixed forms (e.g. `/metrics-reset now`) return `metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)`; once enabled, extra args return invalid usage.
 - `/audit-tail` or `/audit-tail <1-20>` — show recent in-memory operator audit events (disabled by default; enable with `ALLOW_AUDIT_TAIL=true`; limit must be an unsigned integer; invalid extra args are rejected)
-  - Guard-first behavior: while disabled, malformed forms (e.g. `/audit-tail 21`, `/audit-tail 3 extra`) still return the disabled response; validation errors apply when enabled.
+  - Guard-first behavior: while disabled, malformed forms (e.g. `/audit-tail 21`, `/audit-tail 3 extra`) return `audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)`; validation errors apply when enabled.
 
 Unknown slash commands now return an explicit hint (`unknown command: /<name> (use /?, /help, or /commands)`) instead of falling through to LLM mode, with near-match suggestions for simple typos (e.g. `/hepl` -> `did you mean /help?`).
 Known no-arg operator commands now return explicit usage guidance when called with extra args (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.

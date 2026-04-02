@@ -137,6 +137,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added shared `HELP_ALIASES`/`HELP_ALIAS_SET` constants and refactored help alias checks (exact-match + arg-suffixed invalid usage + usage hint rendering) to one source of truth.
 - Added `formatCommandListWithOr()` helper for stable human-readable command-list formatting and covered 0/1/2/N list behavior with table-driven tests.
 - Expanded README docs regression coverage to pin operator help-invalid-usage and unknown-command hint wording (`use /?, /help, or /commands`) against runtime behavior.
+- Clarified README guard-first docs with exact disabled response strings for `/metrics-reset` and `/audit-tail`, and pinned those strings in README regression tests.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

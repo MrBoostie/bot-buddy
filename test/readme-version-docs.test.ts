@@ -15,8 +15,8 @@ test('README documents versioning and startup-log guidance (table-driven)', () =
     /On Discord startup, the bot now logs resolved app version metadata \(`value` \+ `source`\)/,
     /Command order is intentional: fast identity\/liveness\/diagnostics first, higher-impact guard-gated commands at the end\./,
     /Known no-arg operator commands now return explicit usage guidance when called with extra args \(e\.g\. `\/ping now` -> `ping: invalid usage \(use \/ping\)`\) instead of generic unknown-command fallback\./,
-    /Guard-first behavior: while disabled, arg-suffixed forms \(e\.g\. `\/metrics-reset now`\) return the disabled response; once enabled, extra args return invalid usage\./,
-    /Guard-first behavior: while disabled, malformed forms \(e\.g\. `\/audit-tail 21`, `\/audit-tail 3 extra`\) still return the disabled response; validation errors apply when enabled\./,
+    /Guard-first behavior: while disabled, arg-suffixed forms \(e\.g\. `\/metrics-reset now`\) return `metrics-reset: disabled \(set ALLOW_METRICS_RESET=true to enable\)`; once enabled, extra args return invalid usage\./,
+    /Guard-first behavior: while disabled, malformed forms \(e\.g\. `\/audit-tail 21`, `\/audit-tail 3 extra`\) return `audit-tail: disabled \(set ALLOW_AUDIT_TAIL=true to enable\)`; validation errors apply when enabled\./,
     /Extra args are rejected \(`\/help now` -> `help: invalid usage \(use \/\?, \/help, or \/commands\)`\) to keep operator command parsing predictable\./,
     /Unknown slash commands now return an explicit hint \(`unknown command: \/<name> \(use \/\?, \/help, or \/commands\)`\)/,
   ];
