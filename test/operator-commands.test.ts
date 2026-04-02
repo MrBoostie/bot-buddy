@@ -849,10 +849,35 @@ test('returns metrics-reset disabled payload when guard is off', () => {
   assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
 });
 
+test('treats mixed-case metrics-reset token as guard-gated command when disabled', () => {
+  const result = evaluateOperatorCommand('/METRICS-RESET', makeDeps());
+  assert.equal(result, 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)');
+});
+
 test('resets metrics when metrics-reset guard is on', () => {
   let resetCalls = 0;
   const result = evaluateOperatorCommand(
     '/metrics-reset',
+    makeDeps({
+      allowMetricsReset: () => true,
+      resetMetrics: () => {
+        resetCalls += 1;
+      },
+      metricsSummary: () => 'commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
+    }),
+  );
+
+  assert.equal(resetCalls, 1);
+  assert.equal(
+    result,
+    'metrics-reset: ok | commands=0,llmCalls=0,llmOk=0,llmErr=0,llmAvgMs=0,llmRecentMaxMs=0,llmLt250Ms=0,llm250To1000Ms=0,llmGt1000Ms=0,cmdAvgMs=0,cmdRecentMaxMs=0',
+  );
+});
+
+test('supports mixed-case metrics-reset token when guard is on', () => {
+  let resetCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/METRICS-RESET',
     makeDeps({
       allowMetricsReset: () => true,
       resetMetrics: () => {
