@@ -58,6 +58,17 @@ function auditTailLine(payload: string): string {
   return `audit-tail: ${payload}`;
 }
 
+test('line-format helpers produce canonical operator response prefixes', () => {
+  assert.equal(commandsLine('/help, /commands'), 'commands: /help, /commands');
+  assert.equal(unknownCommandLine('/mystery'), 'unknown command: /mystery (use /?, /help, or /commands)');
+  assert.equal(
+    unknownCommandWithSuggestion('/hepl', '/help'),
+    'unknown command: /hepl (use /?, /help, or /commands) | did you mean /help?',
+  );
+  assert.equal(noArgInvalidUsageLine('/ping'), 'ping: invalid usage (use /ping)');
+  assert.equal(auditTailLine('tail'), 'audit-tail: tail');
+});
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',

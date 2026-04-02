@@ -154,6 +154,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Centralized common `/audit-tail` success response fixtures (`audit-tail: tail`, `audit-tail: short tail`, sample entry payload) to reduce repeated literals in operator tests.
 - Added `noArgInvalidUsageLine()` helper for operator tests and switched no-arg invalid-usage cases to use it, reducing repeated `"<cmd>: invalid usage (use /<cmd>)"` literals.
 - Added `auditTailLine()` helper in operator tests and switched audit-tail success assertions to use it (`tail`, `short tail`, sample entry payload), reducing repeated response-wrapper literals.
+- Added a small regression test covering shared operator line-format helpers (`commandsLine`, unknown-command helpers, `noArgInvalidUsageLine`, `auditTailLine`) to pin canonical response-prefix formatting.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
