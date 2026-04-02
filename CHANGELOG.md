@@ -118,6 +118,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added regression coverage for metrics-reset invalid-usage audit mapping (`operator metrics reset denied (invalid usage)`).
 - Simplified help-arg detection to avoid per-call regex allocation and added regression coverage ensuring help-prefixed tokens (e.g. `/helping`) stay in unknown-command handling.
 - Expanded help-alias prefix regression coverage to include `/commandsx` and `/?x`, ensuring all help aliases avoid false invalid-usage classification.
+- Unknown-command suggestions no longer propose the `/?` alias, avoiding noisy outputs like `did you mean /??` for inputs such as `/?x`.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

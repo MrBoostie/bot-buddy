@@ -1091,8 +1091,12 @@ test('returns invalid usage for metrics-reset extra args when guard is on', () =
 });
 
 test('does not suggest /? for short unknown slash commands', () => {
-  const result = evaluateOperatorCommand('/x', makeDeps());
-  assert.equal(result, 'unknown command: /x (use /?, /help, or /commands)');
+  const inputs = ['/x', '/?x'];
+
+  for (const input of inputs) {
+    const result = evaluateOperatorCommand(input, makeDeps());
+    assert.equal(result, `unknown command: ${input} (use /?, /help, or /commands)`);
+  }
 });
 
 test('does not emit noisy suggestions for unrelated or broad unknown commands (table-driven)', () => {

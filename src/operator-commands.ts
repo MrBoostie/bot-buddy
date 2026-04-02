@@ -139,7 +139,7 @@ function unknownCommandSuggestion(
       continue;
     }
 
-    if (known === OPERATOR_COMMANDS.question && !command.startsWith(OPERATOR_COMMANDS.question)) {
+    if (known === OPERATOR_COMMANDS.question) {
       continue;
     }
 
