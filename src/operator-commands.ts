@@ -119,6 +119,20 @@ function helpEnableHint(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'a
   return ` | enable: ${envToggles.join(', ')}`;
 }
 
+function diagCoreFields(
+  deps: Pick<
+    OperatorCommandDeps,
+    'hasDiscord' | 'hasOpenAI' | 'llmBackend' | 'allowMetricsReset' | 'allowAuditTail'
+  >,
+): string {
+  const availability = `hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())}`;
+  const backendMode = `llmBackend=${deps.llmBackend()}`;
+  const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
+  const auditTail = `auditTailDefault=${AUDIT_TAIL_DEFAULT_LIMIT} | auditTailMax=${AUDIT_TAIL_MAX_LIMIT}`;
+  const replyPolicy = `operatorReplyMaxChars=${MAX_OPERATOR_REPLY_CHARS}`;
+  return `${availability} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy}`;
+}
+
 function damerauLevenshteinDistance(a: string, b: string): number {
   const rows = a.length + 1;
   const cols = b.length + 1;
@@ -327,17 +341,10 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     incrementCommandCount();
     const issues = deps.validateRuntime();
     const backend = deps.backendHealthSummary();
-    const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
-    const auditTail = `auditTailDefault=${AUDIT_TAIL_DEFAULT_LIMIT} | auditTailMax=${AUDIT_TAIL_MAX_LIMIT}`;
-    const replyPolicy = `operatorReplyMaxChars=${MAX_OPERATOR_REPLY_CHARS}`;
-    const backendMode = `llmBackend=${deps.llmBackend()}`;
+    const core = diagCoreFields(deps);
     return issues.length === 0
-      ? done(
-          `diag: ok | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
-        )
-      : done(
-          `diag: issues detected -> ${issues.join(' ; ')} | hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy} | lastBackendError=${backend}`,
-        );
+      ? done(`diag: ok | ${core} | lastBackendError=${backend}`)
+      : done(`diag: issues detected -> ${issues.join(' ; ')} | ${core} | lastBackendError=${backend}`);
   }
 
   if (cmd === OPERATOR_COMMANDS.health) {
