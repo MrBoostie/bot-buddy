@@ -28,6 +28,7 @@ const AUDIT_TAIL_INVALID_LIMIT_LINE = `audit-tail: invalid limit ${AUDIT_TAIL_US
 
 const METRICS_RESET_DISABLED_LINE = 'metrics-reset: disabled (set ALLOW_METRICS_RESET=true to enable)';
 const METRICS_RESET_INVALID_USAGE_LINE = 'metrics-reset: invalid usage (use /metrics-reset)';
+const AUDIT_TAIL_DISABLED_LINE = 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)';
 
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
 const HELP_INVALID_USAGE_LINE = `help: invalid usage ${UNKNOWN_COMMAND_USAGE_HINT}`;
@@ -994,7 +995,7 @@ test('supports mixed-case metrics-reset token when guard is on', () => {
 });
 test('returns audit-tail disabled payload when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail', makeDeps());
-  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+  assert.equal(result, AUDIT_TAIL_DISABLED_LINE);
 });
 
 test('returns audit tail when guard is on', () => {
@@ -1078,17 +1079,17 @@ test('supports mixed-case audit-tail command token in evaluator routing', () => 
 
 test('treats audit-tail with trailing tab as audit-tail command (not unknown command)', () => {
   const result = evaluateOperatorCommand('/audit-tail\t', makeDeps());
-  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+  assert.equal(result, AUDIT_TAIL_DISABLED_LINE);
 });
 
 test('treats mixed-case audit-tail token as guard-gated command when disabled', () => {
   const result = evaluateOperatorCommand('/AUDIT-TAIL 3', makeDeps());
-  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+  assert.equal(result, AUDIT_TAIL_DISABLED_LINE);
 });
 
 test('returns disabled for audit-tail with extra args when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail 3 extra', makeDeps());
-  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+  assert.equal(result, AUDIT_TAIL_DISABLED_LINE);
 });
 
 test('rejects extra audit-tail args when guard is on (space/tab/newline + mixed-case)', () => {
@@ -1107,7 +1108,7 @@ test('treats audit-tail-prefixed unknown commands as unknown command hints', () 
 
 test('returns disabled for invalid audit-tail limit when guard is off', () => {
   const result = evaluateOperatorCommand('/audit-tail 21', makeDeps());
-  assert.equal(result, 'audit-tail: disabled (set ALLOW_AUDIT_TAIL=true to enable)');
+  assert.equal(result, AUDIT_TAIL_DISABLED_LINE);
 });
 
 test('rejects invalid audit-tail limit when guard is on (space/tab/newline + mixed-case)', () => {

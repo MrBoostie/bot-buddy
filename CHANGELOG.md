@@ -149,6 +149,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Centralized help invalid-usage expected text in tests (`HELP_INVALID_USAGE_LINE`) and reused it across help-invalid/false-positive assertions to reduce wording drift.
 - Centralized `/audit-tail` invalid-usage and invalid-limit expected strings in operator tests to reduce repeated error-text literals.
 - Centralized `/metrics-reset` disabled and invalid-usage expected strings in operator tests to reduce repeated guard/error response literals.
+- Centralized `/audit-tail` disabled expected strings in operator tests to remove remaining repeated guard-denied response literals.
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.
