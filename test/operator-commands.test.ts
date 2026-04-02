@@ -45,6 +45,16 @@ test('formatCommandListWithOr handles 0/1/2/n command lists (table-driven)', () 
   }
 });
 
+test('formatCommandListWithOr does not mutate input arrays', () => {
+  const input = ['/?', '/help', '/commands'];
+  const snapshot = [...input];
+
+  const result = formatCommandListWithOr(input);
+
+  assert.equal(result, '/?, /help, or /commands');
+  assert.deepEqual(input, snapshot);
+});
+
 function backendModeToken(mode: 'openclaw' | 'openai'): string {
   return `llmBackend=${mode}`;
 }
