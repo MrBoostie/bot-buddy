@@ -61,6 +61,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ### Fixed
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
+- Help aliases with non-space argument separators (tab/newline), e.g. `/help\tnow` or `/?\nnow`, now correctly return `help: invalid usage ...` instead of falling into unknown-command handling.
 
 ### Internal
 - Refactored Discord operator command dependency wiring into `buildOperatorCommandDeps()` to reduce drift risk between backend mode and model label wiring.
@@ -99,6 +100,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added regression coverage ensuring `/audit-tail` with trailing tab is routed as audit-tail (disabled response) instead of unknown-command fallback.
 - Hoisted `/audit-tail` command-detection regex into a shared constant to avoid per-command regex allocation and reduce routing drift risk.
 - Expanded typo-suggestion regression coverage for transposition edits across key operator commands (`/reload`, `/commands`, `/health`).
+- Added `hasCommandArgs()` helper + regression coverage so help alias invalid-usage detection consistently handles whitespace separators (`space`, `tab`, `newline`).
 - Added a dedicated help-order regression test to pin canonical operator command discovery ordering and prevent accidental list drift.
 - Expanded help-order regression coverage to assert the same canonical ordering when guard-gated commands are enabled.
 - Expanded README docs regression coverage to pin the intentional help-ordering guidance line.

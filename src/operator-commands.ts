@@ -4,6 +4,11 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
+
+function hasCommandArgs(input: string, command: string): boolean {
+  const escapedCommand = command.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^${escapedCommand}\\s+`).test(input);
+}
 const OPERATOR_COMMANDS = {
   question: '/?',
   help: '/help',
@@ -269,9 +274,9 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   }
 
   if (
-    cmd.startsWith(`${OPERATOR_COMMANDS.question} `) ||
-    cmd.startsWith(`${OPERATOR_COMMANDS.help} `) ||
-    cmd.startsWith(`${OPERATOR_COMMANDS.commands} `)
+    hasCommandArgs(cmd, OPERATOR_COMMANDS.question) ||
+    hasCommandArgs(cmd, OPERATOR_COMMANDS.help) ||
+    hasCommandArgs(cmd, OPERATOR_COMMANDS.commands)
   ) {
     incrementCommandCount();
     return done(HELP_INVALID_USAGE);
