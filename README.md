@@ -59,6 +59,7 @@ Built-in operator commands (directed to bot):
 - `/up` or `/uptime` — compact uptime + model check without ping wording
 - `/version` — compact build/runtime identity (`version`, `node`, `model`)
   - `version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`
+- `/model` — quick model/backend identity (`model`, `backend`)
 
 On Discord startup, the bot now logs resolved app version metadata (`value` + `source`) to simplify deployment/debug verification.
 - `/status` — uptime + model + redacted runtime summary
