@@ -279,6 +279,22 @@ test('returns version payload across known/unknown appVersion states (table-driv
   }
 });
 
+test('returns id payload with combined runtime identity fields', () => {
+  const openclawResult = evaluateOperatorCommand('/id', makeDeps());
+  assert.equal(openclawResult, `id: version=0.1.0-test | model=gpt-test | backend=openclaw | node=${process.version}`);
+
+  const openaiResult = evaluateOperatorCommand(
+    '/id',
+    makeDeps({
+      appVersion: () => '2.0.1',
+      modelName: () => 'gpt-4o-mini',
+      llmBackend: () => 'openai',
+      runtimeSummary: () => 'bot=buddy | llmBackend=openai',
+    }),
+  );
+  assert.equal(openaiResult, `id: version=2.0.1 | model=gpt-4o-mini | backend=openai | node=${process.version}`);
+});
+
 test('returns model payload with current backend', () => {
   const openclawResult = evaluateOperatorCommand('/model', makeDeps());
   assert.equal(openclawResult, 'model=gpt-test | backend=openclaw');
@@ -310,7 +326,7 @@ test('returns model payload with current backend', () => {
 test('returns help payload with disabled guard markers for all help aliases (table-driven)', () => {
   const cases = ['/help', '/commands', '/?'];
   const expected =
-    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true';
+    'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset (disabled), /audit-tail [1-20] (disabled) | enable: ALLOW_METRICS_RESET=true, ALLOW_AUDIT_TAIL=true';
 
   for (const input of cases) {
     const result = evaluateOperatorCommand(input, makeDeps());
@@ -328,13 +344,13 @@ test('returns help payload across guard-state combinations (table-driven)', () =
       allowMetricsReset: true,
       allowAuditTail: true,
       expected:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20]',
     },
     {
       allowMetricsReset: true,
       allowAuditTail: false,
       expected:
-        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
+        'commands: /?, /help, /commands, /ping, /up, /uptime, /version, /id, /model, /backend, /status, /runtime, /diag, /health, /reload, /metrics-reset, /audit-tail [1-20] (disabled) | enable: ALLOW_AUDIT_TAIL=true',
     },
   ];
 

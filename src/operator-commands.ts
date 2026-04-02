@@ -11,6 +11,7 @@ const OPERATOR_COMMANDS = {
   up: '/up',
   uptime: '/uptime',
   version: '/version',
+  id: '/id',
   model: '/model',
   backend: '/backend',
   status: '/status',
@@ -34,6 +35,7 @@ function helpCommandSummary(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' 
     OPERATOR_COMMANDS.up,
     OPERATOR_COMMANDS.uptime,
     OPERATOR_COMMANDS.version,
+    OPERATOR_COMMANDS.id,
     OPERATOR_COMMANDS.model,
     OPERATOR_COMMANDS.backend,
     OPERATOR_COMMANDS.status,
@@ -208,6 +210,13 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
   if (cmd === OPERATOR_COMMANDS.version) {
     incrementCommandCount();
     return done(`version=${deps.appVersion()} | node=${process.version} | model=${deps.modelName()}`);
+  }
+
+  if (cmd === OPERATOR_COMMANDS.id) {
+    incrementCommandCount();
+    return done(
+      `id: version=${deps.appVersion()} | model=${deps.modelName()} | backend=${deps.llmBackend()} | node=${process.version}`,
+    );
   }
 
   if (cmd === OPERATOR_COMMANDS.model || cmd === OPERATOR_COMMANDS.backend) {

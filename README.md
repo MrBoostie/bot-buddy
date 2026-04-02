@@ -59,6 +59,7 @@ Built-in operator commands (directed to bot):
 - `/up` or `/uptime` — compact uptime + model check without ping wording
 - `/version` — compact build/runtime identity (`version`, `node`, `model`)
   - `version` resolves from `BOT_BUDDY_VERSION`, then `npm_package_version`, else `unknown`
+- `/id` — single-line identity snapshot (`version`, `model`, `backend`, `node`)
 - `/model` or `/backend` — quick model/backend identity (`model`, `backend`)
 - `/status` or `/runtime` — uptime + model + redacted runtime summary
 

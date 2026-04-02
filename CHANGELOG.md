@@ -42,6 +42,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Added `/model` operator command for quick model/backend identity checks.
   - Added `/backend` alias for `/model` to improve operator command ergonomics.
   - Added `/runtime` alias for `/status` to improve operator command ergonomics.
+  - Added `/id` operator command for a single-line runtime identity snapshot (`version`, `model`, `backend`, `node`).
   - `/version` now supports explicit version injection via `BOT_BUDDY_VERSION` (fallback chain: `BOT_BUDDY_VERSION` -> `npm_package_version` -> `unknown`).
   - Discord startup now logs resolved app version `value` + `source` for faster deployment verification and incident triage.
   - README now includes systemd/docker `BOT_BUDDY_VERSION` examples for deterministic `/version` and startup version logs across deploy targets.
