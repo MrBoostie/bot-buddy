@@ -54,6 +54,10 @@ function noArgInvalidUsageLine(command: string): string {
   return `${normalized}: invalid usage (use /${normalized})`;
 }
 
+function auditTailLine(payload: string): string {
+  return `audit-tail: ${payload}`;
+}
+
 function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommandDeps {
   return {
     formatUptime: () => '12s',
@@ -1015,7 +1019,7 @@ test('returns audit tail when guard is on', () => {
       getAuditTail: () => AUDIT_TAIL_SAMPLE_ENTRY,
     }),
   );
-  assert.equal(result, `audit-tail: ${AUDIT_TAIL_SAMPLE_ENTRY}`);
+  assert.equal(result, auditTailLine(AUDIT_TAIL_SAMPLE_ENTRY));
 });
 
 test('supports custom audit-tail limit in valid range', () => {
@@ -1032,7 +1036,7 @@ test('supports custom audit-tail limit in valid range', () => {
   );
 
   assert.equal(calledWith, 12);
-  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
+  assert.equal(result, auditTailLine('tail'));
 });
 
 test('supports extra whitespace around audit-tail limit', () => {
@@ -1049,7 +1053,7 @@ test('supports extra whitespace around audit-tail limit', () => {
   );
 
   assert.equal(calledWith, 3);
-  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
+  assert.equal(result, auditTailLine('tail'));
 });
 
 test('supports tab/newline whitespace for audit-tail command detection', () => {
@@ -1066,7 +1070,7 @@ test('supports tab/newline whitespace for audit-tail command detection', () => {
   );
 
   assert.equal(calledWith, 3);
-  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
+  assert.equal(result, auditTailLine('tail'));
 });
 
 test('supports mixed-case audit-tail command token in evaluator routing', () => {
@@ -1083,7 +1087,7 @@ test('supports mixed-case audit-tail command token in evaluator routing', () => 
   );
 
   assert.equal(calledWith, 3);
-  assert.equal(result, AUDIT_TAIL_TAIL_LINE);
+  assert.equal(result, auditTailLine('tail'));
 });
 
 test('treats audit-tail with trailing tab as audit-tail command (not unknown command)', () => {
@@ -1152,7 +1156,7 @@ test('does not truncate normal audit-tail response', () => {
     }),
   );
 
-  assert.equal(result, AUDIT_TAIL_SHORT_LINE);
+  assert.equal(result, auditTailLine('short tail'));
 });
 
 test('returns null for non-command input', () => {
