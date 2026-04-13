@@ -191,7 +191,7 @@ Then install service:
 
 ## CI
 
-GitHub Actions now runs `npm run check` + `npm test` on every push to `main` and on pull requests.
+GitHub Actions now runs `npm run verify` (typecheck + docs link checks + full tests) on every push to `main` and on pull requests.
 
 ## Release notes
 

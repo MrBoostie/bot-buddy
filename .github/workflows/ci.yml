@@ -41,14 +41,5 @@ jobs:
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'skip-changelog')
         run: echo "skip-changelog label present; changelog policy check bypassed for this PR"
 
-      - name: Type check
-        run: npm run check
-
-      - name: Docs link consistency check
-        run: npm run check:docs
-
-      - name: Test (changelog policy fixtures)
-        run: npm run test:changelog-policy
-
-      - name: Test (full suite)
-        run: npm test
+      - name: Verify (typecheck, docs links, tests)
+        run: npm run verify

@@ -72,6 +72,8 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
+- Added a canonical `npm run verify` script (`check` + `check:docs` + `test`) and switched CI to use it as the single validation entrypoint, reducing local/CI drift risk.
+- Added regression tests that pin both the `verify` script contract and CI workflow usage (`npm run verify`) to prevent validation pipeline drift.
 - Refactored Discord operator command dependency wiring into `buildOperatorCommandDeps()` to reduce drift risk between backend mode and model label wiring.
 - Added dedicated dependency-composition tests to verify openclaw/openai backend+model label consistency in Discord operator command wiring.
 - Added shared numeric parsing helper `parseUnsignedIntInRange` for consistent strict numeric command argument validation.

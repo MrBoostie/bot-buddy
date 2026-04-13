@@ -12,7 +12,8 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "node --import tsx --test test/**/*.test.ts",
     "test:changelog-policy": "node --import tsx --test test/changelog-policy-script.test.ts",
-    "check:docs": "bash scripts/check-doc-links.sh"
+    "check:docs": "bash scripts/check-doc-links.sh",
+    "verify": "npm run check && npm run check:docs && npm test"
   },
   "dependencies": {
     "discord.js": "^14.21.0",
