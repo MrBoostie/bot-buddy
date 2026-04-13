@@ -27,6 +27,7 @@ test('preflight script exits 0 for valid runtime env', () => {
 
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /preflight: ok/);
+  assert.match(result.stdout, /strictTools=false/);
 });
 
 test('preflight script exits non-zero and reports config issues', () => {
@@ -42,4 +43,22 @@ test('preflight script exits non-zero and reports config issues', () => {
   assert.match(result.stderr, /preflight: issues detected/);
   assert.match(result.stderr, /LLM_BACKEND must be "openclaw" or "openai"/);
   assert.match(result.stderr, /OPENCLAW_AGENT_ID cannot be empty/);
+});
+
+test('preflight strict tool checks fail when openclaw CLI is unavailable', () => {
+  const result = runPreflight({
+    PREFLIGHT_STRICT_TOOLS: 'true',
+    PREFLIGHT_OPENCLAW_COMMAND: '__definitely_missing_openclaw_binary__',
+    LLM_BACKEND: 'openclaw',
+    OPENCLAW_AGENT_ID: 'main',
+    OPENCLAW_TIMEOUT_SEC: '90',
+    OPERATOR_RELOAD_COOLDOWN_SEC: '30',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '0',
+  });
+
+  assert.notEqual(result.status, 0, 'expected non-zero exit when strict tool check fails');
+  assert.match(
+    result.stderr,
+    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but __definitely_missing_openclaw_binary__ CLI is unavailable in PATH/,
+  );
 });

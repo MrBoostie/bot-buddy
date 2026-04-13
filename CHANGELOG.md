@@ -25,6 +25,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ## Unreleased
 
 ### Added
+- `npm run preflight` now supports optional strict backend tooling checks via `PREFLIGHT_STRICT_TOOLS=true` (for example, verifies `openclaw` CLI availability when `LLM_BACKEND=openclaw`).
 - Added `npm run preflight` runtime env sanity check (`scripts/preflight-runtime.ts`) that reports startup-equivalent config validation issues and exits non-zero when invalid.
 - Operator command hardening + observability improvements:
   - `/audit-tail <1-20>` support with strict argument validation.
@@ -73,6 +74,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
+- Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including failure mode when required backend tooling is missing from PATH).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.
 - Split CI into dual validation tracks: `quick-verify` (`npm run verify:quick`) for faster early signal and `full-verify` (`npm run verify`) for full-suite gating.
 - Kept PR changelog policy enforcement in the quick CI track so behavior-visible policy failures surface early.

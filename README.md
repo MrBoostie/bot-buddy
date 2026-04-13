@@ -29,6 +29,8 @@ Talk in terminal. Type `exit` to quit.
 
 `npm run preflight` performs a runtime env sanity check (same validation rules as startup) and exits non-zero with actionable issues when config is invalid.
 
+Set `PREFLIGHT_STRICT_TOOLS=true` to additionally require backend tooling presence (for example `openclaw` CLI availability when `LLM_BACKEND=openclaw`).
+
 ## Tomorrow morning wiring
 
 Populate `.env`:
