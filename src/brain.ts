@@ -43,6 +43,31 @@ type ExecLikeError = {
   message?: string;
 };
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function isRetryableOpenClawExecError(error: unknown): boolean {
+  const err = (error ?? {}) as ExecLikeError;
+  const code = typeof err.code === 'number' ? String(err.code) : (err.code ?? '');
+  const message = err.message?.toLowerCase() ?? '';
+
+  if (code === 'ETIMEDOUT') return true;
+  if (['ECONNRESET', 'EPIPE', 'EAI_AGAIN', 'ENETUNREACH', 'ECONNREFUSED'].includes(code)) return true;
+  return message.includes('timed out') || message.includes('timeout');
+}
+
+export function computeOpenClawRetryDelayMs(
+  attempt: number,
+  baseDelayMs: number,
+  randomValue: number = Math.random(),
+): number {
+  const exponentialDelay = Math.max(0, baseDelayMs * 2 ** Math.max(0, attempt));
+  const jitterSpan = Math.round(exponentialDelay * 0.2);
+  const centered = Math.max(0, Math.min(1, randomValue)) * 2 - 1;
+  return Math.max(0, Math.round(exponentialDelay + centered * jitterSpan));
+}
+
 const fallbackReply = (input: string) =>
   `[local-mode] heard: ${input}\n\n(no OPENAI_API_KEY yet — wire creds tomorrow and I'll get smarter)`;
 
@@ -92,29 +117,38 @@ async function thinkWithOpenAI(input: string): Promise<string> {
 async function thinkWithOpenClaw(input: string): Promise<string> {
   const prompt = `${config.systemPrompt}\n\nUser: ${input}`;
 
-  let stdout: string;
+  let lastError: unknown;
 
-  try {
-    const result = await execFileAsync(
-      'openclaw',
-      [
-        'agent',
-        '--agent',
-        config.openclawAgentId,
-        '--message',
-        prompt,
-        '--json',
-        '--timeout',
-        String(config.openclawTimeoutSec),
-      ],
-      { timeout: config.openclawTimeoutSec * 1000 + 5000, maxBuffer: 1024 * 1024 * 8 },
-    );
-    stdout = result.stdout;
-  } catch (error) {
-    throw new Error(classifyOpenClawExecError(error));
+  for (let attempt = 0; attempt <= config.openclawRetryAttempts; attempt += 1) {
+    try {
+      const result = await execFileAsync(
+        'openclaw',
+        [
+          'agent',
+          '--agent',
+          config.openclawAgentId,
+          '--message',
+          prompt,
+          '--json',
+          '--timeout',
+          String(config.openclawTimeoutSec),
+        ],
+        { timeout: config.openclawTimeoutSec * 1000 + 5000, maxBuffer: 1024 * 1024 * 8 },
+      );
+      return parseOpenClawAgentOutput(result.stdout);
+    } catch (error) {
+      lastError = error;
+      const hasRemainingRetryBudget = attempt < config.openclawRetryAttempts;
+      if (!hasRemainingRetryBudget || !isRetryableOpenClawExecError(error)) {
+        break;
+      }
+
+      const retryDelayMs = computeOpenClawRetryDelayMs(attempt, config.openclawRetryBaseDelayMs);
+      await sleep(retryDelayMs);
+    }
   }
 
-  return parseOpenClawAgentOutput(stdout);
+  throw new Error(classifyOpenClawExecError(lastError));
 }
 
 export async function think(input: string): Promise<string> {

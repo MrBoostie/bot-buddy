@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyOpenClawExecError, parseOpenClawAgentOutput } from '../src/brain.ts';
+import {
+  classifyOpenClawExecError,
+  computeOpenClawRetryDelayMs,
+  isRetryableOpenClawExecError,
+  parseOpenClawAgentOutput,
+} from '../src/brain.ts';
 
 test('parses successful openclaw output with concatenated payload text', () => {
   const text = parseOpenClawAgentOutput(
@@ -65,4 +70,21 @@ test('classifies timeout exec failure', () => {
 test('classifies unknown exec failure with code when present', () => {
   const message = classifyOpenClawExecError({ code: 'EACCES' });
   assert.equal(message, 'openclaw agent execution failed (code=EACCES)');
+});
+
+test('retry classifier marks transient network/timeout failures as retryable', () => {
+  assert.equal(isRetryableOpenClawExecError({ code: 'ETIMEDOUT' }), true);
+  assert.equal(isRetryableOpenClawExecError({ code: 'ECONNRESET' }), true);
+  assert.equal(isRetryableOpenClawExecError({ message: 'request timeout reached' }), true);
+  assert.equal(isRetryableOpenClawExecError({ code: 'ENOENT' }), false);
+});
+
+test('retry delay calculator applies bounded jitter around exponential backoff', () => {
+  const attempt0Low = computeOpenClawRetryDelayMs(0, 200, 0);
+  const attempt0High = computeOpenClawRetryDelayMs(0, 200, 1);
+  const attempt1Mid = computeOpenClawRetryDelayMs(1, 200, 0.5);
+
+  assert.equal(attempt0Low, 160);
+  assert.equal(attempt0High, 240);
+  assert.equal(attempt1Mid, 400);
 });

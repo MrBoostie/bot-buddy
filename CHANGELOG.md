@@ -25,6 +25,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ## Unreleased
 
 ### Added
+- Added optional OpenClaw retry env controls: `OPENCLAW_RETRY_ATTEMPTS` and `OPENCLAW_RETRY_BASE_DELAY_MS`.
 - `npm run preflight` now supports optional strict backend tooling checks via `PREFLIGHT_STRICT_TOOLS=true` (for example, verifies `openclaw` CLI availability when `LLM_BACKEND=openclaw`).
 - Added `npm run preflight` runtime env sanity check (`scripts/preflight-runtime.ts`) that reports startup-equivalent config validation issues and exits non-zero when invalid.
 - Operator command hardening + observability improvements:
@@ -61,6 +62,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - `/audit-tail` command detection now accepts any whitespace separator (spaces, tabs, newlines), preserving parser behavior for non-space whitespace variants.
 
 ### Fixed
+- OpenClaw execution path now supports bounded retries with jitter for transient timeout/network failures, reducing one-off CLI flake impact.
 - OpenClaw backend reply parsing is now resilient to non-JSON stdout prelude lines (for example transient CLI notices before the final JSON payload), reducing false `invalid JSON output` failures.
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
@@ -74,6 +76,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
+- Added regression coverage for retryability classification and bounded-jitter delay calculations in OpenClaw backend logic.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.

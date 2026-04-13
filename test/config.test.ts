@@ -51,9 +51,11 @@ test('boolean parser supports yes/no style values', () => {
   assert.equal(cfg.metricsSnapshotIntervalSec, 60);
 });
 
-test('flags non-positive timeout, empty agent id, invalid reload cooldown, and invalid metrics snapshot interval', () => {
+test('flags invalid openclaw runtime bounds and operator intervals', () => {
   const cfg = buildConfigFromEnv({
     OPENCLAW_TIMEOUT_SEC: '0',
+    OPENCLAW_RETRY_ATTEMPTS: '-1',
+    OPENCLAW_RETRY_BASE_DELAY_MS: '0',
     OPENCLAW_AGENT_ID: '   ',
     OPERATOR_RELOAD_COOLDOWN_SEC: '0',
     METRICS_SNAPSHOT_INTERVAL_SEC: '-1',
@@ -61,6 +63,8 @@ test('flags non-positive timeout, empty agent id, invalid reload cooldown, and i
 
   const issues = validateConfig(cfg);
   assert.equal(issues.some((issue) => issue.includes('OPENCLAW_TIMEOUT_SEC')), true);
+  assert.equal(issues.some((issue) => issue.includes('OPENCLAW_RETRY_ATTEMPTS')), true);
+  assert.equal(issues.some((issue) => issue.includes('OPENCLAW_RETRY_BASE_DELAY_MS')), true);
   assert.equal(issues.some((issue) => issue.includes('OPENCLAW_AGENT_ID')), true);
   assert.equal(issues.some((issue) => issue.includes('OPERATOR_RELOAD_COOLDOWN_SEC')), true);
   assert.equal(issues.some((issue) => issue.includes('METRICS_SNAPSHOT_INTERVAL_SEC')), true);

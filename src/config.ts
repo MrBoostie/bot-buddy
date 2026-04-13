@@ -10,6 +10,8 @@ export type RuntimeConfig = {
   llmBackendValid: boolean;
   openclawAgentId: string;
   openclawTimeoutSec: number;
+  openclawRetryAttempts: number;
+  openclawRetryBaseDelayMs: number;
   openaiApiKey?: string;
   openaiModel: string;
   requireOpenAIForDiscord: boolean;
@@ -79,6 +81,8 @@ export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
     llmBackendValid: backend.llmBackendValid,
     openclawAgentId: env.OPENCLAW_AGENT_ID ?? 'main',
     openclawTimeoutSec: parsePositiveNumber(env.OPENCLAW_TIMEOUT_SEC, 90),
+    openclawRetryAttempts: parseNonNegativeNumber(env.OPENCLAW_RETRY_ATTEMPTS, 0),
+    openclawRetryBaseDelayMs: parsePositiveNumber(env.OPENCLAW_RETRY_BASE_DELAY_MS, 250),
     openaiApiKey: env.OPENAI_API_KEY,
     openaiModel: env.OPENAI_MODEL ?? 'gpt-4.1-mini',
     requireOpenAIForDiscord: parseBoolean(env.REQUIRE_OPENAI_FOR_DISCORD, true),
@@ -133,6 +137,18 @@ export function validateConfig(runtime: RuntimeConfig): string[] {
     issues.push('OPENCLAW_TIMEOUT_SEC must be a positive number.');
   }
 
+  if (
+    !Number.isFinite(runtime.openclawRetryAttempts) ||
+    runtime.openclawRetryAttempts < 0 ||
+    !Number.isInteger(runtime.openclawRetryAttempts)
+  ) {
+    issues.push('OPENCLAW_RETRY_ATTEMPTS must be a non-negative integer.');
+  }
+
+  if (!Number.isFinite(runtime.openclawRetryBaseDelayMs) || runtime.openclawRetryBaseDelayMs <= 0) {
+    issues.push('OPENCLAW_RETRY_BASE_DELAY_MS must be a positive number.');
+  }
+
   if (!Number.isFinite(runtime.operatorReloadCooldownSec) || runtime.operatorReloadCooldownSec <= 0) {
     issues.push('OPERATOR_RELOAD_COOLDOWN_SEC must be a positive number.');
   }
@@ -171,6 +187,8 @@ export function redactedRuntimeSummary(): string {
     `channelLock=${channelLock}`,
     `openclawAgent=${config.openclawAgentId}`,
     `openclawTimeoutSec=${config.openclawTimeoutSec}`,
+    `openclawRetryAttempts=${config.openclawRetryAttempts}`,
+    `openclawRetryBaseDelayMs=${config.openclawRetryBaseDelayMs}`,
     `operatorReloadCooldownSec=${config.operatorReloadCooldownSec}`,
     `allowMetricsReset=${String(config.allowMetricsReset)}`,
     `allowAuditTail=${String(config.allowAuditTail)}`,
