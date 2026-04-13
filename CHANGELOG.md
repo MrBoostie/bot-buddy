@@ -72,6 +72,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
 - `/diag` now includes OpenClaw retry policy fields (`openclawRetryAttempts`, `openclawRetryBaseDelayMs`) so operator checks can confirm runtime retry posture without running preflight.
 - README `/diag` docs/sample now include OpenClaw retry policy fields to match runtime output.
+- `/health` now includes `llmBackend` so machine-readable health checks can confirm active backend mode directly.
 - Help aliases with non-space argument separators (tab/newline), e.g. `/help\tnow` or `/?\nnow`, now correctly return `help: invalid usage ...` instead of falling into unknown-command handling.
 - Unknown-command fallback no longer emits self-suggestions when a known command is invoked with extra args (e.g. `/ping now` no longer says `did you mean /ping?`).
 - Known no-arg operator commands with extra args now return explicit invalid-usage guidance (e.g. `/ping now` -> `ping: invalid usage (use /ping)`) instead of generic unknown-command fallback.
@@ -90,6 +91,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded preflight regression coverage to pin retry-policy fields in successful preflight output (including non-default configured retry values).
 - Added regression coverage that pins `/diag` field ordering and payload expectations with OpenClaw retry policy fields included.
 - Updated README docs regression expectations to include `/diag` retry-policy fields and glossary entries.
+- Added regression coverage for `llmBackend` in `/health` payload expectations and README health docs contract.
 - Added direct `thinkWithOpenClaw` retry-loop regression coverage for transient-failure recovery, retry-budget exhaustion, non-retryable-failure short-circuit paths, and multi-retry exponential delay progression.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).

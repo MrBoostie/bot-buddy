@@ -367,6 +367,7 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
         `issues=${issues.length}`,
         `discord=${String(deps.hasDiscord())}`,
         `openai=${String(deps.hasOpenAI())}`,
+        `llmBackend=${deps.llmBackend()}`,
         `backend=${deps.backendHealthSummary()}`,
         `metrics=${deps.metricsSummary()}`,
       ].join(' | '),
