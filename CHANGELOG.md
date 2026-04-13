@@ -74,7 +74,8 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
-- Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including failure mode when required backend tooling is missing from PATH).
+- Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
+- Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.
 - Split CI into dual validation tracks: `quick-verify` (`npm run verify:quick`) for faster early signal and `full-verify` (`npm run verify`) for full-suite gating.
 - Kept PR changelog policy enforcement in the quick CI track so behavior-visible policy failures surface early.

@@ -7,7 +7,7 @@ function strictToolChecksEnabled(): boolean {
 }
 
 function commandExists(command: string): boolean {
-  const probe = spawnSync(command, ['--version'], { encoding: 'utf8' });
+  const probe = spawnSync('which', [command], { stdio: 'ignore' });
   return probe.status === 0;
 }
 
