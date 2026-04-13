@@ -65,7 +65,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - OpenClaw execution path now supports bounded retries with jitter for transient timeout/network failures, reducing one-off CLI flake impact.
 - Added safety bound on `OPENCLAW_RETRY_ATTEMPTS` (max `5`) to prevent misconfiguration from causing runaway retry latency.
 - Added safety bound on `OPENCLAW_RETRY_BASE_DELAY_MS` (max `5000`) to prevent excessive backoff delays from misconfiguration.
-- Added hard cap to computed retry backoff delay (10s before jitter) to prevent runaway exponential sleep durations.
+- Added hard cap to computed retry backoff delay (10s absolute, including jitter) to prevent runaway exponential sleep durations.
 - OpenClaw backend reply parsing is now resilient to non-JSON stdout prelude lines (for example transient CLI notices before the final JSON payload), reducing false `invalid JSON output` failures.
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.

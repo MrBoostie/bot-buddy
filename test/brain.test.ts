@@ -88,5 +88,5 @@ test('retry delay calculator applies bounded jitter around exponential backoff',
   assert.equal(attempt0Low, 160);
   assert.equal(attempt0High, 240);
   assert.equal(attempt1Mid, 400);
-  assert.equal(cappedHigh, 12000);
+  assert.equal(cappedHigh, 10000);
 });

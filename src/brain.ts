@@ -62,13 +62,11 @@ export function computeOpenClawRetryDelayMs(
   baseDelayMs: number,
   randomValue: number = Math.random(),
 ): number {
-  const exponentialDelay = Math.min(
-    10_000,
-    Math.max(0, baseDelayMs * 2 ** Math.max(0, attempt)),
-  );
+  const maxDelayMs = 10_000;
+  const exponentialDelay = Math.min(maxDelayMs, Math.max(0, baseDelayMs * 2 ** Math.max(0, attempt)));
   const jitterSpan = Math.round(exponentialDelay * 0.2);
   const centered = Math.max(0, Math.min(1, randomValue)) * 2 - 1;
-  return Math.max(0, Math.round(exponentialDelay + centered * jitterSpan));
+  return Math.min(maxDelayMs, Math.max(0, Math.round(exponentialDelay + centered * jitterSpan)));
 }
 
 const fallbackReply = (input: string) =>
