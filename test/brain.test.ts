@@ -163,3 +163,37 @@ test('thinkWithOpenClaw surfaces timeout error after retry budget is exhausted',
     config.openclawRetryBaseDelayMs = previous.openclawRetryBaseDelayMs;
   }
 });
+
+test('thinkWithOpenClaw does not retry non-retryable failures even when retry budget exists', async () => {
+  const previous = {
+    openclawRetryAttempts: config.openclawRetryAttempts,
+    openclawRetryBaseDelayMs: config.openclawRetryBaseDelayMs,
+  };
+  config.openclawRetryAttempts = 3;
+  config.openclawRetryBaseDelayMs = 100;
+
+  let calls = 0;
+  const sleepCalls: number[] = [];
+  try {
+    await assert.rejects(
+      () =>
+        thinkWithOpenClaw('hello', {
+          execFileAsync: async () => {
+            calls += 1;
+            throw { code: 'ENOENT', message: 'command not found' };
+          },
+          sleep: async (ms) => {
+            sleepCalls.push(ms);
+          },
+          random: () => 0.5,
+        }),
+      /openclaw CLI is not installed or not available in PATH/,
+    );
+
+    assert.equal(calls, 1);
+    assert.deepEqual(sleepCalls, []);
+  } finally {
+    config.openclawRetryAttempts = previous.openclawRetryAttempts;
+    config.openclawRetryBaseDelayMs = previous.openclawRetryBaseDelayMs;
+  }
+});
