@@ -22,3 +22,10 @@ test('ci workflow uses npm run verify', () => {
 
   assert.match(workflow, /run:\s*npm run verify/);
 });
+
+test('ci workflow cancels superseded runs on the same ref', () => {
+  const workflow = readFileSync(CI_WORKFLOW_PATH, 'utf8');
+
+  assert.match(workflow, /concurrency:\s*[\s\S]*cancel-in-progress:\s*true/);
+  assert.match(workflow, /group:\s*\$\{\{\s*github\.workflow\s*\}\}-\$\{\{\s*github\.ref\s*\}\}/);
+});
