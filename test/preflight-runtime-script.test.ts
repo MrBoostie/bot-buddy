@@ -86,3 +86,20 @@ test('preflight strict tool checks fail when openclaw CLI is unavailable', () =>
     /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but __definitely_missing_openclaw_binary__ CLI is unavailable in PATH/,
   );
 });
+
+test('preflight success output reflects configured retry policy values', () => {
+  const result = runPreflight({
+    LLM_BACKEND: 'openclaw',
+    OPENCLAW_AGENT_ID: 'main',
+    OPENCLAW_TIMEOUT_SEC: '90',
+    OPENCLAW_RETRY_ATTEMPTS: '3',
+    OPENCLAW_RETRY_BASE_DELAY_MS: '750',
+    OPERATOR_RELOAD_COOLDOWN_SEC: '30',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '0',
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /preflight: ok/);
+  assert.match(result.stdout, /retryAttempts=3/);
+  assert.match(result.stdout, /retryBaseDelayMs=750/);
+});
