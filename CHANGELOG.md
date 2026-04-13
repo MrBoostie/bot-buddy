@@ -79,6 +79,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ### Internal
 - Added regression coverage for retryability classification and bounded-jitter delay calculations in OpenClaw backend logic.
 - Added config validation coverage for out-of-range OpenClaw retry-attempt settings.
+- Expanded preflight script regression coverage to assert retry-bound validation errors surface with actionable messaging.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.

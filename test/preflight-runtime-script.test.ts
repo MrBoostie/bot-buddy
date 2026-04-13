@@ -35,6 +35,8 @@ test('preflight script exits non-zero and reports config issues', () => {
     LLM_BACKEND: 'wat',
     OPENCLAW_AGENT_ID: '   ',
     OPENCLAW_TIMEOUT_SEC: '0',
+    OPENCLAW_RETRY_ATTEMPTS: '6',
+    OPENCLAW_RETRY_BASE_DELAY_MS: '0',
     OPERATOR_RELOAD_COOLDOWN_SEC: '0',
     METRICS_SNAPSHOT_INTERVAL_SEC: '-1',
   });
@@ -43,6 +45,8 @@ test('preflight script exits non-zero and reports config issues', () => {
   assert.match(result.stderr, /preflight: issues detected/);
   assert.match(result.stderr, /LLM_BACKEND must be "openclaw" or "openai"/);
   assert.match(result.stderr, /OPENCLAW_AGENT_ID cannot be empty/);
+  assert.match(result.stderr, /OPENCLAW_RETRY_ATTEMPTS must be a non-negative integer <= 5/);
+  assert.match(result.stderr, /OPENCLAW_RETRY_BASE_DELAY_MS must be a positive number/);
 });
 
 test('preflight strict tool checks pass when required command is available', () => {
