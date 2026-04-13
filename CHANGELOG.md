@@ -66,6 +66,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added safety bound on `OPENCLAW_RETRY_ATTEMPTS` (max `5`) to prevent misconfiguration from causing runaway retry latency.
 - Added safety bound on `OPENCLAW_RETRY_BASE_DELAY_MS` (max `5000`) to prevent excessive backoff delays from misconfiguration.
 - Added hard cap to computed retry backoff delay (10s absolute, including jitter) to prevent runaway exponential sleep durations.
+- Preflight success output now surfaces OpenClaw retry policy values (`retryAttempts`, `retryBaseDelayMs`) for clearer runtime verification.
 - OpenClaw backend reply parsing is now resilient to non-JSON stdout prelude lines (for example transient CLI notices before the final JSON payload), reducing false `invalid JSON output` failures.
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
@@ -84,6 +85,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Expanded preflight script regression coverage to assert retry-bound validation errors surface with actionable messaging.
 - Added config + preflight regression coverage for out-of-range OpenClaw retry base-delay settings.
 - Expanded retry-delay regression coverage to pin capped exponential backoff behavior.
+- Expanded preflight regression coverage to pin retry-policy fields in successful preflight output.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.

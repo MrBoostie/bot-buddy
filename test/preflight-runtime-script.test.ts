@@ -27,6 +27,8 @@ test('preflight script exits 0 for valid runtime env', () => {
 
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /preflight: ok/);
+  assert.match(result.stdout, /retryAttempts=0/);
+  assert.match(result.stdout, /retryBaseDelayMs=250/);
   assert.match(result.stdout, /strictTools=false/);
 });
 
@@ -62,6 +64,8 @@ test('preflight strict tool checks pass when required command is available', () 
 
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /preflight: ok/);
+  assert.match(result.stdout, /retryAttempts=0/);
+  assert.match(result.stdout, /retryBaseDelayMs=250/);
   assert.match(result.stdout, /strictTools=true/);
 });
 

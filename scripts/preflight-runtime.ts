@@ -34,6 +34,8 @@ console.log(
     'preflight: ok',
     `backend=${runtime.llmBackend}`,
     `model=${runtimeModelLabel(runtime)}`,
+    `retryAttempts=${runtime.openclawRetryAttempts}`,
+    `retryBaseDelayMs=${runtime.openclawRetryBaseDelayMs}`,
     `discord=${runtime.discordToken ? 'enabled' : 'disabled'}`,
     `strictTools=${strictToolChecksEnabled()}`,
   ].join(' | '),
