@@ -94,6 +94,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added regression coverage for `llmBackend` in `/health` payload expectations and README health docs contract.
 - Added canonical `/health` field-ordering regression assertions to prevent accidental token reordering in machine-grep monitoring output.
 - Added `/health` regression assertions that pin the `discord` capability boolean alongside existing `openai` and `llmBackend` health signals.
+- Added a dedicated `/health` test case for `discord=false` to keep capability-signal behavior covered outside the default happy-path fixture.
 - Added direct `thinkWithOpenClaw` retry-loop regression coverage for transient-failure recovery, retry-budget exhaustion, non-retryable-failure short-circuit paths, and multi-retry exponential delay progression.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).

@@ -968,6 +968,20 @@ test('returns health payload in degraded state', () => {
   assertHealthFieldOrder(result);
 });
 
+test('returns health payload with discord=false capability signal', () => {
+  const result = evaluateOperatorCommand(
+    '/health',
+    makeDeps({
+      hasDiscord: () => false,
+    }),
+  );
+
+  assertHealthSignals(result, { runtime: 'ok', issues: 0, discord: false, openai: false, llmBackend: 'openclaw' });
+  assertHealthBackendSummary(result, 'none');
+  assertHealthMetricsSuffix(result, METRICS_SUMMARY_BASE);
+  assertHealthFieldOrder(result);
+});
+
 test('diag and health surface inconsistent openai capability signals', () => {
   const deps = makeDeps({
     llmBackend: () => 'openai',
