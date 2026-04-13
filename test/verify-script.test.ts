@@ -5,15 +5,21 @@ import { readFileSync } from 'node:fs';
 const PACKAGE_JSON_PATH = '/home/openclaw/.openclaw/workspace/bot-buddy/package.json';
 const CI_WORKFLOW_PATH = '/home/openclaw/.openclaw/workspace/bot-buddy/.github/workflows/ci.yml';
 
-test('verify script runs canonical local validation sequence', () => {
+test('verify scripts run canonical local validation sequences', () => {
   const packageJson = JSON.parse(readFileSync(PACKAGE_JSON_PATH, 'utf8')) as {
     scripts?: Record<string, string>;
   };
 
   assert.equal(
+    packageJson.scripts?.['verify:quick'],
+    'npm run check && npm run check:docs && npm run test:changelog-policy',
+    'verify:quick should run check + docs link check + changelog-policy fixtures',
+  );
+
+  assert.equal(
     packageJson.scripts?.verify,
     'npm run check && npm run check:docs && npm test',
-    'verify script should run check + docs link check + full tests',
+    'verify should run check + docs link check + full tests',
   );
 });
 

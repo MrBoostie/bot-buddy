@@ -13,6 +13,7 @@
     "test": "node --import tsx --test test/**/*.test.ts",
     "test:changelog-policy": "node --import tsx --test test/changelog-policy-script.test.ts",
     "check:docs": "bash scripts/check-doc-links.sh",
+    "verify:quick": "npm run check && npm run check:docs && npm run test:changelog-policy",
     "verify": "npm run check && npm run check:docs && npm test"
   },
   "dependencies": {
