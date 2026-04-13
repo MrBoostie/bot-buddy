@@ -21,10 +21,13 @@ npm install
 cp .env.example .env
 npm run check
 npm test
+npm run preflight
 npm run buddy
 ```
 
 Talk in terminal. Type `exit` to quit.
+
+`npm run preflight` performs a runtime env sanity check (same validation rules as startup) and exits non-zero with actionable issues when config is invalid.
 
 ## Tomorrow morning wiring
 
