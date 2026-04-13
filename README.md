@@ -191,7 +191,9 @@ Then install service:
 
 ## CI
 
-GitHub Actions now runs `npm run verify` (typecheck + docs link checks + full tests) on every push to `main` and on pull requests.
+GitHub Actions now runs two CI validation tracks on push/PR:
+- `npm run verify:quick` for fast feedback (typecheck + docs links + changelog-policy fixtures)
+- `npm run verify` for the full validation gate (typecheck + docs links + full tests)
 
 Local validation shortcuts:
 - `npm run verify:quick` -> typecheck + docs links + changelog policy fixtures (fast feedback loop)

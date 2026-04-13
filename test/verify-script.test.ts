@@ -23,9 +23,10 @@ test('verify scripts run canonical local validation sequences', () => {
   );
 });
 
-test('ci workflow uses npm run verify', () => {
+test('ci workflow runs both quick and full verify commands', () => {
   const workflow = readFileSync(CI_WORKFLOW_PATH, 'utf8');
 
+  assert.match(workflow, /run:\s*npm run verify:quick/);
   assert.match(workflow, /run:\s*npm run verify/);
 });
 

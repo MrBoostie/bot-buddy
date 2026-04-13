@@ -72,6 +72,9 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
 
 ### Internal
+- Split CI into dual validation tracks: `quick-verify` (`npm run verify:quick`) for faster early signal and `full-verify` (`npm run verify`) for full-suite gating.
+- Kept PR changelog policy enforcement in the quick CI track so behavior-visible policy failures surface early.
+- Added regression coverage that pins CI usage of both `npm run verify:quick` and `npm run verify`.
 - Added `npm run verify:quick` (typecheck + docs links + changelog-policy fixtures) to speed up local pre-push feedback while preserving `npm run verify` as the full CI-equivalent gate.
 - Added regression coverage that pins both `verify:quick` and `verify` script contracts to prevent validation command drift.
 - Added GitHub Actions CI concurrency cancellation (`group: ${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: true`) to automatically stop superseded runs on the same ref and reduce wasted CI minutes.
