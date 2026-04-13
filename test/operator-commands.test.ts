@@ -88,13 +88,13 @@ test('health assertion helpers enforce canonical signal formatting and reject ne
   const healthLine =
     'health | runtime=degraded | issues=2 | discord=true | openai=true | llmBackend=openai | backend=timeout | metrics=commands=9,llmCalls=9';
 
-  assertHealthSignals(healthLine, { runtime: 'degraded', issues: 2, openai: true, llmBackend: 'openai' });
+  assertHealthSignals(healthLine, { runtime: 'degraded', issues: 2, discord: true, openai: true, llmBackend: 'openai' });
   assertHealthBackendSummary(healthLine, 'timeout');
   assertHealthMetricsSuffix(healthLine, 'commands=9,llmCalls=9');
   assertHealthFieldOrder(healthLine);
 
   assertAssertionFailure(() =>
-    assertHealthSignals(healthLine, { runtime: 'ok', issues: 2, openai: true, llmBackend: 'openai' }),
+    assertHealthSignals(healthLine, { runtime: 'ok', issues: 2, discord: true, openai: true, llmBackend: 'openai' }),
   );
   assertAssertionFailure(() => assertHealthBackendSummary(healthLine, 'none'));
   assertAssertionFailure(() => assertHealthMetricsSuffix(healthLine, 'commands=9,llmCalls=8'));
@@ -221,12 +221,14 @@ function assertHealthSignals(
   options: {
     runtime: 'ok' | 'degraded';
     issues: number;
+    discord: boolean;
     openai: boolean;
     llmBackend: 'openclaw' | 'openai';
   },
 ): void {
   const target = text ?? '';
   assert.match(target, new RegExp(`^health \\| runtime=${options.runtime} \\| issues=${options.issues} \\|`));
+  assert.match(target, new RegExp(`\\| discord=${String(options.discord)} \\|`));
   assert.match(target, new RegExp(`\\| openai=${String(options.openai)} \\|`));
   assert.match(target, new RegExp(`\\| llmBackend=${options.llmBackend} \\|`));
 }
@@ -943,7 +945,7 @@ test('diag reflects hasOpenAI=true after reload switches backend to openai', () 
 
 test('returns health payload in ok state', () => {
   const result = evaluateOperatorCommand('/health', makeDeps());
-  assertHealthSignals(result, { runtime: 'ok', issues: 0, openai: false, llmBackend: 'openclaw' });
+  assertHealthSignals(result, { runtime: 'ok', issues: 0, discord: true, openai: false, llmBackend: 'openclaw' });
   assertHealthBackendSummary(result, 'none');
   assertHealthMetricsSuffix(result, METRICS_SUMMARY_BASE);
   assertHealthFieldOrder(result);
@@ -957,7 +959,7 @@ test('returns health payload in degraded state', () => {
       metricsSummary: () => 'commands=9,llmCalls=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1,cmdAvgMs=14,cmdRecentMaxMs=22',
     }),
   );
-  assertHealthSignals(result, { runtime: 'degraded', issues: 1, openai: false, llmBackend: 'openclaw' });
+  assertHealthSignals(result, { runtime: 'degraded', issues: 1, discord: true, openai: false, llmBackend: 'openclaw' });
   assertHealthBackendSummary(result, 'timeout @ 2026-03-31T00:40:00.000Z');
   assertHealthMetricsSuffix(
     result,
@@ -986,7 +988,7 @@ test('diag and health surface inconsistent openai capability signals', () => {
   });
   assertDiagPolicyTail(diag);
 
-  assertHealthSignals(health, { runtime: 'degraded', issues: 1, openai: false, llmBackend: 'openai' });
+  assertHealthSignals(health, { runtime: 'degraded', issues: 1, discord: true, openai: false, llmBackend: 'openai' });
 });
 
 test('health stays coherent across reload switch to openai', () => {
@@ -998,8 +1000,8 @@ test('health stays coherent across reload switch to openai', () => {
   evaluateOperatorCommand('/reload', deps);
   const after = evaluateOperatorCommand('/health', deps);
 
-  assertHealthSignals(before, { runtime: 'ok', issues: 0, openai: false, llmBackend: 'openclaw' });
-  assertHealthSignals(after, { runtime: 'degraded', issues: 1, openai: true, llmBackend: 'openai' });
+  assertHealthSignals(before, { runtime: 'ok', issues: 0, discord: true, openai: false, llmBackend: 'openclaw' });
+  assertHealthSignals(after, { runtime: 'degraded', issues: 1, discord: true, openai: true, llmBackend: 'openai' });
 });
 
 test('runs reload and returns success payload', () => {
