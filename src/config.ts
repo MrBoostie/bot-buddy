@@ -26,6 +26,7 @@ export type RuntimeConfig = {
 };
 
 const OPENCLAW_RETRY_ATTEMPTS_MAX = 5;
+const OPENCLAW_RETRY_BASE_DELAY_MS_MAX = 5_000;
 
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {
   if (!value) return fallback;
@@ -150,8 +151,14 @@ export function validateConfig(runtime: RuntimeConfig): string[] {
     );
   }
 
-  if (!Number.isFinite(runtime.openclawRetryBaseDelayMs) || runtime.openclawRetryBaseDelayMs <= 0) {
-    issues.push('OPENCLAW_RETRY_BASE_DELAY_MS must be a positive number.');
+  if (
+    !Number.isFinite(runtime.openclawRetryBaseDelayMs) ||
+    runtime.openclawRetryBaseDelayMs <= 0 ||
+    runtime.openclawRetryBaseDelayMs > OPENCLAW_RETRY_BASE_DELAY_MS_MAX
+  ) {
+    issues.push(
+      `OPENCLAW_RETRY_BASE_DELAY_MS must be a positive number <= ${OPENCLAW_RETRY_BASE_DELAY_MS_MAX}.`,
+    );
   }
 
   if (!Number.isFinite(runtime.operatorReloadCooldownSec) || runtime.operatorReloadCooldownSec <= 0) {

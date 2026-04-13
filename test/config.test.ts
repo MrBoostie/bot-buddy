@@ -80,6 +80,16 @@ test('flags excessive openclaw retry attempts above safety bound', () => {
   assert.equal(issues.some((issue) => issue.includes('<= 5')), true);
 });
 
+test('flags excessive openclaw retry base delay above safety bound', () => {
+  const cfg = buildConfigFromEnv({
+    OPENCLAW_RETRY_BASE_DELAY_MS: '5001',
+  });
+
+  const issues = validateConfig(cfg);
+  assert.equal(issues.some((issue) => issue.includes('OPENCLAW_RETRY_BASE_DELAY_MS')), true);
+  assert.equal(issues.some((issue) => issue.includes('<= 5000')), true);
+});
+
 test('runtimeModelLabel uses openclaw agent label in openclaw mode', () => {
   const cfg = buildConfigFromEnv({
     LLM_BACKEND: 'openclaw',

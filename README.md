@@ -39,7 +39,7 @@ Populate `.env`:
 - `OPENCLAW_AGENT_ID=main`
 - `OPENCLAW_TIMEOUT_SEC=90`
 - `OPENCLAW_RETRY_ATTEMPTS=0` (optional, non-negative integer, max `5`)
-- `OPENCLAW_RETRY_BASE_DELAY_MS=250` (optional, base backoff delay for retries)
+- `OPENCLAW_RETRY_BASE_DELAY_MS=250` (optional, base backoff delay for retries, max `5000`)
 - `DISCORD_TOKEN`
 - optional `DISCORD_CHANNEL_ID` lock
 
