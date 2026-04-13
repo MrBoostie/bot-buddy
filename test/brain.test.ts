@@ -5,7 +5,9 @@ import {
   computeOpenClawRetryDelayMs,
   isRetryableOpenClawExecError,
   parseOpenClawAgentOutput,
+  thinkWithOpenClaw,
 } from '../src/brain.ts';
+import { config } from '../src/config.ts';
 
 test('parses successful openclaw output with concatenated payload text', () => {
   const text = parseOpenClawAgentOutput(
@@ -89,4 +91,75 @@ test('retry delay calculator applies bounded jitter around exponential backoff',
   assert.equal(attempt0High, 240);
   assert.equal(attempt1Mid, 400);
   assert.equal(cappedHigh, 10000);
+});
+
+test('thinkWithOpenClaw retries transient failure and succeeds on subsequent attempt', async () => {
+  const previous = {
+    openclawRetryAttempts: config.openclawRetryAttempts,
+    openclawRetryBaseDelayMs: config.openclawRetryBaseDelayMs,
+  };
+  config.openclawRetryAttempts = 2;
+  config.openclawRetryBaseDelayMs = 100;
+
+  let calls = 0;
+  const sleepCalls: number[] = [];
+  try {
+    const result = await thinkWithOpenClaw('hello', {
+      execFileAsync: async () => {
+        calls += 1;
+        if (calls === 1) {
+          throw { code: 'ETIMEDOUT', message: 'process timed out' };
+        }
+        return {
+          stdout: JSON.stringify({ status: 'ok', result: { payloads: [{ text: 'recovered' }] } }),
+          stderr: '',
+        };
+      },
+      sleep: async (ms) => {
+        sleepCalls.push(ms);
+      },
+      random: () => 0.5,
+    });
+
+    assert.equal(result, 'recovered');
+    assert.equal(calls, 2);
+    assert.deepEqual(sleepCalls, [100]);
+  } finally {
+    config.openclawRetryAttempts = previous.openclawRetryAttempts;
+    config.openclawRetryBaseDelayMs = previous.openclawRetryBaseDelayMs;
+  }
+});
+
+test('thinkWithOpenClaw surfaces timeout error after retry budget is exhausted', async () => {
+  const previous = {
+    openclawRetryAttempts: config.openclawRetryAttempts,
+    openclawRetryBaseDelayMs: config.openclawRetryBaseDelayMs,
+  };
+  config.openclawRetryAttempts = 1;
+  config.openclawRetryBaseDelayMs = 100;
+
+  let calls = 0;
+  const sleepCalls: number[] = [];
+  try {
+    await assert.rejects(
+      () =>
+        thinkWithOpenClaw('hello', {
+          execFileAsync: async () => {
+            calls += 1;
+            throw { code: 'ETIMEDOUT', message: 'process timed out' };
+          },
+          sleep: async (ms) => {
+            sleepCalls.push(ms);
+          },
+          random: () => 0.5,
+        }),
+      /openclaw agent timed out after .*s/,
+    );
+
+    assert.equal(calls, 2);
+    assert.deepEqual(sleepCalls, [100]);
+  } finally {
+    config.openclawRetryAttempts = previous.openclawRetryAttempts;
+    config.openclawRetryBaseDelayMs = previous.openclawRetryBaseDelayMs;
+  }
 });

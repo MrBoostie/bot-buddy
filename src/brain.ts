@@ -6,6 +6,8 @@ import { clearBackendError, recordBackendError } from './brain-health.js';
 
 const execFileAsync = promisify(execFile);
 
+type ExecFileAsync = typeof execFileAsync;
+
 type OpenClawAgentResponse = {
   status?: string;
   result?: { payloads?: Array<{ text?: string | null }> };
@@ -115,14 +117,29 @@ async function thinkWithOpenAI(input: string): Promise<string> {
   return rsp.output_text?.trim() || '...thinking noises...';
 }
 
-async function thinkWithOpenClaw(input: string): Promise<string> {
+export type OpenClawRuntimeDeps = {
+  execFileAsync: ExecFileAsync;
+  sleep: (ms: number) => Promise<void>;
+  random: () => number;
+};
+
+const defaultOpenClawRuntimeDeps: OpenClawRuntimeDeps = {
+  execFileAsync,
+  sleep,
+  random: () => Math.random(),
+};
+
+export async function thinkWithOpenClaw(
+  input: string,
+  deps: OpenClawRuntimeDeps = defaultOpenClawRuntimeDeps,
+): Promise<string> {
   const prompt = `${config.systemPrompt}\n\nUser: ${input}`;
 
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= config.openclawRetryAttempts; attempt += 1) {
     try {
-      const result = await execFileAsync(
+      const result = await deps.execFileAsync(
         'openclaw',
         [
           'agent',
@@ -144,8 +161,12 @@ async function thinkWithOpenClaw(input: string): Promise<string> {
         break;
       }
 
-      const retryDelayMs = computeOpenClawRetryDelayMs(attempt, config.openclawRetryBaseDelayMs);
-      await sleep(retryDelayMs);
+      const retryDelayMs = computeOpenClawRetryDelayMs(
+        attempt,
+        config.openclawRetryBaseDelayMs,
+        deps.random(),
+      );
+      await deps.sleep(retryDelayMs);
     }
   }
 
