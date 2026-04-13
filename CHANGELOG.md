@@ -92,6 +92,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added regression coverage that pins `/diag` field ordering and payload expectations with OpenClaw retry policy fields included.
 - Updated README docs regression expectations to include `/diag` retry-policy fields and glossary entries.
 - Added regression coverage for `llmBackend` in `/health` payload expectations and README health docs contract.
+- Added canonical `/health` field-ordering regression assertions to prevent accidental token reordering in machine-grep monitoring output.
 - Added direct `thinkWithOpenClaw` retry-loop regression coverage for transient-failure recovery, retry-budget exhaustion, non-retryable-failure short-circuit paths, and multi-retry exponential delay progression.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).

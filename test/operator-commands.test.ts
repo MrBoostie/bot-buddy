@@ -86,17 +86,23 @@ test('reload assertion helpers enforce canonical reload response lines', () => {
 
 test('health assertion helpers enforce canonical signal formatting and reject near-misses', () => {
   const healthLine =
-    'health | runtime=degraded | issues=2 | openai=true | llmBackend=openai | backend=timeout | metrics=commands=9,llmCalls=9';
+    'health | runtime=degraded | issues=2 | discord=true | openai=true | llmBackend=openai | backend=timeout | metrics=commands=9,llmCalls=9';
 
   assertHealthSignals(healthLine, { runtime: 'degraded', issues: 2, openai: true, llmBackend: 'openai' });
   assertHealthBackendSummary(healthLine, 'timeout');
   assertHealthMetricsSuffix(healthLine, 'commands=9,llmCalls=9');
+  assertHealthFieldOrder(healthLine);
 
   assertAssertionFailure(() =>
     assertHealthSignals(healthLine, { runtime: 'ok', issues: 2, openai: true, llmBackend: 'openai' }),
   );
   assertAssertionFailure(() => assertHealthBackendSummary(healthLine, 'none'));
   assertAssertionFailure(() => assertHealthMetricsSuffix(healthLine, 'commands=9,llmCalls=8'));
+  assertAssertionFailure(() =>
+    assertHealthFieldOrder(
+      'health | runtime=degraded | issues=2 | openai=true | discord=true | llmBackend=openai | backend=timeout | metrics=commands=9,llmCalls=9',
+    ),
+  );
 });
 
 test('diag assertion helpers enforce canonical formatting and reject near-misses', () => {
@@ -233,6 +239,19 @@ function assertHealthBackendSummary(text: string | null, backendSummary: string)
 function assertHealthMetricsSuffix(text: string | null, metrics: string): void {
   const target = text ?? '';
   assert.match(target, new RegExp(`\\| metrics=${metrics}$`));
+}
+
+function assertHealthFieldOrder(text: string | null): void {
+  const target = text ?? '';
+  const fragments = ['| runtime=', '| issues=', '| discord=', '| openai=', '| llmBackend=', '| backend=', '| metrics='];
+
+  let cursor = -1;
+  for (const fragment of fragments) {
+    const index = target.indexOf(fragment);
+    assert.ok(index >= 0, `missing health fragment: ${fragment}`);
+    assert.ok(index > cursor, `out-of-order health fragment: ${fragment}`);
+    cursor = index;
+  }
 }
 
 function escapeForRegExp(value: string): string {
@@ -927,6 +946,7 @@ test('returns health payload in ok state', () => {
   assertHealthSignals(result, { runtime: 'ok', issues: 0, openai: false, llmBackend: 'openclaw' });
   assertHealthBackendSummary(result, 'none');
   assertHealthMetricsSuffix(result, METRICS_SUMMARY_BASE);
+  assertHealthFieldOrder(result);
 });
 test('returns health payload in degraded state', () => {
   const result = evaluateOperatorCommand(
@@ -943,6 +963,7 @@ test('returns health payload in degraded state', () => {
     result,
     'commands=9,llmCalls=9,llmOk=7,llmErr=2,llmAvgMs=423,llmRecentMaxMs=1100,llmLt250Ms=2,llm250To1000Ms=6,llmGt1000Ms=1,cmdAvgMs=14,cmdRecentMaxMs=22',
   );
+  assertHealthFieldOrder(result);
 });
 
 test('diag and health surface inconsistent openai capability signals', () => {
