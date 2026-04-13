@@ -59,6 +59,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - `/audit-tail` command detection now accepts any whitespace separator (spaces, tabs, newlines), preserving parser behavior for non-space whitespace variants.
 
 ### Fixed
+- OpenClaw backend reply parsing is now resilient to non-JSON stdout prelude lines (for example transient CLI notices before the final JSON payload), reducing false `invalid JSON output` failures.
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
 - Help aliases with non-space argument separators (tab/newline), e.g. `/help\tnow` or `/?\nnow`, now correctly return `help: invalid usage ...` instead of falling into unknown-command handling.

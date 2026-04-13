@@ -11,6 +11,33 @@ type OpenClawAgentResponse = {
   result?: { payloads?: Array<{ text?: string | null }> };
 };
 
+function parseJsonCandidate(candidate: string): OpenClawAgentResponse | null {
+  try {
+    return JSON.parse(candidate) as OpenClawAgentResponse;
+  } catch {
+    return null;
+  }
+}
+
+function parseOpenClawStdout(stdout: string): OpenClawAgentResponse {
+  const direct = parseJsonCandidate(stdout);
+  if (direct) return direct;
+
+  const lines = stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    const parsed = parseJsonCandidate(lines[index] ?? '');
+    if (parsed) {
+      return parsed;
+    }
+  }
+
+  throw new Error('openclaw agent returned invalid JSON output');
+}
+
 type ExecLikeError = {
   code?: string | number;
   message?: string;
@@ -20,13 +47,7 @@ const fallbackReply = (input: string) =>
   `[local-mode] heard: ${input}\n\n(no OPENAI_API_KEY yet — wire creds tomorrow and I'll get smarter)`;
 
 export function parseOpenClawAgentOutput(stdout: string): string {
-  let parsed: OpenClawAgentResponse;
-
-  try {
-    parsed = JSON.parse(stdout) as OpenClawAgentResponse;
-  } catch {
-    throw new Error('openclaw agent returned invalid JSON output');
-  }
+  const parsed = parseOpenClawStdout(stdout);
 
   if (parsed.status !== 'ok') {
     throw new Error(`openclaw agent failed with status=${parsed.status ?? 'unknown'}`);

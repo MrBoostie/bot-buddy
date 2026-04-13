@@ -31,6 +31,20 @@ test('throws on non-ok status', () => {
   );
 });
 
+test('parses json payload when stdout includes leading non-json log lines', () => {
+  const text = parseOpenClawAgentOutput(
+    [
+      'warning: transient CLI notice',
+      JSON.stringify({
+        status: 'ok',
+        result: { payloads: [{ text: 'hello from json line' }] },
+      }),
+    ].join('\n'),
+  );
+
+  assert.equal(text, 'hello from json line');
+});
+
 test('throws clear error on malformed JSON', () => {
   assert.throws(
     () => parseOpenClawAgentOutput('{not-json'),
