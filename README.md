@@ -137,6 +137,13 @@ When to use which:
 - Use `/health` for quick one-line status checks and machine-friendly monitoring/grep pipelines.
 - Use `/diag` for deeper operator triage (capabilities, guard flags, policy limits, and backend error context).
 
+Quick `/health` interpretation guide:
+
+- `discord=true | openai=false | llmBackend=openclaw` — Discord bot is ready and using OpenClaw backend mode.
+- `discord=true | openai=true | llmBackend=openai` — Discord bot is ready and OpenAI backend credentials are available.
+- `discord=true | openai=false | llmBackend=openai` — backend mode is OpenAI but key/capability is missing; expect `runtime=degraded` and check `/diag` for issue details.
+- `discord=false` — Discord capability is not active in current runtime config/env (for example missing token or local non-Discord run mode).
+
 Operator command output style (quick map):
 
 - Machine-grep-friendly: `/health`, `/status`, `/runtime`, `/ping`, `/uptime`, `/up`, `/version`, `/id`, `/model`, `/backend`
