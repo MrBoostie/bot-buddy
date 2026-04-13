@@ -73,7 +73,7 @@ Built-in operator commands (directed to bot):
 - `/status` or `/runtime` — uptime + model + redacted runtime summary
 
 On Discord startup, the bot now logs resolved app version metadata (`value` + `source`) to simplify deployment/debug verification.
-- `/diag` — quick configuration health report + availability signals (`hasDiscord`/`hasOpenAI`) + guard/policy snapshot + last backend error
+- `/diag` — quick configuration health report + availability signals (`hasDiscord`/`hasOpenAI`) + guard/policy snapshot (including OpenClaw retry policy) + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
   - Safe hot-refresh contract: applies environment changes in-process, never restarts the bot process, and is cooldown-limited (`reload: rate-limited | retryAfterSec=<n>`).
@@ -103,8 +103,8 @@ Operator command contract:
 Sample `/diag` output:
 
 ```text
-diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
-diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=true | hasOpenAI=false | llmBackend=openai | allowMetricsReset=false | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
+diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=false | openclawRetryAttempts=0 | openclawRetryBaseDelayMs=250 | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
+diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=true | hasOpenAI=false | llmBackend=openai | allowMetricsReset=false | allowAuditTail=false | openclawRetryAttempts=0 | openclawRetryBaseDelayMs=250 | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none
 ```
 
 `/diag` field glossary (quick operator reference):
@@ -112,6 +112,7 @@ diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=true | hasOpenAI=fa
 - `hasDiscord` / `hasOpenAI` — runtime capability checks for configured integrations.
 - `llmBackend` — active backend mode (`openclaw` or `openai`).
 - `allowMetricsReset` / `allowAuditTail` — guard toggles for sensitive operator commands.
+- `openclawRetryAttempts` / `openclawRetryBaseDelayMs` — active OpenClaw retry policy values.
 - `auditTailDefault` / `auditTailMax` — configured audit-tail limit policy.
 - `operatorReplyMaxChars` — max operator response length before truncation safety applies.
 - `lastBackendError` — latest backend health summary string (`none` when healthy).
