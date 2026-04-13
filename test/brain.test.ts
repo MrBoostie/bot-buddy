@@ -197,3 +197,40 @@ test('thinkWithOpenClaw does not retry non-retryable failures even when retry bu
     config.openclawRetryBaseDelayMs = previous.openclawRetryBaseDelayMs;
   }
 });
+
+test('thinkWithOpenClaw applies exponential retry delays across multiple transient failures', async () => {
+  const previous = {
+    openclawRetryAttempts: config.openclawRetryAttempts,
+    openclawRetryBaseDelayMs: config.openclawRetryBaseDelayMs,
+  };
+  config.openclawRetryAttempts = 3;
+  config.openclawRetryBaseDelayMs = 100;
+
+  let calls = 0;
+  const sleepCalls: number[] = [];
+  try {
+    const result = await thinkWithOpenClaw('hello', {
+      execFileAsync: async () => {
+        calls += 1;
+        if (calls <= 3) {
+          throw { code: 'ETIMEDOUT', message: 'process timed out' };
+        }
+        return {
+          stdout: JSON.stringify({ status: 'ok', result: { payloads: [{ text: 'eventual success' }] } }),
+          stderr: '',
+        };
+      },
+      sleep: async (ms) => {
+        sleepCalls.push(ms);
+      },
+      random: () => 0.5,
+    });
+
+    assert.equal(result, 'eventual success');
+    assert.equal(calls, 4);
+    assert.deepEqual(sleepCalls, [100, 200, 400]);
+  } finally {
+    config.openclawRetryAttempts = previous.openclawRetryAttempts;
+    config.openclawRetryBaseDelayMs = previous.openclawRetryBaseDelayMs;
+  }
+});

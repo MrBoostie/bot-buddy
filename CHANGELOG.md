@@ -86,7 +86,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - Added config + preflight regression coverage for out-of-range OpenClaw retry base-delay settings.
 - Expanded retry-delay regression coverage to pin capped exponential backoff behavior.
 - Expanded preflight regression coverage to pin retry-policy fields in successful preflight output (including non-default configured retry values).
-- Added direct `thinkWithOpenClaw` retry-loop regression coverage for transient-failure recovery, retry-budget exhaustion, and non-retryable-failure short-circuit paths.
+- Added direct `thinkWithOpenClaw` retry-loop regression coverage for transient-failure recovery, retry-budget exhaustion, non-retryable-failure short-circuit paths, and multi-retry exponential delay progression.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.
