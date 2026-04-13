@@ -70,6 +70,16 @@ test('flags invalid openclaw runtime bounds and operator intervals', () => {
   assert.equal(issues.some((issue) => issue.includes('METRICS_SNAPSHOT_INTERVAL_SEC')), true);
 });
 
+test('flags excessive openclaw retry attempts above safety bound', () => {
+  const cfg = buildConfigFromEnv({
+    OPENCLAW_RETRY_ATTEMPTS: '6',
+  });
+
+  const issues = validateConfig(cfg);
+  assert.equal(issues.some((issue) => issue.includes('OPENCLAW_RETRY_ATTEMPTS')), true);
+  assert.equal(issues.some((issue) => issue.includes('<= 5')), true);
+});
+
 test('runtimeModelLabel uses openclaw agent label in openclaw mode', () => {
   const cfg = buildConfigFromEnv({
     LLM_BACKEND: 'openclaw',

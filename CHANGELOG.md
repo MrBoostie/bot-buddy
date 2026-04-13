@@ -63,6 +63,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 
 ### Fixed
 - OpenClaw execution path now supports bounded retries with jitter for transient timeout/network failures, reducing one-off CLI flake impact.
+- Added safety bound on `OPENCLAW_RETRY_ATTEMPTS` (max `5`) to prevent misconfiguration from causing runaway retry latency.
 - OpenClaw backend reply parsing is now resilient to non-JSON stdout prelude lines (for example transient CLI notices before the final JSON payload), reducing false `invalid JSON output` failures.
 - `/ping` and `/status` now report the active backend label correctly in Discord operator mode (`openclaw:<agent>` when `LLM_BACKEND=openclaw`, OpenAI model name when `LLM_BACKEND=openai`).
 - `/diag` now reports the active backend mode explicitly (`llmBackend=openclaw|openai`) to reduce operator confusion during mixed environment debugging.
@@ -77,6 +78,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 
 ### Internal
 - Added regression coverage for retryability classification and bounded-jitter delay calculations in OpenClaw backend logic.
+- Added config validation coverage for out-of-range OpenClaw retry-attempt settings.
 - Hardened strict preflight backend-tool detection to use PATH lookup semantics (`which`) instead of assuming `--version` support for required commands.
 - Expanded `preflight` script regression coverage to pin strict-tool-check behavior (including success/failure modes for required backend tooling checks).
 - Added regression coverage for the `preflight` script success/failure paths to keep runtime-env validation output and exit behavior stable.

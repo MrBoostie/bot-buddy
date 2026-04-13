@@ -38,7 +38,7 @@ Populate `.env`:
 - `LLM_BACKEND=openclaw` (default, uses same OpenClaw auth path as Boostie)
 - `OPENCLAW_AGENT_ID=main`
 - `OPENCLAW_TIMEOUT_SEC=90`
-- `OPENCLAW_RETRY_ATTEMPTS=0` (optional, non-negative integer)
+- `OPENCLAW_RETRY_ATTEMPTS=0` (optional, non-negative integer, max `5`)
 - `OPENCLAW_RETRY_BASE_DELAY_MS=250` (optional, base backoff delay for retries)
 - `DISCORD_TOKEN`
 - optional `DISCORD_CHANNEL_ID` lock

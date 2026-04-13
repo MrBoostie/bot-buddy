@@ -25,6 +25,8 @@ export type RuntimeConfig = {
   discordChannelId?: string;
 };
 
+const OPENCLAW_RETRY_ATTEMPTS_MAX = 5;
+
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {
   if (!value) return fallback;
   const normalized = value.trim().toLowerCase();
@@ -140,9 +142,12 @@ export function validateConfig(runtime: RuntimeConfig): string[] {
   if (
     !Number.isFinite(runtime.openclawRetryAttempts) ||
     runtime.openclawRetryAttempts < 0 ||
-    !Number.isInteger(runtime.openclawRetryAttempts)
+    !Number.isInteger(runtime.openclawRetryAttempts) ||
+    runtime.openclawRetryAttempts > OPENCLAW_RETRY_ATTEMPTS_MAX
   ) {
-    issues.push('OPENCLAW_RETRY_ATTEMPTS must be a non-negative integer.');
+    issues.push(
+      `OPENCLAW_RETRY_ATTEMPTS must be a non-negative integer <= ${OPENCLAW_RETRY_ATTEMPTS_MAX}.`,
+    );
   }
 
   if (!Number.isFinite(runtime.openclawRetryBaseDelayMs) || runtime.openclawRetryBaseDelayMs <= 0) {
