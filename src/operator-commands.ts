@@ -122,15 +122,22 @@ function helpEnableHint(deps: Pick<OperatorCommandDeps, 'allowMetricsReset' | 'a
 function diagCoreFields(
   deps: Pick<
     OperatorCommandDeps,
-    'hasDiscord' | 'hasOpenAI' | 'llmBackend' | 'allowMetricsReset' | 'allowAuditTail'
+    | 'hasDiscord'
+    | 'hasOpenAI'
+    | 'llmBackend'
+    | 'allowMetricsReset'
+    | 'allowAuditTail'
+    | 'openclawRetryAttempts'
+    | 'openclawRetryBaseDelayMs'
   >,
 ): string {
   const availability = `hasDiscord=${String(deps.hasDiscord())} | hasOpenAI=${String(deps.hasOpenAI())}`;
   const backendMode = `llmBackend=${deps.llmBackend()}`;
   const guards = `allowMetricsReset=${String(deps.allowMetricsReset())} | allowAuditTail=${String(deps.allowAuditTail())}`;
+  const retryPolicy = `openclawRetryAttempts=${deps.openclawRetryAttempts()} | openclawRetryBaseDelayMs=${deps.openclawRetryBaseDelayMs()}`;
   const auditTail = `auditTailDefault=${AUDIT_TAIL_DEFAULT_LIMIT} | auditTailMax=${AUDIT_TAIL_MAX_LIMIT}`;
   const replyPolicy = `operatorReplyMaxChars=${MAX_OPERATOR_REPLY_CHARS}`;
-  return `${availability} | ${backendMode} | ${guards} | ${auditTail} | ${replyPolicy}`;
+  return `${availability} | ${backendMode} | ${guards} | ${retryPolicy} | ${auditTail} | ${replyPolicy}`;
 }
 
 function damerauLevenshteinDistance(a: string, b: string): number {
@@ -281,6 +288,8 @@ export type OperatorCommandDeps = {
   allowMetricsReset: () => boolean;
   resetMetrics: () => void;
   allowAuditTail: () => boolean;
+  openclawRetryAttempts: () => number;
+  openclawRetryBaseDelayMs: () => number;
   getAuditTail: (limit?: number) => string;
 };
 

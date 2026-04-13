@@ -99,7 +99,7 @@ test('health assertion helpers enforce canonical signal formatting and reject ne
 
 test('diag assertion helpers enforce canonical formatting and reject near-misses', () => {
   const diagOkLine =
-    'diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=true | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none';
+    'diag: ok | hasDiscord=true | hasOpenAI=false | llmBackend=openclaw | allowMetricsReset=false | allowAuditTail=true | openclawRetryAttempts=0 | openclawRetryBaseDelayMs=250 | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=none';
   assertDiagOk(diagOkLine, {
     hasDiscord: true,
     hasOpenAI: false,
@@ -110,7 +110,7 @@ test('diag assertion helpers enforce canonical formatting and reject near-misses
   assertDiagCoreFieldOrder(diagOkLine);
 
   const diagIssuesLine =
-    'diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=false | hasOpenAI=true | llmBackend=openai | allowMetricsReset=true | allowAuditTail=false | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=timeout';
+    'diag: issues detected -> OPENAI_API_KEY missing | hasDiscord=false | hasOpenAI=true | llmBackend=openai | allowMetricsReset=true | allowAuditTail=false | openclawRetryAttempts=3 | openclawRetryBaseDelayMs=750 | auditTailDefault=5 | auditTailMax=20 | operatorReplyMaxChars=1900 | lastBackendError=timeout';
   assertDiagIssues(diagIssuesLine, 'OPENAI_API_KEY missing');
   assertDiagAvailability(diagIssuesLine, { hasDiscord: false, hasOpenAI: true });
   assertDiagBackendAndGuards(diagIssuesLine, {
@@ -118,6 +118,7 @@ test('diag assertion helpers enforce canonical formatting and reject near-misses
     allowMetricsReset: true,
     allowAuditTail: false,
   });
+  assertDiagRetryPolicy(diagIssuesLine, { attempts: 3, baseDelayMs: 750 });
   assertDiagPolicyTail(diagIssuesLine);
   assertDiagLastBackendError(diagIssuesLine, 'timeout');
   assertDiagCoreFieldOrder(diagIssuesLine);
@@ -168,6 +169,8 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     allowMetricsReset: () => false,
     resetMetrics: () => {},
     allowAuditTail: () => false,
+    openclawRetryAttempts: () => 0,
+    openclawRetryBaseDelayMs: () => 250,
     getAuditTail: () => 'none',
     ...overrides,
   };
@@ -246,7 +249,22 @@ function assertAssertionFailure(fn: () => unknown): void {
 
 function assertDiagPolicyTail(text: string | null): void {
   const target = text ?? '';
-  assert.match(target, /\| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/);
+  assert.match(
+    target,
+    /\| openclawRetryAttempts=\d+ \| openclawRetryBaseDelayMs=\d+ \| auditTailDefault=5 \| auditTailMax=20 \| operatorReplyMaxChars=1900 \|/,
+  );
+}
+
+function assertDiagRetryPolicy(
+  text: string | null,
+  options: {
+    attempts: number;
+    baseDelayMs: number;
+  },
+): void {
+  const target = text ?? '';
+  assert.match(target, new RegExp(`\\| openclawRetryAttempts=${options.attempts} \\|`));
+  assert.match(target, new RegExp(`\\| openclawRetryBaseDelayMs=${options.baseDelayMs} \\|`));
 }
 
 function assertDiagAvailability(
@@ -288,6 +306,8 @@ function assertDiagCoreFieldOrder(text: string | null): void {
     '| llmBackend=',
     '| allowMetricsReset=',
     '| allowAuditTail=',
+    '| openclawRetryAttempts=',
+    '| openclawRetryBaseDelayMs=',
     '| auditTailDefault=',
     '| auditTailMax=',
     '| operatorReplyMaxChars=',
@@ -323,6 +343,7 @@ function assertDiagOk(
   assert.match(target, new RegExp(`\\| llmBackend=${options.llmBackend} \\|`));
   assert.match(target, new RegExp(`\\| allowMetricsReset=${String(options.allowMetricsReset)} \\|`));
   assert.match(target, new RegExp(`\\| allowAuditTail=${String(options.allowAuditTail)} \\|`));
+  assertDiagRetryPolicy(target, { attempts: 0, baseDelayMs: 250 });
   assertDiagPolicyTail(target);
   assertDiagLastBackendError(target, options.lastBackendError ?? 'none');
 }

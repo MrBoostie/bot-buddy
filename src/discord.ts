@@ -58,6 +58,8 @@ export function buildOperatorCommandDeps(): OperatorCommandDeps {
     allowMetricsReset: () => config.allowMetricsReset,
     resetMetrics,
     allowAuditTail: () => config.allowAuditTail,
+    openclawRetryAttempts: () => config.openclawRetryAttempts,
+    openclawRetryBaseDelayMs: () => config.openclawRetryBaseDelayMs,
     getAuditTail,
   };
 }
