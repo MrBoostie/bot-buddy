@@ -27,6 +27,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ### Added
 - Added optional OpenClaw retry env controls: `OPENCLAW_RETRY_ATTEMPTS` and `OPENCLAW_RETRY_BASE_DELAY_MS`.
 - Added `src/local-cli-runner.ts` plus focused tests for local CLI loop behavior (greeting, blank-input skip, thinker error handling, clean exit paths).
+- Added preflight strict-tool coverage for commands that exist but return non-zero for `--version`, preventing false negatives in availability checks.
 - `npm run preflight` now supports optional strict backend tooling checks via `PREFLIGHT_STRICT_TOOLS=true` (for example, verifies `openclaw` CLI availability when `LLM_BACKEND=openclaw`).
 - Added `npm run preflight` runtime env sanity check (`scripts/preflight-runtime.ts`) that reports startup-equivalent config validation issues and exits non-zero when invalid.
 - Operator command hardening + observability improvements:
@@ -65,6 +66,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ### Fixed
 - OpenClaw execution path now supports bounded retries with jitter for transient timeout/network failures, reducing one-off CLI flake impact.
 - Local CLI now exits cleanly on EOF/Ctrl+C (`ERR_USE_AFTER_CLOSE`) with a shutdown line, instead of surfacing readline close stack traces.
+- Preflight strict tooling checks now probe commands directly instead of relying on `which`, improving portability in minimal runtime environments.
 - Added safety bound on `OPENCLAW_RETRY_ATTEMPTS` (max `5`) to prevent misconfiguration from causing runaway retry latency.
 - Added safety bound on `OPENCLAW_RETRY_BASE_DELAY_MS` (max `5000`) to prevent excessive backoff delays from misconfiguration.
 - Added hard cap to computed retry backoff delay (10s absolute, including jitter) to prevent runaway exponential sleep durations.

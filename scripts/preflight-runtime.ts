@@ -7,8 +7,15 @@ function strictToolChecksEnabled(): boolean {
 }
 
 function commandExists(command: string): boolean {
-  const probe = spawnSync('which', [command], { stdio: 'ignore' });
-  return probe.status === 0;
+  const probe = spawnSync(command, ['--version'], {
+    stdio: 'ignore',
+    timeout: 2000,
+  });
+
+  const errorCode = (probe.error as NodeJS.ErrnoException | undefined)?.code;
+  if (errorCode === 'ENOENT') return false;
+
+  return true;
 }
 
 const runtime = buildConfigFromEnv(process.env);

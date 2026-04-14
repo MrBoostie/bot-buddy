@@ -69,6 +69,22 @@ test('preflight strict tool checks pass when required command is available', () 
   assert.match(result.stdout, /strictTools=true/);
 });
 
+test('preflight strict tool checks treat existing command as available even when --version exits non-zero', () => {
+  const result = runPreflight({
+    PREFLIGHT_STRICT_TOOLS: 'true',
+    PREFLIGHT_OPENCLAW_COMMAND: 'false',
+    LLM_BACKEND: 'openclaw',
+    OPENCLAW_AGENT_ID: 'main',
+    OPENCLAW_TIMEOUT_SEC: '90',
+    OPERATOR_RELOAD_COOLDOWN_SEC: '30',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '0',
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /preflight: ok/);
+  assert.match(result.stdout, /strictTools=true/);
+});
+
 test('preflight strict tool checks fail when openclaw CLI is unavailable', () => {
   const result = runPreflight({
     PREFLIGHT_STRICT_TOOLS: 'true',
