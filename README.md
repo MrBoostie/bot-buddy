@@ -25,7 +25,7 @@ npm run preflight
 npm run buddy
 ```
 
-Talk in terminal. Type `exit` to quit.
+Talk in terminal. Type `exit` to quit. EOF/Ctrl+C now exits cleanly with a short shutdown line instead of a stack trace.
 
 `npm run preflight` performs a runtime env sanity check (same validation rules as startup) and exits non-zero with actionable issues when config is invalid.
 Successful preflight output includes backend retry policy fields (`retryAttempts`, `retryBaseDelayMs`) for faster operator verification.
