@@ -13,7 +13,14 @@ function commandExists(command: string): boolean {
   });
 
   const errorCode = (probe.error as NodeJS.ErrnoException | undefined)?.code;
-  if (errorCode === 'ENOENT' || errorCode === 'EACCES' || errorCode === 'EPERM') return false;
+  if (
+    errorCode === 'ENOENT' ||
+    errorCode === 'EACCES' ||
+    errorCode === 'EPERM' ||
+    errorCode === 'ETIMEDOUT'
+  ) {
+    return false;
+  }
 
   return true;
 }
@@ -24,7 +31,7 @@ const issues = validateConfig(runtime);
 const openclawCommand = process.env.PREFLIGHT_OPENCLAW_COMMAND?.trim() || 'openclaw';
 if (strictToolChecksEnabled() && runtime.llmBackend === 'openclaw' && !commandExists(openclawCommand)) {
   issues.push(
-    `PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but ${openclawCommand} CLI is unavailable or not executable in PATH.`,
+    `PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but ${openclawCommand} CLI is unavailable, not executable, or not responding in PATH.`,
   );
 }
 

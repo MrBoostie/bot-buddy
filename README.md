@@ -30,7 +30,7 @@ Talk in terminal. Type `exit` to quit. EOF/Ctrl+C now exits cleanly with a short
 `npm run preflight` performs a runtime env sanity check (same validation rules as startup) and exits non-zero with actionable issues when config is invalid.
 Successful preflight output includes backend retry policy fields (`retryAttempts`, `retryBaseDelayMs`) for faster operator verification.
 
-Set `PREFLIGHT_STRICT_TOOLS=true` to additionally require backend tooling presence (for example `openclaw` CLI availability when `LLM_BACKEND=openclaw`). Strict checks now confirm the command is launchable directly (no `which` dependency) and executable (not just present on disk), improving portability across minimal environments.
+Set `PREFLIGHT_STRICT_TOOLS=true` to additionally require backend tooling presence (for example `openclaw` CLI availability when `LLM_BACKEND=openclaw`). Strict checks now confirm the command is launchable directly (no `which` dependency), executable (not just present on disk), and responsive (probe timeout is treated as unavailable), improving portability across minimal environments.
 
 ## Tomorrow morning wiring
 

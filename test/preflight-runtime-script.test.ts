@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync, chmodSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const REPO = '/home/openclaw/.openclaw/workspace/bot-buddy';
 
@@ -99,7 +102,7 @@ test('preflight strict tool checks fail when openclaw CLI is unavailable', () =>
   assert.notEqual(result.status, 0, 'expected non-zero exit when strict tool check fails');
   assert.match(
     result.stderr,
-    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but __definitely_missing_openclaw_binary__ CLI is unavailable or not executable in PATH/,
+    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but __definitely_missing_openclaw_binary__ CLI is unavailable, not executable, or not responding in PATH/,
   );
 });
 
@@ -117,8 +120,36 @@ test('preflight strict tool checks fail when command exists but is not executabl
   assert.notEqual(result.status, 0, 'expected non-zero exit when command is not executable');
   assert.match(
     result.stderr,
-    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but \/ CLI is unavailable or not executable in PATH/,
+    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but \/ CLI is unavailable, not executable, or not responding in PATH/,
   );
+});
+
+test('preflight strict tool checks fail when command hangs and probe times out', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'bot-buddy-preflight-timeout-'));
+  const hangingScript = join(tempDir, 'hang-forever');
+
+  try {
+    writeFileSync(hangingScript, '#!/usr/bin/env sh\nsleep 5\n', 'utf8');
+    chmodSync(hangingScript, 0o755);
+
+    const result = runPreflight({
+      PREFLIGHT_STRICT_TOOLS: 'true',
+      PREFLIGHT_OPENCLAW_COMMAND: hangingScript,
+      LLM_BACKEND: 'openclaw',
+      OPENCLAW_AGENT_ID: 'main',
+      OPENCLAW_TIMEOUT_SEC: '90',
+      OPERATOR_RELOAD_COOLDOWN_SEC: '30',
+      METRICS_SNAPSHOT_INTERVAL_SEC: '0',
+    });
+
+    assert.notEqual(result.status, 0, 'expected non-zero exit when strict tool probe times out');
+    assert.match(
+      result.stderr,
+      /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but .* CLI is unavailable, not executable, or not responding in PATH/,
+    );
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('preflight success output reflects configured retry policy values', () => {
