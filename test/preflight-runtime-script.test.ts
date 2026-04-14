@@ -99,7 +99,25 @@ test('preflight strict tool checks fail when openclaw CLI is unavailable', () =>
   assert.notEqual(result.status, 0, 'expected non-zero exit when strict tool check fails');
   assert.match(
     result.stderr,
-    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but __definitely_missing_openclaw_binary__ CLI is unavailable in PATH/,
+    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but __definitely_missing_openclaw_binary__ CLI is unavailable or not executable in PATH/,
+  );
+});
+
+test('preflight strict tool checks fail when command exists but is not executable', () => {
+  const result = runPreflight({
+    PREFLIGHT_STRICT_TOOLS: 'true',
+    PREFLIGHT_OPENCLAW_COMMAND: '/',
+    LLM_BACKEND: 'openclaw',
+    OPENCLAW_AGENT_ID: 'main',
+    OPENCLAW_TIMEOUT_SEC: '90',
+    OPERATOR_RELOAD_COOLDOWN_SEC: '30',
+    METRICS_SNAPSHOT_INTERVAL_SEC: '0',
+  });
+
+  assert.notEqual(result.status, 0, 'expected non-zero exit when command is not executable');
+  assert.match(
+    result.stderr,
+    /PREFLIGHT_STRICT_TOOLS=true and LLM_BACKEND=openclaw, but \/ CLI is unavailable or not executable in PATH/,
   );
 });
 
