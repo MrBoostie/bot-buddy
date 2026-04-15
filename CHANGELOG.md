@@ -92,9 +92,11 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 - `/metrics-reset` now mirrors guard-first behavior for arg-suffixed invocations when disabled (`/metrics-reset now` -> disabled response); when enabled, extra args still return invalid usage.
 - Operator audit mapping now records `metrics-reset: invalid usage ...` as a denied metrics-reset audit event for clearer denied-attempt visibility.
 - README operator command docs now explicitly document guard-first behavior for disabled `/metrics-reset` and `/audit-tail` malformed/suffixed invocations.
+- OpenAI mode config now treats blank `OPENAI_MODEL` values as unset (fallback to `gpt-4.1-mini`) and validates non-empty model names at runtime.
 
 ### Internal
 - Added regression coverage for retryability classification and bounded-jitter delay calculations in OpenClaw backend logic.
+- Added config regression coverage for blank/fallback OpenAI model handling and runtime validation of malformed empty model values.
 - Added config validation coverage for out-of-range OpenClaw retry-attempt settings.
 - Expanded preflight script regression coverage to assert retry-bound validation errors surface with actionable messaging.
 - Added config + preflight regression coverage for out-of-range OpenClaw retry base-delay settings.

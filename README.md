@@ -47,7 +47,7 @@ Populate `.env`:
 If you want direct key mode instead:
 - `LLM_BACKEND=openai`
 - `OPENAI_API_KEY`
-- `OPENAI_MODEL`
+- `OPENAI_MODEL` (defaults to `gpt-4.1-mini` when unset or blank)
 - `REQUIRE_OPENAI_FOR_DISCORD=true` (default): refuse Discord boot if key missing in openai mode
 
 Then:

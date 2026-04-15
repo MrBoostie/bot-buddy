@@ -71,6 +71,12 @@ function parseNonNegativeNumber(value: string | undefined, fallback: number): nu
   return parsed;
 }
 
+function parseNonEmptyString(value: string | undefined, fallback: string): string {
+  if (value === undefined) return fallback;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : fallback;
+}
+
 export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
   const backend = parseBackend(env.LLM_BACKEND);
 
@@ -87,7 +93,7 @@ export function buildConfigFromEnv(env: NodeJS.ProcessEnv): RuntimeConfig {
     openclawRetryAttempts: parseNonNegativeNumber(env.OPENCLAW_RETRY_ATTEMPTS, 0),
     openclawRetryBaseDelayMs: parsePositiveNumber(env.OPENCLAW_RETRY_BASE_DELAY_MS, 250),
     openaiApiKey: env.OPENAI_API_KEY,
-    openaiModel: env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+    openaiModel: parseNonEmptyString(env.OPENAI_MODEL, 'gpt-4.1-mini'),
     requireOpenAIForDiscord: parseBoolean(env.REQUIRE_OPENAI_FOR_DISCORD, true),
     operatorReloadCooldownSec: parsePositiveNumber(env.OPERATOR_RELOAD_COOLDOWN_SEC, 30),
     allowMetricsReset: parseBoolean(env.ALLOW_METRICS_RESET, false),
@@ -142,6 +148,10 @@ export function validateConfig(runtime: RuntimeConfig): string[] {
     issues.push(
       'DISCORD_TOKEN is set but OPENAI_API_KEY is missing while LLM_BACKEND=openai and REQUIRE_OPENAI_FOR_DISCORD=true.',
     );
+  }
+
+  if (runtime.llmBackend === 'openai' && !runtime.openaiModel.trim()) {
+    issues.push('OPENAI_MODEL cannot be empty when LLM_BACKEND=openai.');
   }
 
   if (!runtime.openclawAgentId.trim()) {

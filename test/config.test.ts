@@ -118,3 +118,24 @@ test('runtimeModelLabel uses openai model in openai mode', () => {
 
   assert.equal(runtimeModelLabel(cfg), 'gpt-4o-mini');
 });
+
+test('falls back to default openai model when OPENAI_MODEL is blank', () => {
+  const cfg = buildConfigFromEnv({
+    LLM_BACKEND: 'openai',
+    OPENAI_MODEL: '   ',
+  });
+
+  assert.equal(cfg.openaiModel, 'gpt-4.1-mini');
+  assert.equal(runtimeModelLabel(cfg), 'gpt-4.1-mini');
+  assert.deepEqual(validateConfig(cfg), []);
+});
+
+test('flags empty openai model when runtime is externally malformed', () => {
+  const cfg = buildConfigFromEnv({
+    LLM_BACKEND: 'openai',
+  });
+
+  cfg.openaiModel = '   ';
+  const issues = validateConfig(cfg);
+  assert.equal(issues.some((issue) => issue.includes('OPENAI_MODEL cannot be empty')), true);
+});
