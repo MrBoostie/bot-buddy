@@ -78,10 +78,12 @@ test('reload assertion helpers enforce canonical reload response lines', () => {
 
   assertReloadRateLimited('reload: rate-limited | retryAfterSec=12', 12);
   assertReloadIssuesRemain('reload: applied, but issues remain -> OPENAI_API_KEY missing', 'OPENAI_API_KEY missing');
+  assertReloadRejected('reload: rejected -> OPENAI_API_KEY missing', 'OPENAI_API_KEY missing');
 
   assertAssertionFailure(() => assertReloadApplied('reload: applied | bot=other | llmBackend=openclaw'));
   assertAssertionFailure(() => assertReloadRateLimited('reload: rate-limited | retryAfterSec=13', 12));
   assertAssertionFailure(() => assertReloadIssuesRemain('reload: applied, but issues remain -> wrong', 'OPENAI_API_KEY missing'));
+  assertAssertionFailure(() => assertReloadRejected('reload: rejected -> wrong', 'OPENAI_API_KEY missing'));
 });
 
 test('health assertion helpers enforce canonical signal formatting and reject near-misses', () => {
@@ -167,7 +169,7 @@ function makeDeps(overrides: Partial<OperatorCommandDeps> = {}): OperatorCommand
     appVersion: () => '0.1.0-test',
     runtimeSummary: () => 'bot=buddy | llmBackend=openclaw',
     validateRuntime: () => [],
-    refreshConfigFromEnv: () => {},
+    refreshConfigFromEnv: () => ({ applied: true, issues: [] }),
     hasDiscord: () => true,
     hasOpenAI: () => false,
     llmBackend: () => 'openclaw',
@@ -385,6 +387,10 @@ function assertReloadIssuesRemain(text: string | null, issues: string): void {
   assert.equal(text, `reload: applied, but issues remain -> ${issues}`);
 }
 
+function assertReloadRejected(text: string | null, issues: string): void {
+  assert.equal(text, `reload: rejected -> ${issues}`);
+}
+
 function assertStatusPayload(
   text: string | null,
   options: {
@@ -438,6 +444,7 @@ function makeModeSwitchDeps(options: {
     refreshConfigFromEnv: () => {
       mode = switchedMode;
       options.onRefresh?.();
+      return { applied: true, issues: [] };
     },
     validateRuntime: () => options.validateRuntime?.(mode) ?? [],
     hasOpenAI: () => mode === 'openai',
@@ -1025,6 +1032,7 @@ test('runs reload and returns success payload', () => {
     makeDeps({
       refreshConfigFromEnv: () => {
         reloadCalls += 1;
+        return { applied: true, issues: [] };
       },
     }),
   );
@@ -1040,6 +1048,7 @@ test('runs reload and returns success payload for openai mode summary', () => {
     makeDeps({
       refreshConfigFromEnv: () => {
         reloadCalls += 1;
+        return { applied: true, issues: [] };
       },
       llmBackend: () => 'openai',
       runtimeSummary: () => 'bot=buddy | llmBackend=openai | openAIKey=set',
@@ -1071,6 +1080,7 @@ test('returns reload rate-limit payload and skips refresh', () => {
       tryAcquireReload: () => ({ ok: false, retryAfterSec: 12 }),
       refreshConfigFromEnv: () => {
         reloadCalls += 1;
+        return { applied: true, issues: [] };
       },
     }),
   );
@@ -1111,6 +1121,7 @@ test('runs reload and returns issues payload when validation fails', () => {
     makeDeps({
       refreshConfigFromEnv: () => {
         reloadCalls += 1;
+        return { applied: true, issues: [] };
       },
       validateRuntime: () => ['still broken'],
     }),
@@ -1118,6 +1129,22 @@ test('runs reload and returns issues payload when validation fails', () => {
 
   assert.equal(reloadCalls, 1);
   assertReloadIssuesRemain(result, 'still broken');
+});
+
+test('reload rejects invalid env updates without applying them', () => {
+  let reloadCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/reload',
+    makeDeps({
+      refreshConfigFromEnv: () => {
+        reloadCalls += 1;
+        return { applied: false, issues: ['OPENAI_API_KEY missing'] };
+      },
+    }),
+  );
+
+  assert.equal(reloadCalls, 1);
+  assertReloadRejected(result, 'OPENAI_API_KEY missing');
 });
 
 test('reload issues branch keeps diag/status mode-consistent after switch to openai', () => {

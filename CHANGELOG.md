@@ -68,6 +68,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
 ### Fixed
 - OpenClaw execution path now supports bounded retries with jitter for transient timeout/network failures, reducing one-off CLI flake impact.
 - Local CLI now exits cleanly on EOF/Ctrl+C (`ERR_USE_AFTER_CLOSE`) with a shutdown line, instead of surfacing readline close stack traces.
+- `/reload` is now transactional: invalid `.env` updates are rejected (`reload: rejected -> ...`) and no longer mutate the live runtime config.
 - Preflight strict tooling checks now probe commands directly instead of relying on `which`, improving portability in minimal runtime environments.
 - Preflight strict tooling checks now treat non-executable commands (`EACCES`/`EPERM`) as unavailable, improving deploy-time misconfiguration detection.
 - Preflight strict tooling checks now treat timed-out command probes (`ETIMEDOUT`) as unavailable, improving detection of stalled/broken tool binaries.

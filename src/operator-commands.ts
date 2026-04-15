@@ -278,7 +278,7 @@ export type OperatorCommandDeps = {
   appVersion: () => string;
   runtimeSummary: () => string;
   validateRuntime: () => string[];
-  refreshConfigFromEnv: () => void;
+  refreshConfigFromEnv: () => { applied: boolean; issues: string[] };
   hasDiscord: () => boolean;
   hasOpenAI: () => boolean;
   llmBackend: () => string;
@@ -381,7 +381,11 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
       return done(`reload: rate-limited | retryAfterSec=${gate.retryAfterSec}`);
     }
 
-    deps.refreshConfigFromEnv();
+    const refresh = deps.refreshConfigFromEnv();
+    if (!refresh.applied) {
+      return done(`reload: rejected -> ${refresh.issues.join(' ; ')}`);
+    }
+
     const issues = deps.validateRuntime();
     if (issues.length > 0) {
       return done(`reload: applied, but issues remain -> ${issues.join(' ; ')}`);

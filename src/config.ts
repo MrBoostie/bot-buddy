@@ -104,9 +104,21 @@ dotenv.config();
 
 export const config: RuntimeConfig = buildConfigFromEnv(process.env);
 
-export function refreshConfigFromEnv(): void {
+export type RefreshConfigResult =
+  | { applied: true; issues: [] }
+  | { applied: false; issues: string[] };
+
+export function refreshConfigFromEnv(): RefreshConfigResult {
   dotenv.config({ override: true });
-  Object.assign(config, buildConfigFromEnv(process.env));
+  const candidate = buildConfigFromEnv(process.env);
+  const issues = validateConfig(candidate);
+
+  if (issues.length > 0) {
+    return { applied: false, issues };
+  }
+
+  Object.assign(config, candidate);
+  return { applied: true, issues: [] };
 }
 
 export function hasOpenAI(): boolean {
