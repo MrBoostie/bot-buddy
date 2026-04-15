@@ -76,6 +76,7 @@ On Discord startup, the bot now logs resolved app version metadata (`value` + `s
 - `/diag` — quick configuration health report + availability signals (`hasDiscord`/`hasOpenAI`) + guard/policy snapshot (including OpenClaw retry policy) + last backend error
 - `/health` — machine-grep-friendly one-line health summary (runtime + backend + in-memory metrics, including llmCalls, LLM avg/recent-max latency + buckets, and command latency)
 - `/reload` — re-read `.env` safely (no process restart, cooldown controlled by `OPERATOR_RELOAD_COOLDOWN_SEC`)
+  - `/reload --dry-run` validates current runtime env and reports issues without applying config mutations.
   - Safe hot-refresh contract: applies environment changes in-process, never restarts the bot process, and is cooldown-limited (`reload: rate-limited | retryAfterSec=<n>`).
   - Validation-failure contract: invalid `.env` updates are rejected without mutating live config (`reload: rejected -> ...`).
   - Defensive fallback contract: if refresh applies but runtime checks still fail, response is `reload: applied, but issues remain -> ...`.

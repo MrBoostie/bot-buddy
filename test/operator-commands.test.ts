@@ -36,6 +36,7 @@ const AUDIT_TAIL_SHORT_LINE = 'audit-tail: short tail';
 
 const UNKNOWN_COMMAND_USAGE_HINT = '(use /?, /help, or /commands)';
 const HELP_INVALID_USAGE_LINE = `help: invalid usage ${UNKNOWN_COMMAND_USAGE_HINT}`;
+const RELOAD_INVALID_USAGE_LINE = 'reload: invalid usage (use /reload or /reload --dry-run)';
 
 function commandsLine(commands: string): string {
   return `commands: ${commands}`;
@@ -1089,6 +1090,44 @@ test('returns reload rate-limit payload and skips refresh', () => {
   assertReloadRateLimited(result, 12);
 });
 
+test('reload dry-run reports ok runtime summary without applying refresh', () => {
+  let reloadCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/reload --dry-run',
+    makeDeps({
+      refreshConfigFromEnv: () => {
+        reloadCalls += 1;
+        return { applied: true, issues: [] };
+      },
+    }),
+  );
+
+  assert.equal(reloadCalls, 0);
+  assert.equal(result, 'reload: dry-run ok | bot=buddy | llmBackend=openclaw');
+});
+
+test('reload dry-run reports detected issues without applying refresh', () => {
+  let reloadCalls = 0;
+  const result = evaluateOperatorCommand(
+    '/reload --dry-run',
+    makeDeps({
+      refreshConfigFromEnv: () => {
+        reloadCalls += 1;
+        return { applied: true, issues: [] };
+      },
+      validateRuntime: () => ['OPENAI_API_KEY missing'],
+    }),
+  );
+
+  assert.equal(reloadCalls, 0);
+  assert.equal(result, 'reload: dry-run detected issues -> OPENAI_API_KEY missing');
+});
+
+test('reload rejects invalid usage forms', () => {
+  assert.equal(evaluateOperatorCommand('/reload now', makeDeps()), RELOAD_INVALID_USAGE_LINE);
+  assert.equal(evaluateOperatorCommand('/reload --dry-run extra', makeDeps()), RELOAD_INVALID_USAGE_LINE);
+});
+
 test('reload rate-limit does not mutate backend mode observed by diag', () => {
   let refreshCalls = 0;
 
@@ -1441,13 +1480,13 @@ test('returns explicit invalid-usage guidance for known no-arg commands with ext
     { input: '/runtime now', expected: noArgInvalidUsageLine('/runtime') },
     { input: '/diag now', expected: noArgInvalidUsageLine('/diag') },
     { input: '/health now', expected: noArgInvalidUsageLine('/health') },
-    { input: '/reload now', expected: noArgInvalidUsageLine('/reload') },
+    { input: '/reload now', expected: RELOAD_INVALID_USAGE_LINE },
     { input: '/metrics-reset now', expected: METRICS_RESET_DISABLED_LINE },
     { input: '/ping\tnow', expected: noArgInvalidUsageLine('/ping') },
     { input: '/status\nnow', expected: noArgInvalidUsageLine('/status') },
     { input: '/PING now', expected: noArgInvalidUsageLine('/ping') },
     { input: '/Status now', expected: noArgInvalidUsageLine('/status') },
-    { input: '/Reload now', expected: noArgInvalidUsageLine('/reload') },
+    { input: '/Reload now', expected: RELOAD_INVALID_USAGE_LINE },
     { input: '/Metrics-Reset now', expected: METRICS_RESET_DISABLED_LINE },
   ];
 

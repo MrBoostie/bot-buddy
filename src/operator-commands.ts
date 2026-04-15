@@ -4,6 +4,7 @@ const MAX_OPERATOR_REPLY_CHARS = 1900;
 const AUDIT_TAIL_DEFAULT_LIMIT = 5;
 const AUDIT_TAIL_MAX_LIMIT = 20;
 const AUDIT_TAIL_COMMAND_RE = /^\/audit-tail(?:\s|$)/;
+const RELOAD_COMMAND_RE = /^\/reload(?:\s|$)/;
 const ENV_ALLOW_METRICS_RESET = 'ALLOW_METRICS_RESET=true';
 const ENV_ALLOW_AUDIT_TAIL = 'ALLOW_AUDIT_TAIL=true';
 const METRICS_RESET_DISABLED_MESSAGE = `metrics-reset: disabled (set ${ENV_ALLOW_METRICS_RESET} to enable)`;
@@ -83,6 +84,7 @@ const BASE_HELP_COMMANDS: string[] = [
 ];
 const NO_ARG_OPERATOR_COMMANDS = new Set<string>([
   ...BASE_HELP_COMMANDS.filter((cmd) => !HELP_ALIAS_SET.has(cmd)),
+  OPERATOR_COMMANDS.reload,
   OPERATOR_COMMANDS.metricsReset,
 ]);
 
@@ -231,6 +233,10 @@ type AuditTailParseResult =
   | { ok: true; limit: number }
   | { ok: false; reason: 'invalid-usage' | 'invalid-limit' };
 
+type ReloadParseResult =
+  | { ok: true; dryRun: boolean }
+  | { ok: false; reason: 'invalid-usage' };
+
 export function parseUnsignedIntInRange(
   raw: string,
   min: number,
@@ -270,6 +276,24 @@ export function parseAuditTailInput(input: string): AuditTailParseResult {
   }
 
   return { ok: true, limit: parsedLimit.value };
+}
+
+export function parseReloadInput(input: string): ReloadParseResult {
+  const cmd = input.trim().toLowerCase();
+  const parts = cmd.split(/\s+/).filter(Boolean);
+  if (parts[0] !== OPERATOR_COMMANDS.reload) {
+    return { ok: false, reason: 'invalid-usage' };
+  }
+
+  if (parts.length === 1) {
+    return { ok: true, dryRun: false };
+  }
+
+  if (parts.length === 2 && parts[1] === '--dry-run') {
+    return { ok: true, dryRun: true };
+  }
+
+  return { ok: false, reason: 'invalid-usage' };
 }
 
 export type OperatorCommandDeps = {
@@ -374,8 +398,22 @@ export function evaluateOperatorCommand(input: string, deps: OperatorCommandDeps
     );
   }
 
-  if (cmd === OPERATOR_COMMANDS.reload) {
+  if (RELOAD_COMMAND_RE.test(cmd)) {
     incrementCommandCount();
+
+    const parsed = parseReloadInput(cmd);
+    if (!parsed.ok) {
+      return done('reload: invalid usage (use /reload or /reload --dry-run)');
+    }
+
+    if (parsed.dryRun) {
+      const issues = deps.validateRuntime();
+      if (issues.length > 0) {
+        return done(`reload: dry-run detected issues -> ${issues.join(' ; ')}`);
+      }
+      return done(`reload: dry-run ok | ${deps.runtimeSummary()}`);
+    }
+
     const gate = deps.tryAcquireReload();
     if (!gate.ok) {
       return done(`reload: rate-limited | retryAfterSec=${gate.retryAfterSec}`);

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseAuditTailInput, parseUnsignedIntInRange } from '../src/operator-commands.ts';
+import { parseAuditTailInput, parseReloadInput, parseUnsignedIntInRange } from '../src/operator-commands.ts';
 
 test('parseUnsignedIntInRange accepts in-range digits', () => {
   const result = parseUnsignedIntInRange('12', 1, 20);
@@ -123,4 +123,20 @@ test('parseAuditTailInput rejects non-ascii digit input', () => {
 test('parseAuditTailInput rejects non-command input', () => {
   const result = parseAuditTailInput('/ping');
   assert.deepEqual(result, { ok: false, reason: 'invalid-usage' });
+});
+
+test('parseReloadInput accepts plain reload command', () => {
+  const result = parseReloadInput('/reload');
+  assert.deepEqual(result, { ok: true, dryRun: false });
+});
+
+test('parseReloadInput accepts dry-run flag with mixed whitespace/case', () => {
+  assert.deepEqual(parseReloadInput('/reload --dry-run'), { ok: true, dryRun: true });
+  assert.deepEqual(parseReloadInput('/RELOAD\t--DRY-RUN'), { ok: true, dryRun: true });
+});
+
+test('parseReloadInput rejects invalid usage forms', () => {
+  assert.deepEqual(parseReloadInput('/reload now'), { ok: false, reason: 'invalid-usage' });
+  assert.deepEqual(parseReloadInput('/reload --dry-run extra'), { ok: false, reason: 'invalid-usage' });
+  assert.deepEqual(parseReloadInput('/ping'), { ok: false, reason: 'invalid-usage' });
 });
