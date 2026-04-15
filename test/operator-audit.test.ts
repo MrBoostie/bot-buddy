@@ -60,6 +60,62 @@ test('returns denied audit event for invalid audit-tail limit', () => {
   assert.equal(event, 'operator audit tail denied (invalid limit)');
 });
 
+test('returns audit event for reload apply', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: applied | bot=buddy | llmBackend=openclaw',
+  });
+  assert.equal(event, 'operator reload applied');
+});
+
+test('returns audit event for reload dry-run ok', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: dry-run ok | bot=buddy | llmBackend=openclaw',
+  });
+  assert.equal(event, 'operator reload dry-run ok');
+});
+
+test('returns audit event for reload dry-run issues', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: dry-run detected issues -> OPENAI_API_KEY missing',
+  });
+  assert.equal(event, 'operator reload dry-run detected issues');
+});
+
+test('returns audit event for reload rejected', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: rejected -> OPENAI_API_KEY missing',
+  });
+  assert.equal(event, 'operator reload rejected');
+});
+
+test('returns audit event for reload rate-limited', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: rate-limited | retryAfterSec=9',
+  });
+  assert.equal(event, 'operator reload denied (rate-limited)');
+});
+
+test('returns audit event for reload invalid usage', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: invalid usage (use /reload or /reload --dry-run)',
+  });
+  assert.equal(event, 'operator reload denied (invalid usage)');
+});
+
+test('returns audit event for reload applied with issues', () => {
+  const event = getOperatorAuditEvent({
+    kind: 'command',
+    text: 'reload: applied, but issues remain -> OPENAI_API_KEY missing',
+  });
+  assert.equal(event, 'operator reload applied with issues');
+});
+
 test('returns null for non-audited command', () => {
   const event = getOperatorAuditEvent({ kind: 'command', text: 'pong | uptime=5s | model=gpt' });
   assert.equal(event, null);

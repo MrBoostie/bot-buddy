@@ -65,6 +65,7 @@ When preparing a release, move `Unreleased` items into a new dated heading (e.g.
   - Unknown command typo suggestions now respect guard state: disabled guard-gated commands (`/metrics-reset`, `/audit-tail`) are excluded from suggestions until enabled.
   - `/audit-tail` command detection now accepts any whitespace separator (spaces, tabs, newlines), preserving parser behavior for non-space whitespace variants.
   - Added `/reload --dry-run` operator mode for safe config validation without applying runtime config mutations.
+  - Operator audit stream now records `/reload` outcomes (applied, dry-run ok/issues, rejected, rate-limited, invalid usage, applied-with-issues).
 
 ### Fixed
 - OpenClaw execution path now supports bounded retries with jitter for transient timeout/network failures, reducing one-off CLI flake impact.

@@ -34,6 +34,34 @@ export function getOperatorAuditEvent(result: DiscordRoutingResult): string | nu
     return 'operator audit tail viewed';
   }
 
+  if (result.text.startsWith('reload: applied |')) {
+    return 'operator reload applied';
+  }
+
+  if (result.text.startsWith('reload: dry-run ok |')) {
+    return 'operator reload dry-run ok';
+  }
+
+  if (result.text.startsWith('reload: dry-run detected issues ->')) {
+    return 'operator reload dry-run detected issues';
+  }
+
+  if (result.text.startsWith('reload: rejected ->')) {
+    return 'operator reload rejected';
+  }
+
+  if (result.text.startsWith('reload: rate-limited |')) {
+    return 'operator reload denied (rate-limited)';
+  }
+
+  if (result.text.startsWith('reload: invalid usage')) {
+    return 'operator reload denied (invalid usage)';
+  }
+
+  if (result.text.startsWith('reload: applied, but issues remain ->')) {
+    return 'operator reload applied with issues';
+  }
+
   return null;
 }
 
